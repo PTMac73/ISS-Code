@@ -11,7 +11,12 @@
 #include <TSystem.h>
 #include <TObjArray.h>
 #include <TMath.h>
-#include <vector>
+#include <TFile.h>
+
+// SWITCHES FOR POST-PROCESSING
+Bool_t qDrawGraphs = 0;
+Bool_t qPrintGraphs = 1;
+Bool_t qWriteData = 0;
 
 // REDUCED TSelector CODE ---------------------------------------------------------------------- //
 #define NUMPRINT 20 //>0
@@ -21,8 +26,8 @@ ULong64_t ProcessedEntries = 0;
 Float_t Frac = 0.1; //Progress bar
 TStopwatch StpWatch;
 
-TCanvas *c0, *c1, *c20, *c21, *c22, *c23;
-vector <TCanvas*> *c2 = {c20, c21, c22, c23};
+TCanvas *c0, *c1;
+TCanvas *c2[4];
 Int_t n=1;
 
 TString cutName("cut1");
@@ -110,13 +115,16 @@ TH2F* EVZ;
 TH1F* EXE;
 TH2F* EdE[4];
 
+// OUTPUT FILE
+TFile *outFile;
+
 // TSELECTOR BEGIN FUNCTION -------------------------------------------------------------------- //
 void PTMonitors::Begin(TTree *tree){
 	TString option = GetOption();
 	NumEntries = tree->GetEntries();
 
 	//Get any cuts;
-	TFile * fCut = new TFile("../working/cutsFile.root");			// open file
+	TFile * fCut = new TFile("/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/working/cutsFile.root");			// open file
 	isCutFileOpen = fCut->IsOpen(); 
 	numCut = 0 ;
 	if( isCutFileOpen ){
@@ -158,7 +166,7 @@ void PTMonitors::Begin(TTree *tree){
 	sharpyStyle->SetTitleBorderSize(0);
 	sharpyStyle->SetTitleAlign(23);
 	sharpyStyle->SetTitleX(0.5);
-	sharpyStyle->SetMarkerStyle(6);
+	sharpyStyle->SetMarkerStyle(7);
 	sharpyStyle->cd();
 	
 	// Define histograms and set options
@@ -290,7 +298,7 @@ Bool_t PTMonitors::Process(Long64_t entry){
 						double momt = mass * TMath::Tan(x); // momentum of particle b or B in CM frame
 						double EB = TMath::Sqrt(mass*mass + Et*Et - 2*Et*TMath::Sqrt(momt * momt + mass * mass));
 						Ex = EB - massB;
-	
+						
 						double hahaha1 = gamm* TMath::Sqrt(mass * mass + momt * momt) - y;
 						double hahaha2 = gamm* beta * momt;
 						thetaCM = TMath::ACos(hahaha1/hahaha2) * TMath::RadToDeg();
@@ -336,28 +344,44 @@ void PTMonitors::SlaveTerminate(){
 // TSELECTOR TERMINATE FUNCTION ---------------------------------------------------------------- //
 void PTMonitors::Terminate()
 {
-	// PLOT SHARPY'S GRAPHS
-	c0 = new TCanvas("c0","E v.s. z", 1080, 810);
-	EVZ->Draw("scat");
-	EVZ->Draw("colz same");
-	c0->Print("EVZ.png");
+	// PLOT SHARPY'S GRAPHS AND WRITE TO FILE
+	if ( qWriteData == 1 ){ outFile = new TFile("fin.root", "RECREATE"); }
+
+	// E vs.z
+	if ( qDrawGraphs == 1 ){
+		c0 = new TCanvas("c0","E v.s. z", 1080, 810);
+		EVZ->Draw("scat colz same");
+		if ( qPrintGraphs == 1){ c0->Print("EVZ.png"); }
+	}
+	if ( qWriteData == 1 ){ EVZ->Write(); }
 	
 	// Plot excitation energy
-	c1 = new TCanvas( "c1","Excitation energy spectrum", 1080, 810 );
-	EXE->Draw();
-	c1->Print("EXE.png");
+	if ( qDrawGraphs == 1 ){ 
+		c1 = new TCanvas( "c1","Excitation energy spectrum", 1080, 810 ); 
+		EXE->Draw();
+		if (qPrintGraphs == 1){ c1->Print("EXE.png"); }
+	}
+	
+	if ( qWriteData == 1 ){ EXE->Write(); }
+
 
 	// Plot the E-dE plots for making cuts
 	for ( Int_t i = 0; i < 4; i++ ){
-		c2[i] = new TCanvas( "c2", "E-dE plots", 1080, 810 );
-		EdE[i]->Draw("box colz");
-		if( isCutFileOpen ) {
-			cutG = (TCutG *)cutList->At(i);
-			cutG->Draw("same");
+		if ( qDrawGraphs == 1 ){
+			c2[i] = new TCanvas( Form("c2_%i", i), "E-dE plots", 540, 405 );
+			c2[i]->ToggleToolBar();
+			EdE[i]->Draw("box colz");
+			if( isCutFileOpen ) {
+				cutG = (TCutG *)cutList->At(i);
+				cutG->Draw("same");
+			}
 		}
-		c2[i]->ToggleToolBar();
+		if ( qWriteData == 1 ){ EdE[i]->Write( Form("EdE-%i",i) ); }
 	}
 	
+	
+	// Close the file
+	if ( outFile != NULL ){ outFile->Close(); }
 	
 	
 	// Print out some stuff

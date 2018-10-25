@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 # Generates root files for varying buffer sizes (use on run 51)
 # =============================================================================================== #
 # Patrick MacGregor
 # Nuclear Physics Research Group
 # School of Physics and Astronomy
 # The University of Manchester
-# LAST EDITED: 24/10/18
+# LAST EDITED: 25/10/18
 # =============================================================================================== #
 exp=iss000
 dir=/home/ptmac/Documents/07-CERN-ISS-Mg/analysis

@@ -1,0 +1,2846 @@
+chat file: </home/helios/experiments/iss000/analysis/working/GEBMerge.chat> open
+
+will echo command lines
+chat->
+chat->#---------------------------------------
+chat-># max coincidence events to create, listing etc
+chat->
+chat->maxNoEvents 2000000000
+chat->TSlistelen 50  1 20
+chat->#           |  | +-- last bigbuf
+chat->#           |  +-- first bigbuf
+chat->#           +-- max TS to write per file
+chat->
+chat->nprint 1
+will print information for first 1 events
+chat->
+chat->#---------------------------------------
+chat-># output chunk size
+chat->
+chat->chunksiz 2000000000
+chat->
+chat->#---------------------------------------
+chat-># bigbuf size and wosize
+chat->#    +--- big size makes program slow;
+chat->#         but it may be necessary sometimes
+chat->
+chat->bigbufsize 450
+sizeof(EVENT)= 8
+will use a bigbuffer size of 450, or   0.005 MBytes
+chat->wosize     100
+will use a bigbuffer wosize of 450
+chat->#  |
+chat->#  +--- in percent of bigbufsize
+chat->#       written out per buffer
+chat->
+chat->#---------------------------------------
+chat-># how often should we write 
+chat-># statistics to output
+chat->
+chat->reportinterval 1000
+chat->
+chat->#---------------------------------------
+chat-># TS jump recovery trigger limits
+chat-># (if timestamps jumps outside these
+chat->#  limits GTMerge will read forward to 
+chat->#  try and recover, 0.1 to 1 sec seems to works)
+chat->#  100000000 ==  1 sec
+chat->#  100000    ==  1 ms
+chat->#  100       ==  1 us
+chat->#  1         == 10 ns
+chat->
+chat->dts_min  -10000000000
+control.dts_min=-10000000000
+chat->dts_max   10000000000
+control.dts_max=10000000000
+chat->
+chat->dtsfabort 50
+chat->dtsbabort 50
+chat->#         |
+chat->#         +----- abort recovery and accept TS
+chat->#                after this many tries in a row
+chat->
+chat->#---------------------------------------
+chat-># enable to zzip output data file
+chat-># does not work at the moment
+chat->
+chat->;zzipout
+chat->
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: will produce a max of 2000000000 events
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: will write combined data to file "/home/helios/experiments/iss000/analysis/merged_data/GEBMerged_run116.gtd"
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: we have 12 datafiles to combine
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: will keep a pool of 12 events to combine from 
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: input data file "/home/helios/experiments/iss000/analysis/data/iss000_run_116.gtd01_000_0101", number 0, is open
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: input data file "/home/helios/experiments/iss000/analysis/data/iss000_run_116.gtd01_000_0102", number 1, is open
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: input data file "/home/helios/experiments/iss000/analysis/data/iss000_run_116.gtd01_000_0103", number 2, is open
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: input data file "/home/helios/experiments/iss000/analysis/data/iss000_run_116.gtd02_000_0105", number 3, is open
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: input data file "/home/helios/experiments/iss000/analysis/data/iss000_run_116.gtd02_000_0106", number 4, is open
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: input data file "/home/helios/experiments/iss000/analysis/data/iss000_run_116.gtd02_000_0107", number 5, is open
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: input data file "/home/helios/experiments/iss000/analysis/data/iss000_run_116.gtd03_000_0109", number 6, is open
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: input data file "/home/helios/experiments/iss000/analysis/data/iss000_run_116.gtd03_000_0110", number 7, is open
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: input data file "/home/helios/experiments/iss000/analysis/data/iss000_run_116.gtd03_000_0111", number 8, is open
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: input data file "/home/helios/experiments/iss000/analysis/data/iss000_run_116.gtd04_000_0113", number 9, is open
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: input data file "/home/helios/experiments/iss000/analysis/data/iss000_run_116.gtd04_000_0114", number 10, is open
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: input data file "/home/helios/experiments/iss000/analysis/data/iss000_run_116.gtd04_000_0115", number 11, is open
+/home/helios/experiments/iss000/analysis/GEBSort/GEBMerge: output data file "/home/helios/experiments/iss000/analysis/merged_data/GEBMerged_run116.gtd_000" is open
+
+mapping
+6392412 153055552 1 /home/helios/experiments/iss000/analysis/merged_data/GEBMerged_run116.gtd_000
+allocated      5008000 bytes for file pools,    or            4 MB
+allocated      4517216 bytes for bigbuf events, or            4 MB
+filling pool
+attempting to read event... i=0 
+got initial header, TS=1230219568748 for storeNo=0
+read initial payload of siz=864 into  storeNo=0
+st=0
+attempting to read event... i=1 
+got initial header, TS=1230339016532 for storeNo=1
+read initial payload of siz=864 into  storeNo=1
+st=0
+attempting to read event... i=2 
+got initial header, TS=1230859623317 for storeNo=2
+read initial payload of siz=864 into  storeNo=2
+st=0
+attempting to read event... i=3 
+got initial header, TS=1230264720171 for storeNo=3
+read initial payload of siz=864 into  storeNo=3
+st=0
+attempting to read event... i=4 
+got initial header, TS=1230264720175 for storeNo=4
+read initial payload of siz=864 into  storeNo=4
+st=0
+attempting to read event... i=5 
+got initial header, TS=1230348489960 for storeNo=5
+read initial payload of siz=864 into  storeNo=5
+st=0
+attempting to read event... i=6 
+got initial header, TS=1230859623316 for storeNo=6
+read initial payload of siz=864 into  storeNo=6
+st=0
+attempting to read event... i=7 
+got initial header, TS=1230215201948 for storeNo=7
+read initial payload of siz=864 into  storeNo=7
+st=0
+attempting to read event... i=8 
+got initial header, TS=1230219537851 for storeNo=8
+read initial payload of siz=864 into  storeNo=8
+st=0
+attempting to read event... i=9 
+got initial header, TS=1230215201911 for storeNo=9
+read initial payload of siz=864 into  storeNo=9
+st=0
+attempting to read event... i=10 st=0
+attempting to read event... i=11 st=0
+file   0, first TS          1230219568748;
+file   1, first TS          1230339016532;
+file   2, first TS          1230859623317;
+file   3, first TS          1230264720171;
+file   4, first TS          1230264720175;
+file   5, first TS          1230348489960;
+file   6, first TS          1230859623316;
+file   7, first TS          1230215201948;
+file   8, first TS          1230219537851;
+file   9, first TS          1230215201911;
+file  10, first TS          1230228571916;
+file  11, first TS          1230228571917;
+file   0, first TS          1230219568748 or 12302196.000 msec;
+file   1, first TS          1230339016532 or 12303390.000 msec;
+file   2, first TS          1230859623317 or 12308596.000 msec;
+file   3, first TS          1230264720171 or 12302647.000 msec;
+file   4, first TS          1230264720175 or 12302647.000 msec;
+file   5, first TS          1230348489960 or 12303485.000 msec;
+file   6, first TS          1230859623316 or 12308596.000 msec;
+file   7, first TS          1230215201948 or 12302152.000 msec;
+file   8, first TS          1230219537851 or 12302195.000 msec;
+file   9, first TS          1230215201911 or 12302152.000 msec;
+file  10, first TS          1230228571916 or 12302286.000 msec;
+file  11, first TS          1230228571917 or 12302286.000 msec;
+
+initial pool of events read (12 events)
+Event[0].gd->timestamp=1230219568748
+ Event[1].gd->timestamp=1230339016532
+ Event[2].gd->timestamp=1230859623317
+ Event[3].gd->timestamp=1230264720171
+ Event[4].gd->timestamp=1230264720175
+ Event[5].gd->timestamp=1230348489960
+ Event[6].gd->timestamp=1230859623316
+ Event[7].gd->timestamp=1230215201948
+ Event[8].gd->timestamp=1230219537851
+ Event[9].gd->timestamp=1230215201911
+ Event[10].gd->timestamp=1230228571916
+ Event[11].gd->timestamp=1230228571917
+ 
+First TS=1230215201911, from file 9
+
+**----------------------------------------
+file   0 is     active;          1 reads ;        880 bytes; (  0.000GB) TS=     1230219568748
+file   1 is     active;          1 reads ;        880 bytes; (  0.000GB) TS=     1230339016532
+file   2 is     active;          1 reads ;        880 bytes; (  0.000GB) TS=     1230859623317
+file   3 is     active;          1 reads ;        880 bytes; (  0.000GB) TS=     1230264720171
+file   4 is     active;          1 reads ;        880 bytes; (  0.000GB) TS=     1230264720175
+file   5 is     active;          1 reads ;        880 bytes; (  0.000GB) TS=     1230348489960
+file   6 is     active;          1 reads ;        880 bytes; (  0.000GB) TS=     1230859623316
+file   7 is     active;          1 reads ;        880 bytes; (  0.000GB) TS=     1230215201948
+file   8 is     active;          1 reads ;        880 bytes; (  0.000GB) TS=     1230219537851
+file   9 is     active;          1 reads ;        880 bytes; (  0.000GB) TS=     1230215201911
+file  10 is     active;          1 reads ;        880 bytes; (  0.000GB) TS=     1230228571916
+file  11 is     active;          1 reads ;        880 bytes; (  0.000GB) TS=     1230228571917
+current TS:            0; current event no:         0;
+events written:         0; total reads=       12;
+elapsed time..................: -003h-25m-02s, [t0=1230215201911, curTS=0]
+Wed Oct 10 08:30:20 2018
+number of open files:   12
+CPU time: user     0.000 sec, system      0.000 sec, Total      0.000 sec
+bigbuf fills..........=          0
+time order swaps......=          0
+swaps per buffer......=       -nan
+bigbuf covers      0.000 ms
+# bytes read...:        10560B,   0.000GB;     infMB/sec;     infGB/hour, infTB/day
+# bytes written:            0B,   0.000GB;    -nanMB/sec
+total IO rate:     infMB/sec or   infMbits/sec
+output chunk # 0 (chunksiz=2000000000 bytes, or  1.863 GBytes)
+^^----------------------------------------
+
+GEBMerge: big buf is now completely primed with 450 events...
+first fill: bigbuf[   0]->gd->timestamp-curTS=1230215201911
+last  fill: bigbuf[ 449]->gd->timestamp-curTS=1230784565831
+bigbuf covers 0.569364 seconds
+
+
+_    1: TS=       1230215201911, dTS=         0
+_    2: TS=       1230215201948, dTS=        37
+
+_    3: TS=       1230219537851, dTS=   4335903
+_    4: TS=       1230219537856, dTS=         5
+_    5: TS=       1230219537856, dTS=         0
+
+_    6: TS=       1230219568748, dTS=     30892
+
+_    7: TS=       1230224568722, dTS=   4999974
+_    8: TS=       1230224568722, dTS=         0
+
+_    9: TS=       1230228326965, dTS=   3758243
+_   10: TS=       1230228326965, dTS=         0
+
+_   11: TS=       1230228571916, dTS=    244951
+_   12: TS=       1230228571917, dTS=         1
+
+_   13: TS=       1230229568697, dTS=    996780
+
+_   14: TS=       1230233546939, dTS=   3978242
+_   15: TS=       1230233546939, dTS=         0
+_   16: TS=       1230233546941, dTS=         2
+
+_   17: TS=       1230234546920, dTS=    999979
+_   18: TS=       1230234546922, dTS=         2
+_   19: TS=       1230234546922, dTS=         0
+_   20: TS=       1230234546923, dTS=         1
+_   21: TS=       1230234546923, dTS=         0
+_   22: TS=       1230234546923, dTS=         0
+
+_   23: TS=       1230234568671, dTS=     21748
+
+_   24: TS=       1230239568645, dTS=   4999974
+
+_   25: TS=       1230240131900, dTS=    563255
+_   26: TS=       1230240131900, dTS=         0
+
+_   27: TS=       1230240141907, dTS=     10007
+_   28: TS=       1230240141907, dTS=         0
+_   29: TS=       1230240141926, dTS=        19
+_   30: TS=       1230240141926, dTS=         0
+_   31: TS=       1230240141944, dTS=        18
+_   32: TS=       1230240141944, dTS=         0
+_   33: TS=       1230240141945, dTS=         1
+_   34: TS=       1230240141946, dTS=         1
+
+_   35: TS=       1230244568619, dTS=   4426673
+
+_   36: TS=       1230246071916, dTS=   1503297
+_   37: TS=       1230246071916, dTS=         0
+
+_   38: TS=       1230246516941, dTS=    445025
+_   39: TS=       1230246516942, dTS=         1
+
+_   40: TS=       1230249568593, dTS=   3051651
+
+_   41: TS=       1230252836928, dTS=   3268335
+
+_   42: TS=       1230253101959, dTS=    265031
+
+_   43: TS=       1230254568568, dTS=   1466609
+
+_   44: TS=       1230258401889, dTS=   3833321
+_   45: TS=       1230258401889, dTS=         0
+_   46: TS=       1230258401889, dTS=         0
+_   47: TS=       1230258401908, dTS=        19
+_   48: TS=       1230258401910, dTS=         2
+
+_   49: TS=       1230258986930, dTS=    585020
+
+_   50: TS=       1230259568542, dTS=    581612
+
+_   51: TS=       1230264561926, dTS=   4993384
+
+_   52: TS=       1230264568516, dTS=      6590
+
+_   53: TS=       1230264720171, dTS=    151655
+_   54: TS=       1230264720175, dTS=         4
+
+_   55: TS=       1230269568490, dTS=   4848315
+
+_   56: TS=       1230270126892, dTS=    558402
+_   57: TS=       1230270126892, dTS=         0
+_   58: TS=       1230270126892, dTS=         0
+
+_   59: TS=       1230274568464, dTS=   4441572
+
+_   60: TS=       1230278321971, dTS=   3753507
+
+_   61: TS=       1230279568439, dTS=   1246468
+
+_   62: TS=       1230284568413, dTS=   4999974
+
+_   63: TS=       1230286086871, dTS=   1518458
+_   64: TS=       1230286086878, dTS=         7
+_   65: TS=       1230286086879, dTS=         1
+_   66: TS=       1230286086880, dTS=         1
+
+_   67: TS=       1230286763879, dTS=    676999
+
+_   68: TS=       1230286916882, dTS=    153003
+
+_   69: TS=       1230289568387, dTS=   2651505
+
+_   70: TS=       1230294568361, dTS=   4999974
+
+_   71: TS=       1230299568335, dTS=   4999974
+
+_   72: TS=       1230300076863, dTS=    508528
+_   73: TS=       1230300076863, dTS=         0
+_   74: TS=       1230300076863, dTS=         0
+_   75: TS=       1230300076863, dTS=         0
+_   76: TS=       1230300076863, dTS=         0
+_   77: TS=       1230300076881, dTS=        18
+_   78: TS=       1230300076881, dTS=         0
+_   79: TS=       1230300076883, dTS=         2
+_   80: TS=       1230300076883, dTS=         0
+
+_   81: TS=       1230300176901, dTS=    100018
+
+_   82: TS=       1230301805221, dTS=   1628320
+_   83: TS=       1230301805221, dTS=         0
+
+_   84: TS=       1230302655075, dTS=    849854
+_   85: TS=       1230302655083, dTS=         8
+_   86: TS=       1230302655083, dTS=         0
+
+_   87: TS=       1230304568310, dTS=   1913227
+
+_   88: TS=       1230309568284, dTS=   4999974
+
+_   89: TS=       1230312020129, dTS=   2451845
+_   90: TS=       1230312020130, dTS=         1
+
+_   91: TS=       1230314001873, dTS=   1981743
+
+_   92: TS=       1230314568258, dTS=    566385
+
+_   93: TS=       1230319568232, dTS=   4999974
+
+_   94: TS=       1230320166854, dTS=    598622
+_   95: TS=       1230320166854, dTS=         0
+_   96: TS=       1230320166854, dTS=         0
+_   97: TS=       1230320166872, dTS=        18
+_   98: TS=       1230320166872, dTS=         0
+_   99: TS=       1230320166872, dTS=         0
+_  100: TS=       1230320166873, dTS=         1
+_  101: TS=       1230320166874, dTS=         1
+
+_  102: TS=       1230320982810, dTS=    815936
+_  103: TS=       1230320982813, dTS=         3
+
+_  104: TS=       1230324340080, dTS=   3357267
+_  105: TS=       1230324340082, dTS=         2
+
+_  106: TS=       1230324568206, dTS=    228124
+
+_  107: TS=       1230327296856, dTS=   2728650
+
+_  108: TS=       1230328606878, dTS=   1310022
+
+_  109: TS=       1230329568180, dTS=    961302
+
+_  110: TS=       1230334568155, dTS=   4999975
+
+_  111: TS=       1230334881823, dTS=    313668
+
+_  112: TS=       1230335446872, dTS=    565049
+
+_  113: TS=       1230339016532, dTS=   3569660
+
+_  114: TS=       1230339568129, dTS=    551597
+
+_  115: TS=       1230342476812, dTS=   2908683
+_  116: TS=       1230342476812, dTS=         0
+
+_  117: TS=       1230344568103, dTS=   2091291
+
+_  118: TS=       1230345053274, dTS=    485171
+_  119: TS=       1230345053274, dTS=         0
+
+_  120: TS=       1230348489957, dTS=   3436683
+_  121: TS=       1230348489960, dTS=         3
+_  122: TS=       1230348489963, dTS=         3
+
+_  123: TS=       1230349568077, dTS=   1078114
+
+_  124: TS=       1230354216810, dTS=   4648733
+
+_  125: TS=       1230354568051, dTS=    351241
+
+_  126: TS=       1230354634095, dTS=     66044
+_  127: TS=       1230354634095, dTS=         0
+
+_  128: TS=       1230356535311, dTS=   1901216
+_  129: TS=       1230356535311, dTS=         0
+
+_  130: TS=       1230359568026, dTS=   3032715
+
+_  131: TS=       1230361811838, dTS=   2243812
+
+_  132: TS=       1230362176799, dTS=    364961
+_  133: TS=       1230362176799, dTS=         0
+_  134: TS=       1230362176799, dTS=         0
+_  135: TS=       1230362176800, dTS=         1
+_  136: TS=       1230362176800, dTS=         0
+_  137: TS=       1230362176804, dTS=         4
+_  138: TS=       1230362176804, dTS=         0
+_  139: TS=       1230362176805, dTS=         1
+_  140: TS=       1230362176805, dTS=         0
+_  141: TS=       1230362176805, dTS=         0
+_  142: TS=       1230362176805, dTS=         0
+_  143: TS=       1230362176806, dTS=         1
+_  144: TS=       1230362176884, dTS=        78
+
+_  145: TS=       1230362331814, dTS=    154930
+_  146: TS=       1230362331815, dTS=         1
+_  147: TS=       1230362331816, dTS=         1
+
+_  148: TS=       1230364568000, dTS=   2236184
+
+_  149: TS=       1230369567974, dTS=   4999974
+
+_  150: TS=       1230374567948, dTS=   4999974
+
+_  151: TS=       1230375736828, dTS=   1168880
+_  152: TS=       1230375736828, dTS=         0
+
+_  153: TS=       1230379567922, dTS=   3831094
+
+_  154: TS=       1230384567897, dTS=   4999975
+
+_  155: TS=       1230389567871, dTS=   4999974
+
+_  156: TS=       1230394567845, dTS=   4999974
+
+_  157: TS=       1230395270599, dTS=    702754
+
+_  158: TS=       1230399567819, dTS=   4297220
+
+_  159: TS=       1230404567793, dTS=   4999974
+
+_  160: TS=       1230409567767, dTS=   4999974
+
+_  161: TS=       1230414567741, dTS=   4999974
+
+_  162: TS=       1230419327764, dTS=   4760023
+_  163: TS=       1230419327766, dTS=         2
+_  164: TS=       1230419327768, dTS=         2
+
+_  165: TS=       1230419567716, dTS=    239948
+
+_  166: TS=       1230422101761, dTS=   2534045
+_  167: TS=       1230422101761, dTS=         0
+_  168: TS=       1230422101761, dTS=         0
+_  169: TS=       1230422101779, dTS=        18
+_  170: TS=       1230422101780, dTS=         1
+_  171: TS=       1230422101781, dTS=         1
+_  172: TS=       1230422101781, dTS=         0
+
+_  173: TS=       1230424567690, dTS=   2465909
+
+_  174: TS=       1230429567664, dTS=   4999974
+
+_  175: TS=       1230432750398, dTS=   3182734
+_  176: TS=       1230432750398, dTS=         0
+
+_  177: TS=       1230434567638, dTS=   1817240
+
+_  178: TS=       1230435186787, dTS=    619149
+_  179: TS=       1230435186788, dTS=         1
+_  180: TS=       1230435186788, dTS=         0
+_  181: TS=       1230435186788, dTS=         0
+
+_  182: TS=       1230436416738, dTS=   1229950
+_  183: TS=       1230436416739, dTS=         1
+_  184: TS=       1230436416739, dTS=         0
+_  185: TS=       1230436416744, dTS=         5
+_  186: TS=       1230436416744, dTS=         0
+_  187: TS=       1230436416744, dTS=         0
+_  188: TS=       1230436416757, dTS=        13
+_  189: TS=       1230436416758, dTS=         1
+_  190: TS=       1230436416758, dTS=         0
+
+_  191: TS=       1230439567612, dTS=   3150854
+
+_  192: TS=       1230442491729, dTS=   2924117
+_  193: TS=       1230442491729, dTS=         0
+_  194: TS=       1230442491729, dTS=         0
+_  195: TS=       1230442491729, dTS=         0
+_  196: TS=       1230442491730, dTS=         1
+_  197: TS=       1230442491730, dTS=         0
+_  198: TS=       1230442491730, dTS=         0
+_  199: TS=       1230442491733, dTS=         3
+_  200: TS=       1230442491763, dTS=        30
+
+_  201: TS=       1230444567586, dTS=   2075823
+
+_  202: TS=       1230447366763, dTS=   2799177
+_  203: TS=       1230447366763, dTS=         0
+_  204: TS=       1230447366763, dTS=         0
+_  205: TS=       1230447366764, dTS=         1
+
+_  206: TS=       1230449567561, dTS=   2200797
+
+_  207: TS=       1230454296772, dTS=   4729211
+_  208: TS=       1230454296773, dTS=         1
+_  209: TS=       1230454296773, dTS=         0
+
+_  210: TS=       1230454567535, dTS=    270762
+
+_  211: TS=       1230455086719, dTS=    519184
+_  212: TS=       1230455086721, dTS=         2
+
+_  213: TS=       1230459567509, dTS=   4480788
+
+_  214: TS=       1230461526732, dTS=   1959223
+_  215: TS=       1230461526732, dTS=         0
+_  216: TS=       1230461526733, dTS=         1
+_  217: TS=       1230461526733, dTS=         0
+_  218: TS=       1230461526734, dTS=         1
+
+_  219: TS=       1230462226753, dTS=    700019
+_  220: TS=       1230462226755, dTS=         2
+
+_  221: TS=       1230462526816, dTS=    300061
+
+_  222: TS=       1230464567483, dTS=   2040667
+
+_  223: TS=       1230469567457, dTS=   4999974
+
+_  224: TS=       1230474567431, dTS=   4999974
+
+_  225: TS=       1230479567406, dTS=   4999975
+
+_  226: TS=       1230484567380, dTS=   4999974
+
+_  227: TS=       1230489567354, dTS=   4999974
+
+_  228: TS=       1230494567328, dTS=   4999974
+
+_  229: TS=       1230496566700, dTS=   1999372
+
+_  230: TS=       1230499567302, dTS=   3000602
+
+_  231: TS=       1230503651689, dTS=   4084387
+
+_  232: TS=       1230504281686, dTS=    629997
+_  233: TS=       1230504281687, dTS=         1
+_  234: TS=       1230504281691, dTS=         4
+_  235: TS=       1230504281692, dTS=         1
+_  236: TS=       1230504281692, dTS=         0
+_  237: TS=       1230504281692, dTS=         0
+_  238: TS=       1230504281720, dTS=        28
+
+_  239: TS=       1230504567277, dTS=    285557
+
+_  240: TS=       1230509567251, dTS=   4999974
+
+_  241: TS=       1230511073604, dTS=   1506353
+_  242: TS=       1230511073605, dTS=         1
+
+_  243: TS=       1230511140075, dTS=     66470
+
+_  244: TS=       1230514567225, dTS=   3427150
+
+_  245: TS=       1230519567199, dTS=   4999974
+
+_  246: TS=       1230524567173, dTS=   4999974
+
+_  247: TS=       1230528191687, dTS=   3624514
+
+_  248: TS=       1230529567148, dTS=   1375461
+
+_  249: TS=       1230533290361, dTS=   3723213
+_  250: TS=       1230533290364, dTS=         3
+
+_  251: TS=       1230534567122, dTS=   1276758
+
+_  252: TS=       1230535956682, dTS=   1389560
+
+_  253: TS=       1230536431676, dTS=    474994
+_  254: TS=       1230536431679, dTS=         3
+
+_  255: TS=       1230539567096, dTS=   3135417
+
+_  256: TS=       1230542586718, dTS=   3019622
+
+_  257: TS=       1230543296720, dTS=    710002
+
+_  258: TS=       1230544567070, dTS=   1270350
+
+_  259: TS=       1230549567045, dTS=   4999975
+
+_  260: TS=       1230554567019, dTS=   4999974
+
+_  261: TS=       1230555511658, dTS=    944639
+
+_  262: TS=       1230558970780, dTS=   3459122
+
+_  263: TS=       1230559566993, dTS=    596213
+
+_  264: TS=       1230564566967, dTS=   4999974
+
+_  265: TS=       1230569566941, dTS=   4999974
+
+_  266: TS=       1230574566916, dTS=   4999975
+
+_  267: TS=       1230578887966, dTS=   4321050
+_  268: TS=       1230578887967, dTS=         1
+
+_  269: TS=       1230579566890, dTS=    678923
+
+_  270: TS=       1230581486616, dTS=   1919726
+
+_  271: TS=       1230584566864, dTS=   3080248
+
+_  272: TS=       1230589566838, dTS=   4999974
+
+_  273: TS=       1230594566812, dTS=   4999974
+
+_  274: TS=       1230599566787, dTS=   4999975
+
+_  275: TS=       1230602851840, dTS=   3285053
+_  276: TS=       1230602851841, dTS=         1
+
+_  277: TS=       1230604566761, dTS=   1714920
+
+_  278: TS=       1230608616620, dTS=   4049859
+_  279: TS=       1230608616620, dTS=         0
+_  280: TS=       1230608616621, dTS=         1
+_  281: TS=       1230608616635, dTS=        14
+
+_  282: TS=       1230609163756, dTS=    547121
+
+_  283: TS=       1230609566735, dTS=    402979
+
+_  284: TS=       1230614566709, dTS=   4999974
+
+_  285: TS=       1230615346616, dTS=    779907
+_  286: TS=       1230615346616, dTS=         0
+_  287: TS=       1230615346617, dTS=         1
+_  288: TS=       1230615346634, dTS=        17
+_  289: TS=       1230615346635, dTS=         1
+_  290: TS=       1230615346635, dTS=         0
+_  291: TS=       1230615346636, dTS=         1
+_  292: TS=       1230615346636, dTS=         0
+_  293: TS=       1230615346637, dTS=         1
+
+_  294: TS=       1230616794537, dTS=   1447900
+
+_  295: TS=       1230619566683, dTS=   2772146
+
+_  296: TS=       1230622421622, dTS=   2854939
+
+_  297: TS=       1230624566657, dTS=   2145035
+
+_  298: TS=       1230628596586, dTS=   4029929
+_  299: TS=       1230628596587, dTS=         1
+_  300: TS=       1230628596587, dTS=         0
+_  301: TS=       1230628596587, dTS=         0
+
+_  302: TS=       1230628796591, dTS=    200004
+_  303: TS=       1230628796591, dTS=         0
+_  304: TS=       1230628796591, dTS=         0
+_  305: TS=       1230628796591, dTS=         0
+_  306: TS=       1230628796591, dTS=         0
+_  307: TS=       1230628796592, dTS=         1
+_  308: TS=       1230628796592, dTS=         0
+
+_  309: TS=       1230629006612, dTS=    210020
+_  310: TS=       1230629006613, dTS=         1
+
+_  311: TS=       1230629196591, dTS=    189978
+_  312: TS=       1230629196592, dTS=         1
+_  313: TS=       1230629196592, dTS=         0
+_  314: TS=       1230629196592, dTS=         0
+
+_  315: TS=       1230629566632, dTS=    370040
+
+_  316: TS=       1230634566606, dTS=   4999974
+
+_  317: TS=       1230639566580, dTS=   4999974
+
+_  318: TS=       1230642211583, dTS=   2645003
+
+_  319: TS=       1230644566554, dTS=   2354971
+
+_  320: TS=       1230649566528, dTS=   4999974
+
+_  321: TS=       1230654566502, dTS=   4999974
+
+_  322: TS=       1230656936571, dTS=   2370069
+
+_  323: TS=       1230657646555, dTS=    709984
+_  324: TS=       1230657646560, dTS=         5
+
+_  325: TS=       1230659566477, dTS=   1919917
+
+_  326: TS=       1230664566451, dTS=   4999974
+
+_  327: TS=       1230669566425, dTS=   4999974
+
+_  328: TS=       1230670386598, dTS=    820173
+
+_  329: TS=       1230671251562, dTS=    864964
+_  330: TS=       1230671251564, dTS=         2
+
+_  331: TS=       1230674566399, dTS=   3314835
+
+_  332: TS=       1230677706538, dTS=   3140139
+_  333: TS=       1230677706539, dTS=         1
+_  334: TS=       1230677706539, dTS=         0
+
+_  335: TS=       1230679566373, dTS=   1859834
+
+_  336: TS=       1230681408987, dTS=   1842614
+_  337: TS=       1230681408989, dTS=         2
+_  338: TS=       1230681408990, dTS=         1
+
+_  339: TS=       1230684266530, dTS=   2857540
+
+_  340: TS=       1230684566347, dTS=    299817
+_  341: TS=       1230684566527, dTS=       180
+_  342: TS=       1230684566528, dTS=         1
+_  343: TS=       1230684566532, dTS=         4
+
+_  344: TS=       1230684766524, dTS=    199992
+_  345: TS=       1230684766528, dTS=         4
+_  346: TS=       1230684766528, dTS=         0
+
+_  347: TS=       1230685766529, dTS=   1000001
+
+_  348: TS=       1230689566321, dTS=   3799792
+
+_  349: TS=       1230691096527, dTS=   1530206
+_  350: TS=       1230691096528, dTS=         1
+_  351: TS=       1230691096528, dTS=         0
+
+_  352: TS=       1230691331557, dTS=    235029
+
+_  353: TS=       1230691431531, dTS=     99974
+_  354: TS=       1230691431532, dTS=         1
+
+_  355: TS=       1230691696536, dTS=    265004
+_  356: TS=       1230691696538, dTS=         2
+_  357: TS=       1230691696538, dTS=         0
+_  358: TS=       1230691696540, dTS=         2
+
+_  359: TS=       1230692757266, dTS=   1060726
+_  360: TS=       1230692757266, dTS=         0
+
+_  361: TS=       1230694566296, dTS=   1809030
+
+_  362: TS=       1230698026522, dTS=   3460226
+
+_  363: TS=       1230698096547, dTS=     70025
+_  364: TS=       1230698096548, dTS=         1
+_  365: TS=       1230698096548, dTS=         0
+_  366: TS=       1230698096548, dTS=         0
+
+_  367: TS=       1230698226528, dTS=    129980
+
+_  368: TS=       1230698426525, dTS=    199997
+_  369: TS=       1230698426526, dTS=         1
+_  370: TS=       1230698426526, dTS=         0
+_  371: TS=       1230698426526, dTS=         0
+
+_  372: TS=       1230699566270, dTS=   1139744
+
+_  373: TS=       1230704566244, dTS=   4999974
+
+_  374: TS=       1230709566218, dTS=   4999974
+
+_  375: TS=       1230710911514, dTS=   1345296
+_  376: TS=       1230710911514, dTS=         0
+_  377: TS=       1230710911515, dTS=         1
+_  378: TS=       1230710911516, dTS=         1
+_  379: TS=       1230710911516, dTS=         0
+
+_  380: TS=       1230711311514, dTS=    399998
+_  381: TS=       1230711311514, dTS=         0
+_  382: TS=       1230711311515, dTS=         1
+
+_  383: TS=       1230714566192, dTS=   3254677
+
+_  384: TS=       1230717951516, dTS=   3385324
+_  385: TS=       1230717951517, dTS=         1
+
+_  386: TS=       1230718551499, dTS=    599982
+_  387: TS=       1230718551501, dTS=         2
+
+_  388: TS=       1230718806517, dTS=    255016
+_  389: TS=       1230718806519, dTS=         2
+_  390: TS=       1230718806520, dTS=         1
+_  391: TS=       1230718806520, dTS=         0
+_  392: TS=       1230718806520, dTS=         0
+
+_  393: TS=       1230718816508, dTS=      9988
+_  394: TS=       1230718816510, dTS=         2
+
+_  395: TS=       1230719016500, dTS=    199990
+_  396: TS=       1230719016501, dTS=         1
+_  397: TS=       1230719016501, dTS=         0
+_  398: TS=       1230719016501, dTS=         0
+_  399: TS=       1230719016502, dTS=         1
+_  400: TS=       1230719016502, dTS=         0
+
+_  401: TS=       1230719151509, dTS=    135007
+_  402: TS=       1230719151511, dTS=         2
+_  403: TS=       1230719151513, dTS=         2
+_  404: TS=       1230719151514, dTS=         1
+
+_  405: TS=       1230719566166, dTS=    414652
+
+_  406: TS=       1230720722240, dTS=   1156074
+_  407: TS=       1230720722248, dTS=         8
+
+_  408: TS=       1230722383923, dTS=   1661675
+
+_  409: TS=       1230724566141, dTS=   2182218
+
+_  410: TS=       1230724981501, dTS=    415360
+_  411: TS=       1230724981505, dTS=         4
+
+_  412: TS=       1230725746511, dTS=    765006
+
+_  413: TS=       1230729566115, dTS=   3819604
+
+_  414: TS=       1230731261618, dTS=   1695503
+_  415: TS=       1230731261619, dTS=         1
+
+_  416: TS=       1230732576505, dTS=   1314886
+_  417: TS=       1230732576505, dTS=         0
+_  418: TS=       1230732576506, dTS=         1
+_  419: TS=       1230732576507, dTS=         1
+
+_  420: TS=       1230734566089, dTS=   1989582
+
+_  421: TS=       1230738359429, dTS=   3793340
+_  422: TS=       1230738359429, dTS=         0
+_  423: TS=       1230738359429, dTS=         0
+_  424: TS=       1230738359430, dTS=         1
+_  425: TS=       1230738359430, dTS=         0
+_  426: TS=       1230738359430, dTS=         0
+
+_  427: TS=       1230738406492, dTS=     47062
+_  428: TS=       1230738406493, dTS=         1
+
+_  429: TS=       1230739566063, dTS=   1159570
+
+_  430: TS=       1230744566037, dTS=   4999974
+
+_  431: TS=       1230746526565, dTS=   1960528
+
+_  432: TS=       1230749566011, dTS=   3039446
+
+_  433: TS=       1230752211503, dTS=   2645492
+
+_  434: TS=       1230754565986, dTS=   2354483
+
+_  435: TS=       1230759565960, dTS=   4999974
+
+_  436: TS=       1230764565934, dTS=   4999974
+
+_  437: TS=       1230766561512, dTS=   1995578
+_  438: TS=       1230766561512, dTS=         0
+_  439: TS=       1230766561512, dTS=         0
+_  440: TS=       1230766561513, dTS=         1
+_  441: TS=       1230766561513, dTS=         0
+_  442: TS=       1230766561531, dTS=        18
+_  443: TS=       1230766561532, dTS=         1
+_  444: TS=       1230766561532, dTS=         0
+
+_  445: TS=       1230769565908, dTS=   3004376
+
+_  446: TS=       1230774565882, dTS=   4999974
+
+_  447: TS=       1230777362442, dTS=   2796560
+
+_  448: TS=       1230779565857, dTS=   2203415
+
+_  449: TS=       1230784565831, dTS=   4999974
+buf#   1, bigbuf covers  5693.639 ms;
+ buf#   2, bigbuf covers  6085.302 ms;
+ buf#   3, bigbuf covers  4422.667 ms;
+ buf#   4, bigbuf covers  5782.545 ms;
+ buf#   5, bigbuf covers  4294.774 ms;
+ buf#   6, bigbuf covers  5528.368 ms;
+ buf#   7, bigbuf covers  5864.195 ms;
+ buf#   8, bigbuf covers  3962.597 ms;
+ buf#   9, bigbuf covers  5253.809 ms;
+ buf#  10, bigbuf covers  5316.399 ms;
+ buf#  11, bigbuf covers  4786.246 ms;
+ buf#  12, bigbuf covers  4293.298 ms;
+ buf#  13, bigbuf covers  5809.845 ms;
+ buf#  14, bigbuf covers  2542.972 ms;
+ buf#  15, bigbuf covers  5257.196 ms;
+ buf#  16, bigbuf covers  6153.703 ms;
+ buf#  17, bigbuf covers  5386.546 ms;
+ buf#  18, bigbuf covers  4380.347 ms;
+ buf#  19, bigbuf covers  5538.046 ms;
+ buf#  20, bigbuf covers  3859.014 ms;
+ buf#  21, bigbuf covers  4179.704 ms;
+ buf#  22, bigbuf covers  5271.421 ms;
+ buf#  23, bigbuf covers  3181.023 ms;
+ buf#  24, bigbuf covers  4672.059 ms;
+ buf#  25, bigbuf covers  5120.041 ms;
+ buf#  26, bigbuf covers  3882.167 ms;
+ buf#  27, bigbuf covers  5723.946 ms;
+ buf#  28, bigbuf covers  4911.015 ms;
+ buf#  29, bigbuf covers  4465.828 ms;
+ buf#  30, bigbuf covers  4001.447 ms;
+ buf#  31, bigbuf covers  6339.464 ms;
+ buf#  32, bigbuf covers  5845.747 ms;
+ buf#  33, bigbuf covers  5522.941 ms;
+ buf#  34, bigbuf covers  4399.978 ms;
+ buf#  35, bigbuf covers  5684.112 ms;
+ buf#  36, bigbuf covers  3862.561 ms;
+ buf#  37, bigbuf covers  5235.977 ms;
+ buf#  38, bigbuf covers  4049.979 ms;
+ buf#  39, bigbuf covers  4328.995 ms;
+ buf#  40, bigbuf covers  3452.067 ms;
+ buf#  41, bigbuf covers  3037.713 ms;
+ buf#  42, bigbuf covers  4029.393 ms;
+ buf#  43, bigbuf covers  5925.359 ms;
+ buf#  44, bigbuf covers  4523.497 ms;
+ buf#  45, bigbuf covers  5401.063 ms;
+ buf#  46, bigbuf covers  5154.930 ms;
+ buf#  47, bigbuf covers  5295.017 ms;
+ buf#  48, bigbuf covers  4209.294 ms;
+ buf#  49, bigbuf covers  5667.436 ms;
+ 
+**----------------------------------------
+file   0 is     active;      89799 reads ;   79023132 bytes; (  0.074GB) TS=     1674352306397
+file   1 is     active;       2792 reads ;    2456964 bytes; (  0.002GB) TS=     1674427403684
+file   2 is     active;       2425 reads ;    2134004 bytes; (  0.002GB) TS=     1674592355763
+file   3 is     active;      15544 reads ;   13678724 bytes; (  0.013GB) TS=     1674406611461
+file   4 is     active;       3489 reads ;    3070324 bytes; (  0.003GB) TS=     1674406611462
+file   5 is     active;       5159 reads ;    4539924 bytes; (  0.004GB) TS=     1674399401316
+file   6 is     active;       4253 reads ;    3742644 bytes; (  0.003GB) TS=     1674399401320
+file   7 is     active;      48550 reads ;   42724008 bytes; (  0.040GB) TS=     1674354680759
+file   8 is     active;      34656 reads ;   30497288 bytes; (  0.028GB) TS=     1674348440797
+file   9 is     active;     118342 reads ;  104140976 bytes; (  0.097GB) TS=     1674348440778
+file  10 is     active;      94749 reads ;   83379132 bytes; (  0.078GB) TS=     1674347650731
+file  11 is     active;      30254 reads ;   26623524 bytes; (  0.025GB) TS=     1674418602855
+current TS: 1674347650731; current event no:    449550;
+events written:    449550; total reads=   450012;
+elapsed time..................: 001h14m01s, [t0=1230215201911, curTS=1674347650731]
+Wed Oct 10 08:30:40 2018
+number of open files:   12
+CPU time: user     0.290 sec, system      0.290 sec, Total      0.580 sec
+bigbuf fills..........=       1000
+time order swaps......=     206040
+swaps per buffer......=     206.04
+bigbuf covers   4405.497 ms
+# bytes read...:    396010644B,   0.369GB; 651.147MB/sec; 2344.129GB/hour, 56.3TB/day
+# bytes written:    395604084B,   0.368GB; 650.478MB/sec
+total IO rate: 1301.625MB/sec or 10413Mbits/sec
+output chunk # 0 (chunksiz=2000000000 bytes, or  1.863 GBytes)
+^^----------------------------------------
+
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+TS jumped back -2090580343836; file 1; TS=-1; old=2090580343835; nread=840148, njb=0; 
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+TS jumped back -2090580343836; file 1; TS=-1; old=2090580343835; nread=840149, njb=1; 
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+TS jumped back -2090580343836; file 1; TS=-1; old=2090580343835; nread=840150, njb=2; 
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+TS jumped back -2090580343836; file 1; TS=-1; old=2090580343835; nread=840151, njb=3; 
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+TS jumped back -2090580343836; file 1; TS=-1; old=2090580343835; nread=840152, njb=4; 
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+TS jumped back -2090580343836; file 1; TS=-1; old=2090580343835; nread=840153, njb=5; 
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+TS jumped back -2090580343836; file 1; TS=-1; old=2090580343835; nread=840154, njb=6; 
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+TS jumped back -2090580343836; file 1; TS=-1; old=2090580343835; nread=840155, njb=7; 
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+TS jumped back -2090580343836; file 1; TS=-1; old=2090580343835; nread=840156, njb=8; 
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+failed to read 16 bytes for header, got 0
+failed to read more data from file 1, nextTSpoolIndex=1
+reject TS=-1; file 1
+abort jump back recovery, oldFileTS 2090580343835 --> -1; DT=2090580343836
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+TS jumped back -2139785004606; file 2; TS=-1; old=2139785004605; nread=874517, njb=0; 
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+TS jumped back -2139785004606; file 2; TS=-1; old=2139785004605; nread=874518, njb=1; 
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+TS jumped back -2139785004606; file 2; TS=-1; old=2139785004605; nread=874519, njb=2; 
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+TS jumped back -2139785004606; file 2; TS=-1; old=2139785004605; nread=874520, njb=3; 
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+TS jumped back -2139785004606; file 2; TS=-1; old=2139785004605; nread=874521, njb=4; 
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+TS jumped back -2139785004606; file 2; TS=-1; old=2139785004605; nread=874522, njb=5; 
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+TS jumped back -2139785004606; file 2; TS=-1; old=2139785004605; nread=874523, njb=6; 
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+TS jumped back -2139785004606; file 2; TS=-1; old=2139785004605; nread=874524, njb=7; 
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+TS jumped back -2139785004606; file 2; TS=-1; old=2139785004605; nread=874525, njb=8; 
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+failed to read 16 bytes for header, got 0
+failed to read more data from file 2, nextTSpoolIndex=2
+reject TS=-1; file 2
+abort jump back recovery, oldFileTS 2139785004605 --> -1; DT=2139785004606
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+TS jumped back -2154322835215; file 6; TS=-1; old=2154322835214; nread=883635, njb=0; 
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+TS jumped back -2154322835215; file 6; TS=-1; old=2154322835214; nread=883636, njb=1; 
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+TS jumped back -2154322835215; file 6; TS=-1; old=2154322835214; nread=883637, njb=2; 
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+TS jumped back -2154322835215; file 6; TS=-1; old=2154322835214; nread=883638, njb=3; 
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+TS jumped back -2154322835215; file 6; TS=-1; old=2154322835214; nread=883639, njb=4; 
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+TS jumped back -2154322835215; file 6; TS=-1; old=2154322835214; nread=883640, njb=5; 
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+TS jumped back -2154322835215; file 6; TS=-1; old=2154322835214; nread=883641, njb=6; 
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+TS jumped back -2154322835215; file 6; TS=-1; old=2154322835214; nread=883642, njb=7; 
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+TS jumped back -2154322835215; file 6; TS=-1; old=2154322835214; nread=883643, njb=8; 
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+failed to read 16 bytes for header, got 0
+failed to read more data from file 6, nextTSpoolIndex=6
+reject TS=-1; file 6
+abort jump back recovery, oldFileTS 2154322835214 --> -1; DT=2154322835215
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+TS jumped back -2166439839806; file 5; TS=-1; old=2166439839805; nread=891742, njb=0; 
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+TS jumped back -2166439839806; file 5; TS=-1; old=2166439839805; nread=891743, njb=1; 
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+TS jumped back -2166439839806; file 5; TS=-1; old=2166439839805; nread=891744, njb=2; 
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+TS jumped back -2166439839806; file 5; TS=-1; old=2166439839805; nread=891745, njb=3; 
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+TS jumped back -2166439839806; file 5; TS=-1; old=2166439839805; nread=891746, njb=4; 
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+TS jumped back -2166439839806; file 5; TS=-1; old=2166439839805; nread=891747, njb=5; 
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+TS jumped back -2166439839806; file 5; TS=-1; old=2166439839805; nread=891748, njb=6; 
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+TS jumped back -2166439839806; file 5; TS=-1; old=2166439839805; nread=891749, njb=7; 
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+TS jumped back -2166439839806; file 5; TS=-1; old=2166439839805; nread=891750, njb=8; 
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+failed to read 16 bytes for header, got 0
+failed to read more data from file 5, nextTSpoolIndex=5
+reject TS=-1; file 5
+abort jump back recovery, oldFileTS 2166439839805 --> -1; DT=2166439839806
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+TS jumped back -2166848168358; file 4; TS=-1; old=2166848168357; nread=892005, njb=0; 
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+TS jumped back -2166848168358; file 4; TS=-1; old=2166848168357; nread=892006, njb=1; 
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+TS jumped back -2166848168358; file 4; TS=-1; old=2166848168357; nread=892007, njb=2; 
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+TS jumped back -2166848168358; file 4; TS=-1; old=2166848168357; nread=892008, njb=3; 
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+TS jumped back -2166848168358; file 4; TS=-1; old=2166848168357; nread=892009, njb=4; 
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+TS jumped back -2166848168358; file 4; TS=-1; old=2166848168357; nread=892010, njb=5; 
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+TS jumped back -2166848168358; file 4; TS=-1; old=2166848168357; nread=892011, njb=6; 
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+TS jumped back -2166848168358; file 4; TS=-1; old=2166848168357; nread=892012, njb=7; 
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+TS jumped back -2166848168358; file 4; TS=-1; old=2166848168357; nread=892013, njb=8; 
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+failed to read 16 bytes for header, got 0
+failed to read more data from file 4, nextTSpoolIndex=4
+reject TS=-1; file 4
+abort jump back recovery, oldFileTS 2166848168357 --> -1; DT=2166848168358
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+TS jumped back -2177751348773; file 11; TS=-1; old=2177751348772; nread=899061, njb=0; 
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+TS jumped back -2177751348773; file 11; TS=-1; old=2177751348772; nread=899062, njb=1; 
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+TS jumped back -2177751348773; file 11; TS=-1; old=2177751348772; nread=899063, njb=2; 
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+TS jumped back -2177751348773; file 11; TS=-1; old=2177751348772; nread=899064, njb=3; 
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+TS jumped back -2177751348773; file 11; TS=-1; old=2177751348772; nread=899065, njb=4; 
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+TS jumped back -2177751348773; file 11; TS=-1; old=2177751348772; nread=899066, njb=5; 
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+TS jumped back -2177751348773; file 11; TS=-1; old=2177751348772; nread=899067, njb=6; 
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+TS jumped back -2177751348773; file 11; TS=-1; old=2177751348772; nread=899068, njb=7; 
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+TS jumped back -2177751348773; file 11; TS=-1; old=2177751348772; nread=899069, njb=8; 
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+failed to read 16 bytes for header, got 0
+failed to read more data from file 11, nextTSpoolIndex=11
+reject TS=-1; file 11
+abort jump back recovery, oldFileTS 2177751348772 --> -1; DT=2177751348773
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+TS jumped back -2178538524073; file 10; TS=-1; old=2178538524072; nread=899614, njb=0; 
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+TS jumped back -2178538524073; file 10; TS=-1; old=2178538524072; nread=899615, njb=1; 
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+TS jumped back -2178538524073; file 10; TS=-1; old=2178538524072; nread=899616, njb=2; 
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+TS jumped back -2178538524073; file 10; TS=-1; old=2178538524072; nread=899617, njb=3; 
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+TS jumped back -2178538524073; file 10; TS=-1; old=2178538524072; nread=899618, njb=4; 
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+TS jumped back -2178538524073; file 10; TS=-1; old=2178538524072; nread=899619, njb=5; 
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+TS jumped back -2178538524073; file 10; TS=-1; old=2178538524072; nread=899620, njb=6; 
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+TS jumped back -2178538524073; file 10; TS=-1; old=2178538524072; nread=899621, njb=7; 
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+TS jumped back -2178538524073; file 10; TS=-1; old=2178538524072; nread=899622, njb=8; 
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+failed to read 16 bytes for header, got 0
+failed to read more data from file 10, nextTSpoolIndex=10
+reject TS=-1; file 10
+abort jump back recovery, oldFileTS 2178538524072 --> -1; DT=2178538524073
+
+**----------------------------------------
+file   0 is     active;     191961 reads ;  168925704 bytes; (  0.157GB) TS=     2179949730715
+file   1 is NOT active;       5437 reads ;    4784564 bytes; (  0.004GB)  -- completed
+file   2 is NOT active;       4833 reads ;    4253044 bytes; (  0.004GB)  -- completed
+file   3 is     active;      29573 reads ;   26024244 bytes; (  0.024GB) TS=     2180024170141
+file   4 is NOT active;       7249 reads ;    6379124 bytes; (  0.006GB)  -- completed
+file   5 is NOT active;      10873 reads ;    9568244 bytes; (  0.009GB)  -- completed
+file   6 is NOT active;       9061 reads ;    7973684 bytes; (  0.007GB)  -- completed
+file   7 is     active;      94150 reads ;   82852012 bytes; (  0.077GB) TS=     2179961881030
+file   8 is     active;      67585 reads ;   59474816 bytes; (  0.055GB) TS=     2179973964894
+file   9 is     active;     231635 reads ;  203838828 bytes; (  0.190GB) TS=     2179961881017
+file  10 is NOT active;     186038 reads ;  163713468 bytes; (  0.152GB)  -- completed
+file  11 is NOT active;      61610 reads ;   54216808 bytes; (  0.050GB)  -- completed
+current TS: 2179961881030; current event no:    899550;
+events written:    899550; total reads=   900005;
+elapsed time..................: 002h38m17s, [t0=1230215201911, curTS=2179961881030]
+Wed Oct 10 08:31:00 2018
+number of open files:    5
+CPU time: user     0.570 sec, system      0.570 sec, Total      1.140 sec
+bigbuf fills..........=       2000
+time order swaps......=     412341
+swaps per buffer......=     206.17
+bigbuf covers   9046.394 ms
+# bytes read...:    792004540B,   0.738GB; 662.556MB/sec; 2385.203GB/hour, 57.2TB/day
+# bytes written:    791604140B,   0.737GB; 662.221MB/sec
+total IO rate: 1324.778MB/sec or 10598Mbits/sec
+output chunk # 0 (chunksiz=2000000000 bytes, or  1.863 GBytes)
+^^----------------------------------------
+
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+TS jumped back -2181284283866; file 7; TS=-1; old=2181284283865; nread=900951, njb=0; 
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+TS jumped back -2181284283866; file 7; TS=-1; old=2181284283865; nread=900952, njb=1; 
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+TS jumped back -2181284283866; file 7; TS=-1; old=2181284283865; nread=900953, njb=2; 
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+TS jumped back -2181284283866; file 7; TS=-1; old=2181284283865; nread=900954, njb=3; 
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+TS jumped back -2181284283866; file 7; TS=-1; old=2181284283865; nread=900955, njb=4; 
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+TS jumped back -2181284283866; file 7; TS=-1; old=2181284283865; nread=900956, njb=5; 
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+TS jumped back -2181284283866; file 7; TS=-1; old=2181284283865; nread=900957, njb=6; 
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+TS jumped back -2181284283866; file 7; TS=-1; old=2181284283865; nread=900958, njb=7; 
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+TS jumped back -2181284283866; file 7; TS=-1; old=2181284283865; nread=900959, njb=8; 
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+failed to read 16 bytes for header, got 0
+failed to read more data from file 7, nextTSpoolIndex=7
+reject TS=-1; file 7
+abort jump back recovery, oldFileTS 2181284283865 --> -1; DT=2181284283866
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+TS jumped back -2181464382858; file 3; TS=-1; old=2181464382857; nread=901093, njb=0; 
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+TS jumped back -2181464382858; file 3; TS=-1; old=2181464382857; nread=901094, njb=1; 
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+TS jumped back -2181464382858; file 3; TS=-1; old=2181464382857; nread=901095, njb=2; 
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+TS jumped back -2181464382858; file 3; TS=-1; old=2181464382857; nread=901096, njb=3; 
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+TS jumped back -2181464382858; file 3; TS=-1; old=2181464382857; nread=901097, njb=4; 
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+TS jumped back -2181464382858; file 3; TS=-1; old=2181464382857; nread=901098, njb=5; 
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+TS jumped back -2181464382858; file 3; TS=-1; old=2181464382857; nread=901099, njb=6; 
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+TS jumped back -2181464382858; file 3; TS=-1; old=2181464382857; nread=901100, njb=7; 
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+TS jumped back -2181464382858; file 3; TS=-1; old=2181464382857; nread=901101, njb=8; 
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+failed to read 16 bytes for header, got 0
+failed to read more data from file 3, nextTSpoolIndex=3
+reject TS=-1; file 3
+abort jump back recovery, oldFileTS 2181464382857 --> -1; DT=2181464382858
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+TS jumped back -2181693555800; file 8; TS=-1; old=2181693555799; nread=901203, njb=0; 
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+TS jumped back -2181693555800; file 8; TS=-1; old=2181693555799; nread=901204, njb=1; 
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+TS jumped back -2181693555800; file 8; TS=-1; old=2181693555799; nread=901205, njb=2; 
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+TS jumped back -2181693555800; file 8; TS=-1; old=2181693555799; nread=901206, njb=3; 
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+TS jumped back -2181693555800; file 8; TS=-1; old=2181693555799; nread=901207, njb=4; 
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+TS jumped back -2181693555800; file 8; TS=-1; old=2181693555799; nread=901208, njb=5; 
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+TS jumped back -2181693555800; file 8; TS=-1; old=2181693555799; nread=901209, njb=6; 
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+TS jumped back -2181693555800; file 8; TS=-1; old=2181693555799; nread=901210, njb=7; 
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+TS jumped back -2181693555800; file 8; TS=-1; old=2181693555799; nread=901211, njb=8; 
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+failed to read 16 bytes for header, got 0
+failed to read more data from file 8, nextTSpoolIndex=8
+reject TS=-1; file 8
+abort jump back recovery, oldFileTS 2181693555799 --> -1; DT=2181693555800
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+TS jumped back -2182247373148; file 9; TS=-1; old=2182247373147; nread=901442, njb=0; 
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+TS jumped back -2182247373148; file 9; TS=-1; old=2182247373147; nread=901443, njb=1; 
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+TS jumped back -2182247373148; file 9; TS=-1; old=2182247373147; nread=901444, njb=2; 
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+TS jumped back -2182247373148; file 9; TS=-1; old=2182247373147; nread=901445, njb=3; 
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+TS jumped back -2182247373148; file 9; TS=-1; old=2182247373147; nread=901446, njb=4; 
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+TS jumped back -2182247373148; file 9; TS=-1; old=2182247373147; nread=901447, njb=5; 
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+TS jumped back -2182247373148; file 9; TS=-1; old=2182247373147; nread=901448, njb=6; 
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+TS jumped back -2182247373148; file 9; TS=-1; old=2182247373147; nread=901449, njb=7; 
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+TS jumped back -2182247373148; file 9; TS=-1; old=2182247373147; nread=901450, njb=8; 
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+failed to read 16 bytes for header, got 0
+failed to read more data from file 9, nextTSpoolIndex=9
+reject TS=-1; file 9
+abort jump back recovery, oldFileTS 2182247373147 --> -1; DT=2182247373148
+failed to read 16 bytes for header, got 0
+failed to read more data from file 0, nextTSpoolIndex=0
+no more data to be read
+closed all files
+
+
+hit statistics hit/Compton-suppress fraction
+
+
+**----------------------------------------
+file   0 is NOT active;     192682 reads ;  169560184 bytes; (  0.158GB)  -- completed
+file   1 is NOT active;       5437 reads ;    4784564 bytes; (  0.004GB)  -- completed
+file   2 is NOT active;       4833 reads ;    4253044 bytes; (  0.004GB)  -- completed
+file   3 is NOT active;      29597 reads ;   26045364 bytes; (  0.024GB)  -- completed
+file   4 is NOT active;       7249 reads ;    6379124 bytes; (  0.006GB)  -- completed
+file   5 is NOT active;      10873 reads ;    9568244 bytes; (  0.009GB)  -- completed
+file   6 is NOT active;       9061 reads ;    7973684 bytes; (  0.007GB)  -- completed
+file   7 is NOT active;      94227 reads ;   82919772 bytes; (  0.077GB)  -- completed
+file   8 is NOT active;      67651 reads ;   59532896 bytes; (  0.055GB)  -- completed
+file   9 is NOT active;     231944 reads ;  204110748 bytes; (  0.190GB)  -- completed
+file  10 is NOT active;     186038 reads ;  163713468 bytes; (  0.152GB)  -- completed
+file  11 is NOT active;      61610 reads ;   54216808 bytes; (  0.050GB)  -- completed
+current TS: 2183529712459; current event no:    900900;
+events written:    900900; total reads=   901202;
+elapsed time..................: 002h38m53s, [t0=1230215201911, curTS=2183529712459]
+Wed Oct 10 08:31:00 2018
+number of open files:    0
+CPU time: user     0.570 sec, system      0.570 sec, Total      1.140 sec
+bigbuf fills..........=       2002
+time order swaps......=     412803
+swaps per buffer......=     206.20
+bigbuf covers      0.000 ms
+# bytes read...:    793057900B,   0.739GB; 663.438MB/sec; 2388.376GB/hour, 57.3TB/day
+# bytes written:    792792140B,   0.738GB; 663.215MB/sec
+total IO rate: 1326.653MB/sec or 10613Mbits/sec
+output chunk # 0 (chunksiz=2000000000 bytes, or  1.863 GBytes)
+^^----------------------------------------
+
+
+used big buf of size     0.000 GBytes
+
+
+wrote 900900 events to::
+/home/helios/experiments/iss000/analysis/merged_data/GEBMerged_run116.gtd_000: data
+-rwxrwxrwx. 1 root root 792792140 Oct 10 08:31 /home/helios/experiments/iss000/analysis/merged_data/GEBMerged_run116.gtd_000
+
+
+Boniva Sancta ;-) >> GEBMerge3 did not crash << !!
+
+
+

@@ -54,4 +54,10 @@ dkms.conf
 # DATA files
 *.root
 *.gtd*
+*.png
+*.pdf
+*.svg
+
+# FOLDERS
+*ryanAnalysisCode/*
 

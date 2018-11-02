@@ -15,8 +15,8 @@
 
 // SWITCHES FOR POST-PROCESSING
 Bool_t qDrawGraphs = 0;
-Bool_t qPrintGraphs = 1;
-Bool_t qWriteData = 0;
+Bool_t qPrintGraphs = 0;
+Bool_t qWriteData = 1;
 
 // REDUCED TSelector CODE ---------------------------------------------------------------------- //
 #define NUMPRINT 20 //>0

@@ -25,7 +25,7 @@ echo "============================================="
 echo "============ RUN $RUN ======================="
 echo "============================================="
 
-du -hSc $DATADIR/${exp}_run_$RUN*
+du -hSc $DATADIR/${exp}_run_$RUN.gtd*
 
 echo "RUN $RUN: GEBMerge started at `date`"
 $GEBDIR/GEBMerge $MERGECHAT  $MERGDIR/GEBMerged_run$RUN.gtd `ls $DATADIR/${exp}_run_$RUN.gtd*` > $MERGDIR/GEBMerge_run$RUN.log

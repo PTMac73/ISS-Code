@@ -58,6 +58,10 @@ dkms.conf
 *.pdf
 *.svg
 *conflict*
+*.pcm
+*.svg
+*.ods
+*.log
 
 # FOLDERS
 *ryanAnalysisCode/*

@@ -17,7 +17,7 @@ DATADIR=$dir/data
 #MERGECHAT=$dir/bufferSizeCheck/GEBMerge.chat
 SORTCHAT=$dir/bufferSizeCheck/GEBSort.chat
 
-RUN=51
+RUN=25
 
 # Loop over the .chat files
 for f in $dir/bufferSizeCheck/chat_files/*.chat

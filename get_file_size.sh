@@ -18,7 +18,7 @@ I_ARRAY=()
 ARRAY_TOT=()
 
 # Loop over the desired run numbers
-for i in {0..125}
+for i in {20..33}
 do
 	FILECHECK="${PREFIX}${i}${SUFFIX}"
 

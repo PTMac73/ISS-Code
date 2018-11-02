@@ -84,6 +84,7 @@ typedef struct {
   ULong64_t TACTimestamp[100];
   ULong64_t ELUMTimestamp[32];
   ULong64_t EZEROTimestamp[10];
+  ULong64_t EBISTimestamp; 
 
 } PSD;
 
@@ -119,7 +120,8 @@ void GeneralSort::Begin(TTree * tree)
   gen_tree->Branch("elum_t",psd.ELUMTimestamp,"ELUMTimestamp[32]/l"); 
 
   gen_tree->Branch("ezero",psd.EZERO,"EZERO[10]/F");
-  gen_tree->Branch("ezero_t",psd.EZEROTimestamp,"EZEROTimestamp[10]/l"); 
+  gen_tree->Branch("ezero_t",psd.EZEROTimestamp,"EZEROTimestamp[10]/l");
+  gen_tree->Branch("EBIS",&psd.EBISTimestamp,"EBISTimestamp/l"); 
  
   StpWatch.Start();
 }
@@ -163,7 +165,7 @@ Bool_t GeneralSort::Process(Long64_t entry)
       if (i<32) psd.ELUMTimestamp[i]=TMath::QuietNaN();
       if (i<10) psd.EZEROTimestamp[i]=TMath::QuietNaN();	    
     }
-
+    psd.EBISTimestamp=TMath::QuietNaN();
     
     //Pull needed entries
     b_NumHits->GetEntry(entry);
@@ -253,6 +255,14 @@ Bool_t GeneralSort::Process(Long64_t entry)
 	  psd.EZEROTimestamp[ezeroTemp] = event_timestamp[i];
 	}
       }//end EZERO
+
+    
+
+      //EBIS 
+      /************************************************************************/
+      if (id[i]==1010) {
+        psd.EBISTimestamp = event_timestamp[i];
+      }//end EBIS
     } // End NumHits Loop
     
     gen_tree->Fill();

@@ -16,7 +16,7 @@
 // SWITCHES FOR POST-PROCESSING
 Bool_t qDrawGraphs = 1;
 Bool_t qPrintGraphs = 0;
-Bool_t qWriteData = 1;
+Bool_t qWriteData = 0;
 
 // REDUCED TSelector CODE ---------------------------------------------------------------------- //
 #define NUMPRINT 20 //>0
@@ -26,10 +26,6 @@ ULong64_t ProcessedEntries = 0;
 Float_t Frac = 0.1; //Progress bar
 TStopwatch StpWatch;
 
-TCanvas *c0, *c1;
-TCanvas *c2[4];
-TCanvas *c3, *c4;
-TCanvas *cEXE_Row[6];
 Int_t n=1;
 
 TString cutName("cut1");
@@ -120,6 +116,11 @@ TH1F* TD_EBIS;		// Time difference on the EBIS-Energy time
 TH1F* TD_Recoil;	// Time difference on the Energy-Recoil time
 TH1F* EXE_Row[6];	// Gated excitation spectrum on the recoils.
 
+// CANVASES
+TCanvas *cEVZ, *cEXE;
+TCanvas *cRecoilEdE[4];
+TCanvas *cTD_EBIS, *cTD_Recoil;
+TCanvas *cEXE_Row[6];
 
 // OUTPUT FILE
 TFile *outFile;
@@ -185,14 +186,14 @@ void PTMonitors::Begin(TTree *tree){
 	EXE->GetXaxis()->SetTitle("E (MeV)");
 	EXE->SetFillColor(5);
 									  
-	TD_EBIS = new TH1F("TD_EBIS", "", 10000, -3000000000000, 3000000000000);
+	TD_EBIS = new TH1F("TD_EBIS", "", 100000, -1000, 1000);
 	TD_EBIS->GetYaxis()->SetTitle("# counts");
-	TD_EBIS->GetXaxis()->SetTitle("Time Difference (a unit)");
+	TD_EBIS->GetXaxis()->SetTitle("Time Difference / 10^{-8} s");
 	TD_EBIS->SetFillColor(5);
 
-	TD_Recoil = new TH1F("TD_Recoil", "", 10000, -4000000000000, 4000000000000);
+	TD_Recoil = new TH1F("TD_Recoil", "", 100000, -1000, 1000);
 	TD_Recoil->GetYaxis()->SetTitle("# counts");
-	TD_Recoil->GetXaxis()->SetTitle("Time Difference (a unit)");
+	TD_Recoil->GetXaxis()->SetTitle("Time Difference / 10^{-8} s");
 	TD_Recoil->SetFillColor(5);
 	
 	for ( Int_t ii = 0; ii < 4; ii++ ){
@@ -383,17 +384,17 @@ void PTMonitors::Terminate()
 	
 	// E vs.z
 	if ( qDrawGraphs == 1 ){
-		c0 = new TCanvas("c0","E v.s. z", 1080, 810);
+		cEVZ = new TCanvas("cEVZ","E v.s. z", 1080, 810);
 		EVZ->Draw("scat colz same");
-		if ( qPrintGraphs == 1){ c0->Print("EVZ.png"); }
+		if ( qPrintGraphs == 1){ cEVZ->Print("EVZ.png"); }
 	}
 	if ( qWriteData == 1 ){ EVZ->Write(); }
 	
 	// Plot excitation energy
 	if ( qDrawGraphs == 1 ){ 
-		c1 = new TCanvas( "c1","Excitation energy spectrum", 1080, 810 ); 
+		cEXE = new TCanvas( "cEXE","Excitation energy spectrum", 1080, 810 ); 
 		EXE->Draw();
-		if (qPrintGraphs == 1){ c1->Print("EXE.png"); }
+		if (qPrintGraphs == 1){ cEXE->Print("EXE.png"); }
 	}
 	
 	if ( qWriteData == 1 ){ EXE->Write(); }
@@ -402,8 +403,8 @@ void PTMonitors::Terminate()
 	// Plot the E-dE plots for making cuts
 	for ( Int_t i = 0; i < 4; i++ ){
 		if ( qDrawGraphs == 1 ){
-			c2[i] = new TCanvas( Form("c2_%i", i), "E-dE plots", 540, 405 );
-			c2[i]->ToggleToolBar();
+			cRecoilEdE[i] = new TCanvas( Form("cRecoilEdE_%i", i), "E-dE plots", 540, 405 );
+			cRecoilEdE[i]->ToggleToolBar();
 			EdE[i]->Draw("box colz");
 			if( isCutFileOpen ) {
 				cutG = (TCutG *)cutList->At(i);
@@ -412,17 +413,17 @@ void PTMonitors::Terminate()
 		}
 		if ( qWriteData == 1 ){ EdE[i]->Write( Form("EdE-%i",i) ); }
 	}
-	
+	*/
 	if ( qDrawGraphs == 1 ){
-		c3 = new TCanvas( "c3", "EBIS time difference with energy", 1080, 816 );
+		cTD_EBIS = new TCanvas( "cTD_EBIS", "EBIS time difference with energy", 1080, 816 );
 		TD_EBIS->Draw();
 	}
 
 	if ( qDrawGraphs == 1 ){
-		c4 = new TCanvas( "c4", "Recoil detector time difference with energy", 1080, 816 );
+		cTD_Recoil = new TCanvas( "cTD_Recoil", "Recoil detector time difference with energy", 1080, 816 );
 		TD_Recoil->Draw();
 	}
-	*/
+	/*
 	for ( Int_t i = 0; i < 6; i++ ){	
 		if ( qDrawGraphs == 1 ){
 			cEXE_Row[i] = new TCanvas( Form( "cEXE_Row%i", i ), Form( "Si detector E v.s. z: row %i", i ), 1080, 816 );
@@ -432,7 +433,7 @@ void PTMonitors::Terminate()
 			writespe( EXE_Row[i]->GetName(), Form("Ex_Row%i",i) );
 		}
 	}
-	
+	*/
 	
 	
 	// Close the file

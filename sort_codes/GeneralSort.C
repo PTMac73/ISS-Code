@@ -121,6 +121,7 @@ void GeneralSort::Begin(TTree * tree)
 
   gen_tree->Branch("ezero",psd.EZERO,"EZERO[10]/F");
   gen_tree->Branch("ezero_t",psd.EZEROTimestamp,"EZEROTimestamp[10]/l");
+
   gen_tree->Branch("EBIS",&psd.EBISTimestamp,"EBISTimestamp/l"); 
  
   StpWatch.Start();

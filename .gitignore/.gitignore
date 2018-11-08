@@ -62,7 +62,9 @@ dkms.conf
 *.svg
 *.ods
 *.log
+*.spe
 
 # FOLDERS
 *ryanAnalysisCode/*
+*GEBSort/*
 

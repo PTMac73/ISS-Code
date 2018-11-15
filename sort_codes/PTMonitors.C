@@ -115,12 +115,14 @@ TH2F* EdE[4];		// Gated recoil detector E-dE plots
 TH1F* TD_EBIS;		// Time difference on the EBIS-Energy time
 TH1F* TD_Recoil;	// Time difference on the Energy-Recoil time
 TH1F* EXE_Row[6];	// Gated excitation spectrum on the recoils.
+TH2F* XN_XF[24];	// XN v.s. XF plots for each detector
 
 // CANVASES
 TCanvas *cEVZ, *cEXE;
 TCanvas *cRecoilEdE[4];
 TCanvas *cTD_EBIS, *cTD_Recoil;
 TCanvas *cEXE_Row[6];
+TCanvas *cXN_XF;
 
 // OUTPUT FILE
 TFile *outFile;
@@ -176,36 +178,49 @@ void PTMonitors::Begin(TTree *tree){
 	sharpyStyle->SetMarkerStyle(7);
 	sharpyStyle->cd();
 	
-	// Define histograms and set options
+	// DEFINE HISTOGRAMS AND SET OPTIONS
+	// Gated energy v.s. position
 	EVZ = new TH2F("EVZ", "",700, -50, -5, 750 , 0 , 10);
 	EVZ->GetXaxis()->SetTitle("z (cm)");
 	EVZ->GetYaxis()->SetTitle("E (MeV)");
 	
+	// Gated excitation spectrum
 	EXE = new TH1F("EXE", "", 400, -1, 8 );
 	EXE->GetYaxis()->SetTitle("Counts");
 	EXE->GetXaxis()->SetTitle("E (MeV)");
 	EXE->SetFillColor(5);
-									  
+	
+	// Time difference on the EBIS-Energy time
 	TD_EBIS = new TH1F("TD_EBIS", "", 100000, -1000, 1000);
 	TD_EBIS->GetYaxis()->SetTitle("# counts");
 	TD_EBIS->GetXaxis()->SetTitle("Time Difference / 10^{-8} s");
 	TD_EBIS->SetFillColor(5);
 
+	// Time difference on the Energy-Recoil time
 	TD_Recoil = new TH1F("TD_Recoil", "", 100000, -1000, 1000);
 	TD_Recoil->GetYaxis()->SetTitle("# counts");
 	TD_Recoil->GetXaxis()->SetTitle("Time Difference / 10^{-8} s");
 	TD_Recoil->SetFillColor(5);
 	
+	// Gated recoil detector E-dE plots	
 	for ( Int_t ii = 0; ii < 4; ii++ ){
 		EdE[ii] = new TH2F( Form("EdE%d",ii ), "", 1000, 0, 10000, 1000, 0, 4000 );
 		EdE[ii]->SetTitle( Form( "Recoil %d", ii ) );
 	}
 	
+	// Gated excitation spectrum on the recoils.
 	for ( Int_t ii = 0; ii < 6; ii++ ){
 		EXE_Row[ii] = new TH1F( Form( "EXE_Row%i", ii ), "", 450, -1, 8 );
 		EXE_Row[ii]->GetYaxis()->SetTitle("Counts");
 		EXE_Row[ii]->GetXaxis()->SetTitle("E (MeV)");
 		EXE_Row[ii]->SetFillColor(5);
+	}
+
+	// XN v.s. XF plots for each detector
+	for ( Int_t ii = 0; ii < 24; ii++ ){
+		XN_XF[ii] = new TH2F( Form( "XN_XF: Row %i, Side %i", ii % 6, (int)TMath::Floor(ii/6) ), "", 5101, -100, 5000, 5101, -100, 5000 );
+		XN_XF[ii]->GetYaxis()->SetTitle("XN");
+		XN_XF[ii]->GetXaxis()->SetTitle("XF");
 	}
 
 	printf("======== number of cuts found : %d \n", numCut);
@@ -359,6 +374,7 @@ Bool_t PTMonitors::Process(Long64_t entry){
 									EVZ->Fill(z[detID],ecrr[detID]);
 									EXE->Fill(Ex-1);
 									EXE_Row[detID % 6]->Fill(Ex-1);
+									XN_XF[detID]->Fill(xn[detID],xf[detID]);
 								}
 							}
 						}
@@ -423,7 +439,7 @@ void PTMonitors::Terminate()
 		cTD_Recoil = new TCanvas( "cTD_Recoil", "Recoil detector time difference with energy", 1080, 816 );
 		TD_Recoil->Draw();
 	}
-	/*
+	
 	for ( Int_t i = 0; i < 6; i++ ){	
 		if ( qDrawGraphs == 1 ){
 			cEXE_Row[i] = new TCanvas( Form( "cEXE_Row%i", i ), Form( "Si detector E v.s. z: row %i", i ), 1080, 816 );
@@ -433,7 +449,16 @@ void PTMonitors::Terminate()
 			writespe( EXE_Row[i]->GetName(), Form("Ex_Row%i",i) );
 		}
 	}
-	*/
+	
+
+	if ( qDrawGraphs == 1 ){
+		cXN_XF = new TCanvas( "cXN_XF", "XN v.s. XF plot", 1800, 900 );
+		cXN_XF->Divide(6,4);
+		for ( Int_t i = 0; i < 24; i++ ){
+			cXN_XF->cd(i+1);
+			XN_XF[i]->Draw();
+		}
+	}
 	
 	
 	// Close the file

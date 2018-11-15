@@ -4,23 +4,22 @@
 #include "TString.h"
 #include <vector>
 
-// Global variables
-TChain *ch0, *ch1, *ch2;
-TFile *f0, *f1, *f2;
+// GLOBAL VARIABLES
+TChain *ch0, *ch1, *ch2, *chAlpha;
+TFile *f0, *f1, *f2, *fAlpha;
 
 // Run arrays
-//vector <Int_t> runArray0 = {50, 51, 52}; // Array position = 119.765 => z_off = 0.00235
-
+vector <Int_t> runArrayAlpha = {0};
+vector <Int_t> runArray0 = {50, 51, 52}; // Array position = 119.765 => z_off = 0.00235
 vector <Int_t> runArray1 = {53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 82, 83, 84, 85, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100}; // Array position = 164.98 mm => z_off = 3.502
-
 // Run 103 is the run with the 600 ug/cm2 target - use if you want to
-
-//vector <Int_t> runArray2 = {104, 105, 106, 107, 108, 110, 111, 112, 113, 115, 116, 117, 118}; // Array position = 135.0 mm => z_off = 6.5
+vector <Int_t> runArray2 = {104, 105, 106, 107, 108, 110, 111, 112, 113, 115, 116, 117, 118}; // Array position = 135.0 mm => z_off = 6.5
 
 TString prefix = "../root_data/gen_run";
 TString suffix = ".root";
 
 
+// BEGIN FUNCTION THAT CHAINS THE RUNS TOGETHER
 void chainRuns( vector <Int_t> runArray, TChain *ch, TFile *f, TString outName ){
 	// Define the new tree
 	ch = new TChain("gen_tree");
@@ -59,8 +58,10 @@ void SharpChain(){
 	//gDirectory->Delete("ch0");
 	gDirectory->Delete("ch1");
 	//gDirectory->Delete("ch2");
+	//gDirectory->Delete("chAlpha");
 	
 	//chainRuns( runArray0, ch0, f0, "../root_data/genPos0.root" );
 	chainRuns( runArray1, ch1, f1, "../root_data/genPos1.root" );
 	//chainRuns( runArray2, ch2, f2, "../root_data/genPos2.root" );
+	//chainRuns( runArrayAlpha, chAlpha, fAlpha, "../root_data/genAlpha.root" );
 }

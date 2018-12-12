@@ -1,6 +1,6 @@
-#define PTMonitors_cxx
+#define PTMonitorsOLD_cxx
 
-#include "PTMonitors.h"
+#include "PTMonitorsOLD.h"
 #include <TH2.h>
 #include <TH1.h>
 #include <TStyle.h>
@@ -14,7 +14,7 @@
 #include <TFile.h>
 
 // SWITCHES FOR POST-PROCESSING
-Bool_t qDrawGraphs = 0;
+Bool_t qDrawGraphs = 1;
 Bool_t qPrintGraphs = 0;
 Bool_t qWriteData = 0;
 
@@ -28,6 +28,7 @@ TStopwatch StpWatch;
 
 Int_t n=1;
 
+TString cutName("cut1");
 TCutG* cutG; //!
 TObjArray * cutList;
 TString cutTag;
@@ -40,8 +41,8 @@ Float_t timeZero=0;
 Float_t timeCurrent=0;
 Float_t timeRef=0;
 
-//Float_t x[24],z[24];
-//Float_t xcal[24],ecal[24],xfcal[24],xncal[24],ecrr[24];
+Float_t x[24],z[24];
+Float_t xcal[24],ecal[24],xfcal[24],xncal[24],ecrr[24],ezero[10];
 Int_t tacA[24];
 Float_t z_array_pos[6] = {35.868,29.987,24.111,18.248,12.412,6.676};//in cm
 
@@ -133,28 +134,8 @@ TString cutFileDir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/working/ALL-
 // NEW TREE STUFF
 TTree* fin_tree;
 
-typedef struct {
-	// Calculated quantities
-	Float_t x[24];
-	Float_t z[24];
-	Float_t xcal[24];
-	Float_t ecal[24];
-	Float_t xfcal[24];
-	Float_t xncal[24];
-	Float_t ecrr[24];
-	Float_t Ex[24];
-	Float_t thetaCM[24];
-	Int_t detID[24];
-	int td_rdt_e[24][4];
-	int td_rdt_elum[32][4];
-	int td_e_ebis[24];
-	TCutG* cut[100];
-} FIN;
-
-FIN fin;
-
 // TSELECTOR BEGIN FUNCTION -------------------------------------------------------------------- //
-void PTMonitors::Begin(TTree *tree){
+void PTMonitorsOLD::Begin(TTree *tree){
 	// Define offset (array position - offset position = 70mm???)
 	if ( OFF_POSITION == 0 ){
 		z_off = 4.9765;
@@ -230,13 +211,13 @@ void PTMonitors::Begin(TTree *tree){
 	EXE->SetFillColor(5);
 	
 	// Time difference on the EBIS-Energy time
-	TD_EBIS = new TH1F("TD_EBIS", "", 10001, -5000, 5000);
+	TD_EBIS = new TH1F("TD_EBIS", "", 100000, -1000, 1000);
 	TD_EBIS->GetYaxis()->SetTitle("# counts");
 	TD_EBIS->GetXaxis()->SetTitle("Time Difference / 10^{-8} s");
 	TD_EBIS->SetFillColor(5);
 
 	// Time difference on the Energy-Recoil time
-	TD_Recoil = new TH1F("TD_Recoil", "", 2001, -1000, 1000);
+	TD_Recoil = new TH1F("TD_Recoil", "", 100000, -1000, 1000);
 	TD_Recoil->GetYaxis()->SetTitle("# counts");
 	TD_Recoil->GetXaxis()->SetTitle("Time Difference / 10^{-8} s");
 	TD_Recoil->SetFillColor(5);
@@ -262,50 +243,17 @@ void PTMonitors::Begin(TTree *tree){
 		XN_XF[ii]->GetXaxis()->SetTitle("XF");
 	}
 
-	// NEW TTREE STUFF
-	outFile = new TFile("fin.root", "RECREATE");
-	fin_tree = new TTree( "fin_tree", "Tree containing everything" );
-	fin_tree->Branch("e",e,"Energy[100]/F");
-	fin_tree->Branch("e_t",e_t,"EnergyTimestamp[100]/l");
-	fin_tree->Branch("xf",xf,"XF[100]/F");
-	fin_tree->Branch("xf_t",xf_t,"XFTimestamp[100]/l");
-	fin_tree->Branch("xn",xn,"XN[100]/F");
-  	fin_tree->Branch("xn_t",xn_t,"XNTimestamp[100]/l"); 
-	fin_tree->Branch("rdt",rdt,"RDT[100]/F");
-	fin_tree->Branch("rdt_t",rdt_t,"RDTTimestamp[100]/l"); 
-	fin_tree->Branch("tac",tac,"TAC[100]/F");
-	fin_tree->Branch("tac_t",tac_t,"TACTimestamp[100]/l"); 
-	fin_tree->Branch("elum",elum,"ELUM[32]/F");
-	fin_tree->Branch("elum_t",elum_t,"ELUMTimestamp[32]/l");
-	fin_tree->Branch("ezero",ezero,"EZERO[10]/F");
-	fin_tree->Branch("ezero_t",ezero_t,"EZEROTimestamp[10]/l");
-	//fin_tree->Branch("ebis_t",ebis_t,"EBISTimestamp/l"); 
-	
-	fin_tree->Branch("x",fin.x,"X[24]/F");
-	fin_tree->Branch("z",fin.z,"Z[24]/F");
-	fin_tree->Branch("xcal",fin.xcal,"XCalibrated[24]/F");
-	fin_tree->Branch("ecal",fin.ecal,"ECalibrated[24]/F");
-	fin_tree->Branch("xfcal",fin.xfcal,"XFCalibrated[24]/F");
-	fin_tree->Branch("xncal",fin.xncal,"XNCalibrated[24]/F");
-	fin_tree->Branch("ecrr",fin.ecrr,"ECalibrated[24]/F");
-	fin_tree->Branch("td_rdt_e",fin.td_rdt_e,"RDT-E_TD[24][4]/I");
-	fin_tree->Branch("td_rdt_elum",fin.td_rdt_elum,"RDT-ELUM_TD[32][4]/I");
-	fin_tree->Branch("td_e_ebis",fin.td_e_ebis,"E-EBIS_TD[24]/I");
-	fin_tree->Branch("Ex",fin.Ex,"Ex[24]/F");
-	fin_tree->Branch("thetaCM",fin.thetaCM,"ThetaCM[24]/F");
-	fin_tree->Branch("detID",fin.detID,"DetID[24]/I");
-
 	printf("======== number of cuts found : %d \n", numCut);
 	StpWatch.Start();
 }
 
 // TSELECTOR SLAVEBEGIN FUNCTION --------------------------------------------------------------- //
-void PTMonitors::SlaveBegin(TTree * /*tree*/){
+void PTMonitorsOLD::SlaveBegin(TTree * /*tree*/){
 	TString option = GetOption();
 }
 
 // TSELECTOR MAIN PROCESS ---------------------------------------------------------------------- //
-Bool_t PTMonitors::Process(Long64_t entry){
+Bool_t PTMonitorsOLD::Process(Long64_t entry){
 	// Increment number of processed entries
 	ProcessedEntries++;
 	
@@ -335,51 +283,38 @@ Bool_t PTMonitors::Process(Long64_t entry){
 		b_EBISTimestamp->GetEntry(entry);
 
 		// DO CALCULATIONS
-		/* RECOIL-ELUM */
-		// Calculate the elum-recoil time, by first populating arrays with junk
-		for ( Int_t i = 0; i < 32; i++ ){
-			for ( Int_t j = 0; j < 4; j++ ){
-				if ( rdt_t[j] != 0 && elum_t[i] != 0 ){
-					fin.td_rdt_elum[i][j]= (int)(rdt_t[j]-elum_t[i]);
-				}
-				else {
-					fin.td_rdt_elum[i][j] = 10000;
-				}
-			}
-		}
-			
 		/* ARRAY */
 		for (Int_t i = 0; i < 24; i++) {
 			// Calibrate each of the detectors
-			fin.xfcal[i] = xf[i]*xfxneCorr[i][1]+xfxneCorr[i][0];
-			fin.xncal[i] = xn[i]*xnCorr[i]*xfxneCorr[i][1]+xfxneCorr[i][0];
-			fin.ecal[i] = e[i]/eCorr[i][0]+eCorr[i][1];
-			fin.ecrr[i] = e[i]/eCorr[i][0]+eCorr[i][1];
+			xfcal[i] = xf[i]*xfxneCorr[i][1]+xfxneCorr[i][0];
+			xncal[i] = xn[i]*xnCorr[i]*xfxneCorr[i][1]+xfxneCorr[i][0];
+			ecal[i] = e[i]/eCorr[i][0]+eCorr[i][1];
+			ecrr[i] = e[i]/eCorr[i][0]+eCorr[i][1];
 		
 			// Calculate the uncalibrated position on the strip
 			if (xf[i]>0 || xn[i]>0 || !TMath::IsNaN(xf[i]) || !TMath::IsNaN(xn[i])) {
-				fin.x[i] = 0.5*((xf[i]-xn[i]) / (xf[i]+xn[i]))+0.5;
+				x[i] = 0.5*((xf[i]-xn[i]) / (xf[i]+xn[i]))+0.5;
 			}
 		
 			// Calculate the calibrated position on the strip
-			if ( fin.xfcal[i] > 0.5*e[i] ) {
-				fin.xcal[i] = fin.xfcal[i]/e[i];
-			}else if ( fin.xncal[i] >= 0.5*e[i] ) {
-				fin.xcal[i] = 1.0 - fin.xncal[i]/e[i];
+			if (xfcal[i]>0.5*e[i]) {
+				xcal[i] = xfcal[i]/e[i];
+			}else if (xncal[i]>=0.5*e[i]) {
+				xcal[i] = 1.0 - xncal[i]/e[i];
 			}
 		  
 			// Calculate the exact position on the z axis
-			fin.z[i] = 5.0*( fin.xcal[i] - 0.5 ) - z_off - z_array_pos[i%6];
+			z[i] = 5.0*(xcal[i]-0.5) - z_off - z_array_pos[i%6];
 			
 			/* Fill the E-dE histograms if:
 				* The position x (position on the strip) is between -1.1 and 1.1
 				* The energy is greater than 100
 				* One of xn or xf is greater than 0
 			*/
-			if ( fin.x[i] > -1.1 && fin.x[i] <1.1 && e[i] > 100 && ( xn[i] > 0 || xf[i] > 0 ) ){
+			if ( x[i] > -1.1 && x[i] <1.1 && e[i] > 100 && ( xn[i] > 0 || xf[i] > 0 ) ){
 				// Loop over the number of recoil detectors
 	 			for ( Int_t ii = 0; ii < 4; ii++ ){
-					EdE[ii]->Fill( rdt[ii+4], rdt[ii] );
+					EdE[ii]->Fill(rdt[ii+4],rdt[ii]);
 				}
 			}
 		  
@@ -389,12 +324,11 @@ Bool_t PTMonitors::Process(Long64_t entry){
 			for(Int_t j = 0; j < 6; j++){			// Loop over each strip of side
 		
 				// Label the strip from 0 --> 23
-				Int_t index = i*6+j;
-				fin.detID[index] = index;
+				int detID = i*6+j;
 		
 				//======== Ex calculation by Ryan 
-				double y = fin.ecrr[index] + mass; // to give the KE + mass of proton;
-				double Z = alpha * gamm * beta * fin.z[index] * 10.;
+				double y = ecrr[detID] + mass; // to give the KE + mass of proton;
+				double Z = alpha * gamm * beta * z[detID] * 10.;
 				double H = TMath::Sqrt(TMath::Power(gamm * beta,2) * (y*y - mass * mass) ) ;
 
 				// Calculate the angle
@@ -420,55 +354,47 @@ Bool_t PTMonitors::Process(Long64_t entry){
 					if( Df > 0 && TMath::Abs(phi) < TMath::PiOver2()  ){
 						double K = H * TMath::Sin(phi);
 						double x = TMath::ACos( mass / ( y * gamm - K));
-						double momt = mass * TMath::Tan( x ); // momentum of particle b or B in CM frame
+						double momt = mass * TMath::Tan(x); // momentum of particle b or B in CM frame
 						double EB = TMath::Sqrt(mass*mass + Et*Et - 2*Et*TMath::Sqrt(momt * momt + mass * mass));
-						fin.Ex[index] = EB - massB;
+						Ex = EB - massB;
 						
 						double hahaha1 = gamm* TMath::Sqrt(mass * mass + momt * momt) - y;
 						double hahaha2 = gamm* beta * momt;
-						fin.thetaCM[index] = TMath::ACos(hahaha1/hahaha2) * TMath::RadToDeg();
+						thetaCM = TMath::ACos(hahaha1/hahaha2) * TMath::RadToDeg();
 				 
 					}
 					else{
-						fin.Ex[index] = TMath::QuietNaN();
-						fin.thetaCM[index] = TMath::QuietNaN();
+						Ex = TMath::QuietNaN();
+						thetaCM = TMath::QuietNaN();
 					}	
 				}
 				else{
-					fin.Ex[index] = TMath::QuietNaN();
-					fin.thetaCM[index] = TMath::QuietNaN();
+					Ex = TMath::QuietNaN();
+					thetaCM = TMath::QuietNaN();
 				}
 				
 				// Calculate the EBIS time - the array time and populate a histogram
-				fin.td_e_ebis[index] = 10000;
-				if ( ebis_t != 0 && e_t[index] != 0 ){
-					fin.td_e_ebis[index] = (int)(e_t[index] - ebis_t);
-				}
-				TD_EBIS->Fill( fin.td_e_ebis[index] );
+				Long64_t X = (Long64_t)e_t[detID] - (Long64_t)ebis_t;
+				TD_EBIS->Fill( X );
 				
 
-				// Calculate the recoil time stuff, by first populating arrays with junk
-				for ( Int_t ii = 0; ii < 4; ii++ ){
-						fin.td_rdt_e[index][ii] = 10000;
-				}
-				for ( Int_t kk = 0; kk < 4; kk++ ){
-					if ( rdt_t[kk] != 0 && e_t[index] != 0 ){
-						fin.td_rdt_e[index][kk]= (int)(rdt_t[kk]-e_t[index]);
-					}
-					TD_Recoil->Fill( fin.td_rdt_e[index][kk] );
+				// Calculate the recoil time stuff
+				for (Int_t kk = 0; kk < 4; kk++ ){
+					TD_Recoil->Fill( (Long64_t)(rdt_t[kk]-e_t[detID]) );
 				}
 
 				// Now look at cuts for gated spectra
 				if( isCutFileOpen){
 					for( int k = 0 ; k < numCut; k++ ){
-						fin.cut[k] = (TCutG *)cutList->At(k) ;
-						if( fin.cut[k]->IsInside(rdt[k+4], rdt[k]) ) { //CRH
+						cutG = (TCutG *)cutList->At(k) ;
+						if( cutG->IsInside(rdt[k+4], rdt[k]) ) { //CRH
 							for (Int_t kk = 0; kk < 4; kk++) { 
-								if(-30 < fin.td_rdt_e[index][kk] && fin.td_rdt_e[index][kk] < 30) {
-									EVZ->Fill( fin.z[index], fin.ecrr[index] );
-									EXE->Fill(fin.Ex[index] );
-									EXE_Row[index % 6]->Fill( fin.Ex[index] );
-									XN_XF[index]->Fill( xn[index], xf[index] );
+								tacA[detID]= (int)(rdt_t[kk]-e_t[detID]);
+								if(-30 < tacA[detID] && tacA[detID] < 30) {
+									EVZ->Fill(z[detID],ecrr[detID]);
+									EXE->Fill(Ex);
+									EXE_Row[detID % 6]->Fill(Ex);
+									XN_XF[detID]->Fill(xn[detID],xf[detID]);
 								}
 							}
 						}
@@ -476,37 +402,38 @@ Bool_t PTMonitors::Process(Long64_t entry){
 				}
 			} // Strip loop
 		} // Side loop
-
-	// FILL THE NEW TTree BASED ON CALCULATIONS
-	fin_tree->Fill();
 	} // Processed entries
 	return kTRUE;
 }
 
 // TSELECTOR SLAVE TERMINATE FUNCTION ---------------------------------------------------------- //
-void PTMonitors::SlaveTerminate(){
+void PTMonitorsOLD::SlaveTerminate(){
 
 }
 
 // TSELECTOR TERMINATE FUNCTION ---------------------------------------------------------------- //
-void PTMonitors::Terminate()
+void PTMonitorsOLD::Terminate()
 {
 	// PLOT SHARPY'S GRAPHS AND WRITE TO FILE
-	
+	/*
+	if ( qWriteData == 1 ){ outFile = new TFile("fin.root", "RECREATE"); }
+	*/
 	// E vs.z
-	//if ( qDrawGraphs == 1 ){
-		cEVZ = new TCanvas("cEVZ","E v.s. z", 1080, 810);
+	if ( qDrawGraphs == 1 ){
+		cEVZ = new TCanvas("cEVZ","E v.s. z");
 		EVZ->Draw("scat colz same");
 		if ( qPrintGraphs == 1){ cEVZ->Print("EVZ.png"); }
-	//}
-	EVZ->Write();
-
+	}
+	if ( qWriteData == 1 ){ EVZ->Write(); }
+	/*
 	// Plot excitation energy
 	if ( qDrawGraphs == 1 ){ 
 		cEXE = new TCanvas( "cEXE","Excitation energy spectrum", 1080, 810 ); 
 		EXE->Draw();
 		if (qPrintGraphs == 1){ cEXE->Print("EXE.png"); }
 	}
+	
+	if ( qWriteData == 1 ){ EXE->Write(); }
 
 
 	// Plot the E-dE plots for making cuts
@@ -520,6 +447,7 @@ void PTMonitors::Terminate()
 				cutG->Draw("same");
 			}
 		}
+		if ( qWriteData == 1 ){ EdE[i]->Write( Form("EdE-%i",i) ); }
 	}
 	
 	if ( qDrawGraphs == 1 ){
@@ -543,27 +471,17 @@ void PTMonitors::Terminate()
 		}
 	}
 	
+	
 	if ( qDrawGraphs == 1 ){
 		cXN_XF = new TCanvas( "cXN_XF", "XN v.s. XF plot", 1800, 900 );
 		cXN_XF->Divide(6,4);
-	}
-	for ( Int_t i = 0; i < 24; i++ ){
-		if ( qDrawGraphs == 1 ){
+		for ( Int_t i = 0; i < 24; i++ ){
 			cXN_XF->cd(i+1);
 			XN_XF[i]->Draw();
 		}
 	}
+	*/
 	
-	// Write the cuts
-	for ( int i = 0; i < 100; i++ ){
-		if ( fin.cut[i] != NULL ){
-			fin.cut[i]->Write();
-		}
-	}
-
-	// Write the TTree
-	fin_tree->Write();
-
 	// Close the file
 	if ( outFile != NULL ){ outFile->Close(); }
 	

@@ -8,18 +8,15 @@
 #include <TString.h>
 #include <TObjArray.h>
 
-void CutCreator(){
+void RDTCutCreator(){
 	
 	printf("================ Graphic Cut Creator for RDT ============== \n");
    
-	TFile *f = new TFile("../root_data/genPos1.root");
-	TChain *chain = (TChain*)f->Get("gen_tree");
-	/*
    TChain * chain = new TChain("gen_tree");
-   chain->Add("../root_data/genPos1.root");
-   chain->Add("../root_data/gen_run83.root");
-   chain->Add("data/gen_run50.root");
-   */
+   chain->Add("../../root_data/gen_run6[0-9].root");
+  
+   TString saveFileName = "rdtCuts.root";
+   
    chain->GetListOfFiles()->Print();
    
 	TString varX, varY, tag;
@@ -29,9 +26,7 @@ void CutCreator(){
 	TCanvas * cCutCreator = new TCanvas("cCutCreator", "RDT Cut Creator", 100, 100, 800, 800);
 	if( !cCutCreator->GetShowToolBar() ) cCutCreator->ToggleToolBar();
 	
-   
-   TFile * cutFile = new TFile("rdtCuts.root", "recreate");
-	cCutCreator->Update();
+   cCutCreator->Update();
 	
 	TCutG * cut = NULL;
 	TObjArray * cutList = new TObjArray();
@@ -41,11 +36,11 @@ void CutCreator(){
 
 	for (Int_t i = 0; i < 4; i++) {
 
-      printf("======== make a graphic cut on the plot, %d-th cut: ", i );
+      printf("======== make a graphic cut on the plot (double click to stop), %d-th cut: ", i );
 
       varX.Form("rdt[%d]",i+4); varY.Form("rdt[%d]",i);
 
-      expression[i].Form("%s:%s>>h(2096, 0, 8192, 2096, 0, 8192)", 
+      expression[i].Form("%s:%s>>h(500, 0, 8000, 500, 0, 5000)", 
             varY.Data(),
             varX.Data());
 
@@ -56,13 +51,18 @@ void CutCreator(){
       gPad->WaitPrimitive();
 
       cut = (TCutG*) gROOT->FindObject("CUTG");
+      
+      if( cut == NULL ){
+         printf(" stopped by user. no file saved or changed. \n");
+         break;
+      }
 
       TString name; name.Form("cut%d", i);
       cut->SetName(name);
       cut->SetVarX(varX.Data());
       cut->SetVarY(varY.Data());
       cut->SetTitle(tag);
-      cut->SetLineColor(i);
+      cut->SetLineColor(i+1);
       cutList->Add(cut);
 
       printf(" cut-%d \n", i);
@@ -70,8 +70,10 @@ void CutCreator(){
      
 	}
 	
+   TFile * cutFile = new TFile(saveFileName, "recreate");
 	cutList->Write("cutList", TObject::kSingleKey);
 	
-	printf("====> saved %d cuts into rdtCuts.root\n", 4);
-	
+	printf("====> saved %d cuts into %s\n", 4, saveFileName.Data());
+
+	gROOT->ProcessLine(".q");
 }

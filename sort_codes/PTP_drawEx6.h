@@ -42,10 +42,12 @@ void drawEx6( TTree *t, plotterOptions &opt_s, Int_t pos_number ){
 		
 		// Save the excitation spectra as pdf and spe file
 		if ( SWITCH_PRINT_CANVAS == 1 ){
-			writespe( Form("ex6_%i", i ), Form("ex_%i", i ) );
-			cEx6[i]->Print( Form( "%sEX%i_%i|6%s", opt_s.printDir.Data(), pos_number, i, PRINT_FORMAT.Data() ) );
+			TString fileName = Form( "%sEX%i_%i|6", opt_s.printDir.Data(), pos_number, i );
+			writespe( Form("ex6_%i", i ), Form( "%s", fileName.Data() ) );
+			cEx6[i]->Print( Form( "%s%s", fileName.Data(), PRINT_FORMAT.Data() ) );
+
 			// Move the spe file to the PLOTS folder
-			gSystem->Exec( Form( "mv ex6_%i.spe %sex6_%i.spe", i, opt_s.printDir.Data(), i ));
+			gSystem->Exec( Form( "mv %s.spe %s%s.spe", fileName.Data(), opt_s.printDir.Data(), fileName.Data() ) );
 		}
 		
 		// Write a message

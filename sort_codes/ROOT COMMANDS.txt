@@ -1,0 +1,18 @@
+// E v.s. z
+fin_tree->Draw(
+	"ecrr:z>>a(401,-50,-10,901,0,9)", 
+	"(cut0 || cut1 || cut2 || cut3)
+	&&
+	(td_rdt_e > -30 && td_rdt_e < 30)
+	&&
+		( ( detID % 6 == 0 && ecrr > 2.1) || 
+		( detID % 6 == 1 && ecrr > 1.7 ) || 
+		( detID % 6 == 2 && ecrr > 1.5 ) || 
+		( detID % 6 == 3 && ecrr > 0.8) || 
+		( detID % 6 == 4 && ecrr > 0.4 ) || 
+		( detID % 6 == 5 ) )
+	&& xcal >= 0.1 && xcal <= 0.9");
+
+fin_tree->Draw("ecrr:z>>a(401,-50,-10,901,0,9)", "(cut0 || cut1 || cut2 || cut3) && (td_rdt_e > -30 && td_rdt_e < 30) && ( ( detID % 6 == 0 && ecrr > 2.1) || ( detID % 6 == 1 && ecrr > 1.7 ) || ( detID % 6 == 2 && ecrr > 1.5 ) || ( detID % 6 == 3 && ecrr > 0.8) || ( detID % 6 == 4 && ecrr > 0.4 ) || ( detID % 6 == 5 ) ) && xcal >= 0.1 && xcal <= 0.9")
+
+fin_tree->Draw("z>>a(401,-50,-10)", "(cut0 || cut1 || cut2 || cut3) && (td_rdt_e > -30 && td_rdt_e < 30) && ( ( detID % 6 == 0 && ) || ( detID % 6 == 1  ) || ( detID % 6 == 2 ) || ( detID % 6 == 3 ) || ( detID % 6 == 4  ) || ( detID % 6 == 5 ) )")

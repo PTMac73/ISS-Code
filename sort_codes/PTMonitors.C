@@ -47,6 +47,7 @@ Float_t z_array_pos[6] = {35.868,29.987,24.111,18.248,12.412,6.676};//in cm
 
 // z offset
 Int_t OFF_POSITION = 1;
+Bool_t ALPHA_RUN = 1;
 Float_t z_off;
 
 Float_t xnCorr[24] = {0.907342,0.907342,0.976727,0.914866,1.021736,
@@ -92,7 +93,6 @@ Float_t eCorr[24][2] = {{256.060637	,0.021569},
 			{292.477670	,0.015062},
 			{239.341772	-0.009266}};
 
-
 Float_t exCorr[6] = { 938.272,  // mass of proton [MeV/c^2]
 	                   1,        // charge of proton
 	                   27954.0982, // cm frame total energy
@@ -128,7 +128,7 @@ TCanvas *cXN_XF;
 TFile* outFile;
 
 // CUTS FILE
-TString cutFileDir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/working/ALL-MgCuts.root";
+TString cutFileDir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/working/ALL-MgCuts3.root";
 
 // NEW TREE STUFF
 TTree* fin_tree;
@@ -263,7 +263,13 @@ void PTMonitors::Begin(TTree *tree){
 	}
 
 	// NEW TTREE STUFF
-	outFile = new TFile("fin.root", "RECREATE");
+	if ( ALPHA_RUN == 0 ){
+		outFile = new TFile( Form( "fin%i.root", OFF_POSITION ), "RECREATE");
+	}
+	else{
+		outFile = new TFile( "finAlpha2.root", "RECREATE");
+	}
+	
 	fin_tree = new TTree( "fin_tree", "Tree containing everything" );
 	fin_tree->Branch("e",e,"Energy[100]/F");
 	fin_tree->Branch("e_t",e_t,"EnergyTimestamp[100]/l");
@@ -294,6 +300,8 @@ void PTMonitors::Begin(TTree *tree){
 	fin_tree->Branch("Ex",fin.Ex,"Ex[24]/F");
 	fin_tree->Branch("thetaCM",fin.thetaCM,"ThetaCM[24]/F");
 	fin_tree->Branch("detID",fin.detID,"DetID[24]/I");
+	fin_tree->Branch("td_rdt_e_cuts",td_rdt_e_cuts,"TD-RDT-E-CUTS[24][2]/I");
+	fin_tree->Branch("xcal_cuts",xcal_cuts,"XCAL-E-CUTS[24][2]/F");
 
 	printf("======== number of cuts found : %d \n", numCut);
 	StpWatch.Start();
@@ -318,7 +326,32 @@ Bool_t PTMonitors::Process(Long64_t entry){
 			StpWatch.Start(kFALSE);
 			Frac+=0.1;
 		}
-	
+		
+		// RESET ALL QUANTITIES TO NaN
+		for ( Int_t i = 0; i < 32; i++ ){
+			if ( i < 24 ){
+				fin.x[i] = TMath::QuietNaN();
+		 		fin.z[i] = TMath::QuietNaN();
+		 		fin.xcal[i] = TMath::QuietNaN();
+		 		fin.ecal[i] = TMath::QuietNaN();
+		 		fin.xfcal[i] = TMath::QuietNaN();
+		 		fin.xncal[i] = TMath::QuietNaN();
+		 		fin.ecrr[i] = TMath::QuietNaN();
+				fin.Ex[i] = TMath::QuietNaN();
+		 		fin.thetaCM[i] = TMath::QuietNaN();
+		 		fin.detID[i] = TMath::QuietNaN();
+				fin.td_e_ebis[i] = TMath::QuietNaN();
+			}
+			for ( Int_t j = 0; j < 4; j++ ){
+				if ( i < 24 ){
+					fin.td_rdt_e[i][j] = TMath::QuietNaN();
+				}				
+				fin.td_rdt_elum[i][j] = TMath::QuietNaN();
+			}
+		}
+		 
+		 
+		
 		// Get the entries from the defined TTree (populates each of the leaves for processing)
 		b_Energy->GetEntry(entry);
 		b_XF->GetEntry(entry);
@@ -479,6 +512,7 @@ Bool_t PTMonitors::Process(Long64_t entry){
 
 	// FILL THE NEW TTree BASED ON CALCULATIONS
 	fin_tree->Fill();
+	
 	} // Processed entries
 	return kTRUE;
 }
@@ -491,69 +525,6 @@ void PTMonitors::SlaveTerminate(){
 // TSELECTOR TERMINATE FUNCTION ---------------------------------------------------------------- //
 void PTMonitors::Terminate()
 {
-	// PLOT SHARPY'S GRAPHS AND WRITE TO FILE
-	
-	// E vs.z
-	//if ( qDrawGraphs == 1 ){
-		cEVZ = new TCanvas("cEVZ","E v.s. z", 1080, 810);
-		EVZ->Draw("scat colz same");
-		if ( qPrintGraphs == 1){ cEVZ->Print("EVZ.png"); }
-	//}
-	EVZ->Write();
-
-	// Plot excitation energy
-	if ( qDrawGraphs == 1 ){ 
-		cEXE = new TCanvas( "cEXE","Excitation energy spectrum", 1080, 810 ); 
-		EXE->Draw();
-		if (qPrintGraphs == 1){ cEXE->Print("EXE.png"); }
-	}
-
-
-	// Plot the E-dE plots for making cuts
-	for ( Int_t i = 0; i < 4; i++ ){
-		if ( qDrawGraphs == 1 ){
-			cRecoilEdE[i] = new TCanvas( Form("cRecoilEdE_%i", i), "E-dE plots", 540, 405 );
-			cRecoilEdE[i]->ToggleToolBar();
-			EdE[i]->Draw("box colz");
-			if( isCutFileOpen ) {
-				cutG = (TCutG *)cutList->At(i);
-				cutG->Draw("same");
-			}
-		}
-	}
-	
-	if ( qDrawGraphs == 1 ){
-		cTD_EBIS = new TCanvas( "cTD_EBIS", "EBIS time difference with energy", 1080, 816 );
-		TD_EBIS->Draw();
-	}
-
-	if ( qDrawGraphs == 1 ){
-		cTD_Recoil = new TCanvas( "cTD_Recoil", "Recoil detector time difference with energy", 1080, 816 );
-		TD_Recoil->Draw();
-	}
-	
-	for ( Int_t i = 0; i < 6; i++ ){	
-		if ( qDrawGraphs == 1 ){
-			cEXE_Row[i] = new TCanvas( Form( "cEXE_Row%i", i ), Form( "Si detector E v.s. z: row %i", i ), 1080, 816 );
-			EXE_Row[i]->Draw();
-		}
-		if ( qPrintGraphs == 1){ cEXE_Row[i]->Print( Form("cEXE_Row%i_Pos%i.png", i, OFF_POSITION ) ); }
-		if ( qWriteData == 1 ){
-			writespe( EXE_Row[i]->GetName(), Form( "Ex_Row%i_Pos%i", i, OFF_POSITION ) );
-		}
-	}
-	
-	if ( qDrawGraphs == 1 ){
-		cXN_XF = new TCanvas( "cXN_XF", "XN v.s. XF plot", 1800, 900 );
-		cXN_XF->Divide(6,4);
-	}
-	for ( Int_t i = 0; i < 24; i++ ){
-		if ( qDrawGraphs == 1 ){
-			cXN_XF->cd(i+1);
-			XN_XF[i]->Draw();
-		}
-	}
-	
 	// Write the cuts
 	for ( int i = 0; i < 100; i++ ){
 		if ( fin.cut[i] != NULL ){
@@ -566,7 +537,6 @@ void PTMonitors::Terminate()
 
 	// Close the file
 	if ( outFile != NULL ){ outFile->Close(); }
-	
 	
 	// Print out some stuff
 	if (ProcessedEntries>=NUMSORT){

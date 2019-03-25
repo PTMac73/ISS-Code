@@ -1,6 +1,6 @@
-// Define PTMonitors_h
-#ifndef PTMonitors_h
-#define PTMonitors_h
+// Define PTMonitorsOLD_h
+#ifndef PTMonitorsOLD_h
+#define PTMonitorsOLD_h
 
 // Include some stuff
 #include <TROOT.h>
@@ -13,61 +13,6 @@
 #include <TStyle.h>
 #include <TCanvas.h>
 #include <TCutG.h>
-
-// CUT ARRAYS
-// Time difference between recoil detectors and array detectors
-Int_t td_rdt_e_cuts[24][2] = 	{ {-9, 6},
-	{-11, 4},
-	{-9, 3},
-	{-14, 3},
-	{-16, 4},
-	{-20, 3},
-	{-5, 6},
-	{-10, 3},
-	{-8, 4},
-	{-13, 4},
-	{-19, 4},
-	{-200, 200},
-	{-12, 5},
-	{-7, 7},
-	{-9, 7},
-	{-8, 5},
-	{-20, 5},
-	{-20, 6},
-	{-11, 6},
-	{-15, 6},
-	{-11, 8},
-	{-18, 5},
-	{-22, 6},
-	{-21, 6} };
-
-// Cuts on xcal for each of the detectors in the array
-Float_t xcal_cuts[24][2] = 	{ {0, 0.96},
-	{0, 0.99},
-	{0.04, 0.98},
-	{0, 0.96},
-	{0.05, 1},
-	{0.07, 0.95},
-	{0, 1},
-	{0, 1},
-	{0, 0.89},
-	{0.04, 0.99},
-	{0.06, 1},
-	{0.01, 1},
-	{0, 1},
-	{0, 0.9},
-	{0, 0.9},
-	{0, 0.89},
-	{0.05, 0.89},
-	{0.11, 0.84},
-	{0.03, 0.9},
-	{0.1, 0.98},
-	{0.03, 1},
-	{0.03, 1},
-	{0.02, 1},
-	{0, 0.99} };
-
-
 
 // writespe function here - taken from gatemat2.cpp
 void writespe(const Char_t *hisname, Char_t *spename, Char_t const*xy="X"){
@@ -96,7 +41,7 @@ void writespe(const Char_t *hisname, Char_t *spename, Char_t const*xy="X"){
 			}
 		}
 		sprintf( str, "%s.spe", spename );
-		out = fopen( str, "wb" );
+		out = fopen( str, "wb+" );
 		i = 1;
 		j = 24;
 		fwrite( &j, 4, 1, out );
@@ -119,8 +64,8 @@ void writespe(const Char_t *hisname, Char_t *spename, Char_t const*xy="X"){
 	return;
 }
 
-// DEFINE PTMONITORS TSelector CLASS HERE ------------------------------------------------------ //
-class PTMonitors : public TSelector {
+// DEFINE PTMonitorsOLD TSelector CLASS HERE ------------------------------------------------------ //
+class PTMonitorsOLD : public TSelector {
 public :
 	TTree          *fChain;			// Pointer to the analyzed TTree or TChain
 
@@ -159,8 +104,8 @@ public :
 	TBranch		   *b_EBISTimestamp;
 
 	// CLASS MEMBER FUNCTIONS
-	PTMonitors(TTree * /*tree*/ =0) : fChain(0) { }		// Constructor
-	virtual ~PTMonitors() { }							// Destructor
+	PTMonitorsOLD(TTree * /*tree*/ =0) : fChain(0) { }		// Constructor
+	virtual ~PTMonitorsOLD() { }							// Destructor
 	virtual Int_t   Version() const { return 3; }		// Version of this class
 	
 	// Declare required TSelector Functions
@@ -179,13 +124,13 @@ public :
 	virtual void    SetInputList(TList *input) { fInput = input; }
 	virtual TList  *GetOutputList() const { return fOutput; }
 
-	ClassDef(PTMonitors,0);
+	ClassDef(PTMonitorsOLD,0);
 };
 
 #endif
 
-#ifdef PTMonitors_cxx
-void PTMonitors::Init(TTree *tree)
+#ifdef PTMonitorsOLD_cxx
+void PTMonitorsOLD::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -217,7 +162,7 @@ void PTMonitors::Init(TTree *tree)
 	fChain->SetBranchAddress("EBIS", &ebis_t, &b_EBISTimestamp);
 }
 
-Bool_t PTMonitors::Notify()
+Bool_t PTMonitorsOLD::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -228,4 +173,4 @@ Bool_t PTMonitors::Notify()
    return kTRUE;
 }
 
-#endif // #ifdef PTMonitors_cxx
+#endif // #ifdef PTMonitorsOLD_cxx

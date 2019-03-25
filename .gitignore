@@ -64,7 +64,12 @@ dkms.conf
 *.log
 *.spe
 
+# ROOT compile files
+*ACLiC*
+
 # FOLDERS
-ryanAnalysisCode/
-GEBSort/
+/ryanAnalysisCode
+/GEBSort
+/PLOTS
+/forumPost
 

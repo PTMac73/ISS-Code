@@ -5,7 +5,6 @@
 // Nuclear Physics Research Group
 // School of Physics and Astronomy
 // The University of Manchester
-// LAST EDITED: 21/03/19
 // ============================================================================================= //
 #ifndef PTPLOTTER_INIT_H_
 #define PTPLOTTER_INIT_H_
@@ -114,24 +113,7 @@ void initialiseOptions( plotterOptions &opt_s ){
 void printDiv(){
 	printf("================================================================================\n");
 }
-// --------------------------------------------------------------------------------------------- //
-// // Gets the position number from a file name (character before the . in "XYZ-2.root")
-Int_t getPosNumber( TString s ){
-	TString file_ending = ".root";
-	Int_t pos_number;
 
-	// Remove the file suffix
-	s.Remove( s.Length() - file_ending.Length(), file_ending.Length() );
-	
-	// Remove all but the last character
-	s.Remove( 0, s.Length() - 1 );
-
-	// Calculate the number
-	pos_number = s.Atoi();
-
-	// Return it
-	return pos_number;
-}
 
 
 #endif  // PTPLOTTER_H_

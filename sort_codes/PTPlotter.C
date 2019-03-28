@@ -24,7 +24,7 @@ void PTPlotter( TFile *f ){
 	
 	// Initialise options
 	initialiseOptions( opt_s );
-	Int_t pos_number = getPosNumber( (TString)f->GetName() );
+	Int_t pos_number = GetPosNumber( (TString)f->GetName() );
 
 
 	// Get the TTree and the TCutG's

@@ -16,6 +16,7 @@
 #include "PTP_drawEx6.h"
 #include "PTP_drawExFull.h"
 #include "PTP_drawCutExamples.h"
+#include "PTF_GetPosNumber.h"
 
 /*/
  *    |*********************************|

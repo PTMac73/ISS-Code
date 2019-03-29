@@ -101,15 +101,15 @@ void PT_ElumDetectorCounts( TFile *f ){
 	// Print window
 	printf("===============================================================================================\n");
 	printf(" GAUSSIAN FIT:\n");
-	printf(" * Amplitude =\t %5.4e +/-\t %5.4e\n", par[0], f_fitting->GetParError(0) );
-	printf(" * Mu =\t\t %5.4e\t +/-\t %5.4e\n", par[1], f_fitting->GetParError(1) );
-	printf(" * Sigma =\t %5.4e\t +/-\t %5.4e\n", par[2], f_fitting->GetParError(2) );
+	printf(" Amp. =\t%5.4e\t +/- \t%5.4e\n", par[0], f_fitting->GetParError(0) );
+	printf(" Mu   =\t%5.4e\t +/- \t%5.4e\n", par[1], f_fitting->GetParError(1) );
+	printf(" Sig. =\t%5.4e\t +/- \t%5.4e\n", par[2], f_fitting->GetParError(2) );
 	printf(" Integral =\t %5.4e\n\n", f_gaussian->Integral(0,1000));
 
 	printf(" BACKGROUND FIT (B2*x*x + B1*x + B0):\n");
-	printf(" * B2 =\t %5.4e\t +/-\t %5.4e\n", par[3], f_fitting->GetParError(3) );
-	printf(" * B1 =\t %5.4e\t +/-\t %5.4e\n", par[4], f_fitting->GetParError(4) );
-	printf(" * B0 =\t %5.4e\t +/-\t %5.4e\n", par[5], f_fitting->GetParError(5) );
+	printf(" * B2 =\t%5.4e\t +/-\t%5.4e\n", par[3], f_fitting->GetParError(3) );
+	printf(" * B1 =\t%5.4e\t +/-\t%5.4e\n", par[4], f_fitting->GetParError(4) );
+	printf(" * B0 =\t%5.4e\t +/-\t%5.4e\n", par[5], f_fitting->GetParError(5) );
 	printf("===============================================================================================\n");
 
 	// Print the canvas

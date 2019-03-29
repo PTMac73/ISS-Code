@@ -5,7 +5,6 @@
 // Nuclear Physics Research Group
 // School of Physics and Astronomy
 // The University of Manchester
-// LAST EDITED: 21/03/19
 // ============================================================================================= //
 #ifndef PTPLOTTER_H_
 #define PTPLOTTER_H_

@@ -21,22 +21,27 @@
 
 // DEFINE GLOBAL VARIABLES
 // Switches for functions
-const Bool_t SWITCH_EVZ = 0;
+const Bool_t SWITCH_EVZ = 1;
 const Bool_t SWITCH_XCAL_24 = 0;
 const Bool_t SWITCH_TCUTS_24 = 0;
-const Bool_t SWITCH_EX_6 = 1;
+const Bool_t SWITCH_EX_6 = 0;
 const Bool_t SWITCH_EX_FULL = 0;
 const Bool_t SWITCH_CUT_EXAMPLES = 0;
 
 // Global switches
-const Bool_t SWITCH_ITERATE_PLOTS = 1;
-const Bool_t SWITCH_DISPLAY_CANVAS = 0;
-const Bool_t SWITCH_PRINT_CANVAS = 1;
+const Bool_t SWITCH_ITERATE_PLOTS = 0;
+const Bool_t SWITCH_DISPLAY_CANVAS = 1;
+const Bool_t SWITCH_PRINT_CANVAS = 0;
+const Bool_t DRAW_SI_STRIP_DIVIDERS = 1;
 const Int_t NUM_CUT_ITER = 5;
 
 // Canvas size (for 4:3 screen)
 const Int_t C_WIDTH = 1200;
 const Int_t C_HEIGHT = 900;
+
+// Z OFFSET POSITIONS
+Double_t Z_OFF[2]= {9.498,6.5};
+Double_t Z_ARRAY_POS[6] = {35.868, 29.987, 24.111, 18.248, 12.412, 6.676};
 
 // Print format
 const TString PRINT_FORMAT = ".pdf";

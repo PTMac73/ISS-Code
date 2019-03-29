@@ -6,7 +6,6 @@
 // Nuclear Physics Research Group
 // School of Physics and Astronomy
 // The University of Manchester
-// LAST EDITED: 04/03/19
 // ============================================================================================= //
 #include "PTMonitors.h"
 #include "PTPlotter.h"
@@ -35,7 +34,7 @@ void PTPlotter( TFile *f ){
 	TCutG *cut3 = (TCutG*)f->Get("cut3");
 
 	// PLOT THE THINGS
-	if ( SWITCH_EVZ == true )drawEVZ( t, opt_s );
+	if ( SWITCH_EVZ == true )drawEVZ( t, opt_s, pos_number );
 	if ( SWITCH_XCAL_24 == true )drawXcal24( t, opt_s );
 	if ( SWITCH_TCUTS_24 == true )drawTCuts24( t, opt_s );
 	if ( SWITCH_EX_6 == true )drawEx6( t, opt_s, pos_number );

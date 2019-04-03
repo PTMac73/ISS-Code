@@ -267,7 +267,7 @@ void PTMonitors::Begin(TTree *tree){
 		outFile = new TFile( Form( "fin%i.root", OFF_POSITION ), "RECREATE");
 	}
 	else{
-		outFile = new TFile( "finAlpha2.root", "RECREATE");
+		outFile = new TFile( "finAlpha18.root", "RECREATE");
 	}
 	
 	fin_tree = new TTree( "fin_tree", "Tree containing everything" );

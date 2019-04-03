@@ -6,24 +6,39 @@
 // School of Physics and Astronomy
 // The University of Manchester
 // ============================================================================================= //
+
 #include <TFile.h>
 #include <TTree.h>
 #include <TH2.h>
 #include <TDirectory.h>
 #include <TCanvas.h>
 #include <TStyle.h>
+#include <TROOT.h>
 
-
-// GLOBAL VARIABLES
-Bool_t SWITCH_DISPLAY_CANVAS = 1;
-Bool_t SWITCH_PRINT_CANVAS = 0;
+#include "AlphaDetByDet.h"
+#include "AlphaGlobals.h"
 
 
 // MAIN FUNCTION
 void AlphaCalibration( TFile *f ){
 	
+	// Define whether the canvas should display
+	if ( SWITCH_DISPLAY_CANVAS == 1 ){
+		gROOT->SetBatch(kFALSE);
+	}
+	else{
+		gROOT->SetBatch(kTRUE);
+	}
+
 	// Get the TTree
 	TTree *t = (TTree*)f->Get("fin_tree");
+
+	// Plot the alpha spectra detector by detector
+	AlphaDetByDet( t );
+
+
+	/*
+	
 	
 	// PLOT THE HISTOGRAM
 	// Define bins
@@ -55,10 +70,12 @@ void AlphaCalibration( TFile *f ){
 	
 	// GET THE NUMBER OF COUNTS
 	
-	
-	
-	
-	
-	
-	
+	*/
 }
+
+/* TODO
+ * Create spectra detector by detector and write to SPE file
+ * Create spectra row by row and fit the 4 energy peaks to get yields
+ * 
+*/
+ 

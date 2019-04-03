@@ -3,6 +3,7 @@
 #define PTMonitors_h
 
 // Include some stuff
+#include "WriteSPE.h"
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
@@ -68,56 +69,6 @@ Float_t xcal_cuts[24][2] = 	{ {0, 0.96},
 	{0, 0.99} };
 
 
-
-// writespe function here - taken from gatemat2.cpp
-void writespe(const Char_t *hisname, Char_t *spename, Char_t const*xy="X"){
-	TH1		 *hist;
-	Int_t	 i,j,NN,size;
-	Int_t	 i1,i2;
-	Int_t	 NBINS;
-	Char_t	str[32];
-	float *sp;
-	NN = 4096;
-	if ( strncmp( xy, "Y", 1 ) == 0 || strncmp( xy, "y", 1 ) == 0 ){ NN = 4096; }
-	FILE *out;
-	if ( !( sp = (float*) malloc( NN*sizeof( float ) ) ) ) {
-		printf("\007	ERROR: Could not malloc data buffer.\n");
-		exit(-1);
-	}
-	hist = (TH1*)gROOT->FindObject(hisname);
-	if ( hist != NULL ){
-		NBINS = hist->GetNbinsX();
-		for( i = 1; i < NN + 1; i++ ){
-			if ( i <= NBINS ){ 
-				sp[i-1] = hist->GetBinContent(i);
-			}
-			else{
-				sp[i-1] = 0.0;
-			}
-		}
-		sprintf( str, "%s.spe", spename );
-		out = fopen( str, "wb" );
-		i = 1;
-		j = 24;
-		fwrite( &j, 4, 1, out );
-		fwrite( str, 8, 1, out );
-		fwrite( &NN, 4, 1, out );
-		fwrite( &i, 4, 1, out );
-		fwrite( &i, 4, 1, out );
-		fwrite( &i, 4, 1, out );
-		fwrite( &j, 4, 1, out );
-		size = sizeof(float)*NN;
-		fwrite( &size, 4, 1, out );
-		fwrite( sp, 4, NN, out );
-		fwrite( &size, 4, 1, out );
-		fclose( out );
-		printf("wrote %i channels to %s\n", NN, str);
-	} else {
-		printf("spectrum %s not found\n", hisname);
-	}
-	free(sp);
-	return;
-}
 
 // DEFINE PTMONITORS TSelector CLASS HERE ------------------------------------------------------ //
 class PTMonitors : public TSelector {

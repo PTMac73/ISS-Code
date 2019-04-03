@@ -439,7 +439,7 @@ Bool_t PTMonitors::Process(Long64_t entry){
 
 					int iter = 0;				// Number of iterations
 						
-					// Now calculate the angle
+					// Now calculate the angle using Newton-Raphson process
 					do{
 						phi = nPhi;
 						nPhi = phi - (H * TMath::Sin(phi) - G * TMath::Tan(phi) - Z) / (H * TMath::Cos(phi) - G /TMath::Power( TMath::Cos(phi), 2));
@@ -451,6 +451,7 @@ Bool_t PTMonitors::Process(Long64_t entry){
 					// Check f'(phi) > 0
 					double Df = H * TMath::Cos(phi) - G / TMath::Power( TMath::Cos(phi),2);
 					if( Df > 0 && TMath::Abs(phi) < TMath::PiOver2()  ){
+						// Found correct value of phi - now calculate everything else
 						double K = H * TMath::Sin(phi);
 						double x = TMath::ACos( mass / ( y * gamm - K));
 						double momt = mass * TMath::Tan( x ); // momentum of particle b or B in CM frame

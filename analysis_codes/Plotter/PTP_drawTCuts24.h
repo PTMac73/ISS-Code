@@ -5,7 +5,6 @@
 // Nuclear Physics Research Group
 // School of Physics and Astronomy
 // The University of Manchester
-// LAST EDITED: 21/03/19
 // ============================================================================================= //
 #ifndef PTP_DRAW_TCUTS24_H_
 #define PTP_DRAW_TCUTS24_H_
@@ -18,6 +17,7 @@
 #include <TROOT.h>
 #include <TSystem.h>
 #include <THStack.h>
+#include <TCanvas.h>
 #include <iostream>
 
 struct plotterOptions;

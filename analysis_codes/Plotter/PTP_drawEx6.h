@@ -18,6 +18,7 @@
 #include <TROOT.h>
 #include <TSystem.h>
 #include <THStack.h>
+#include "WriteSPE.h"
 #include <iostream>
 
 struct plotterOptions;

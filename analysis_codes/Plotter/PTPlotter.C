@@ -7,7 +7,6 @@
 // School of Physics and Astronomy
 // The University of Manchester
 // ============================================================================================= //
-#include "PTMonitors.h"
 #include "PTPlotter.h"
 
 #include <TFile.h>

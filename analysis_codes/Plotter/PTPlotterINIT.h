@@ -9,7 +9,6 @@
 #ifndef PTPLOTTER_INIT_H_
 #define PTPLOTTER_INIT_H_
 
-#include "PTMonitors.h"
 #include <TFile.h>
 #include <TTree.h>
 #include <TCutG.h>
@@ -17,6 +16,7 @@
 #include <TROOT.h>
 #include <TSystem.h>
 #include <THStack.h>
+#include <TStyle.h>
 #include <iostream>
 
 // DEFINE GLOBAL VARIABLES

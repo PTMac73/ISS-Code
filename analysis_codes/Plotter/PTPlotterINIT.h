@@ -27,6 +27,7 @@ const Bool_t SWITCH_TCUTS_24 = 0;
 const Bool_t SWITCH_EX_6 = 0;
 const Bool_t SWITCH_EX_FULL = 0;
 const Bool_t SWITCH_CUT_EXAMPLES = 0;
+const Bool_t SWITCH_DRAW_BEST_RESOLUTION = 0;
 
 // Global switches
 const Bool_t SWITCH_ITERATE_PLOTS = 0;
@@ -103,7 +104,7 @@ void initialiseOptions( plotterOptions &opt_s ){
 	}
 	
 	// Directory for saving files
-	opt_s.printDir = "../PLOTS/";
+	opt_s.printDir = "/PLOTS/";
 	
 	// Style Options
 	gStyle->SetOptStat("meni");

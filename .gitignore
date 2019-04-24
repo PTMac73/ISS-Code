@@ -63,6 +63,7 @@ dkms.conf
 *.ods
 *.log
 *.spe
+*.dat
 
 # ROOT compile files
 *ACLiC*

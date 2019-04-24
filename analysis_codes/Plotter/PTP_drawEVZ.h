@@ -30,7 +30,7 @@ struct plotterOptions;
 
 // --------------------------------------------------------------------------------------------- //
 // Draw EVZ plot
-void drawEVZ( TTree *t, plotterOptions &opt_s, Int_t pos_number ){
+void DrawEVZ( TTree *t, plotterOptions &opt_s, Int_t pos_number ){
 	gStyle->SetOptStat(kFALSE);
 	
 	// Print welcome message
@@ -69,7 +69,7 @@ void drawEVZ( TTree *t, plotterOptions &opt_s, Int_t pos_number ){
 		Double_t b_field = 2.5;															// [T]
 		Double_t beam_energy_per_nucleon = 9.473;										// MeV per u
 		Double_t excitation_energy[NUM_STATES] = { 0, 1.054, 1.397, 2.225, 2.462, 2.937, 3.21, 3.937, 4.311 };
-		Double_t rho_0 = 0;/*ISSArrayRadius( -14.0, 14.0, 30.0 );*/ 							// Array radius in mm - this is estimated using width of Si strips
+		Double_t rho_0 = ISSArrayRadius( -14.0, 14.0, 10.0 );							// Array radius in mm - this is estimated using width of Si strips
 
 		// Calculate the range of angles (i.e. number of indices in array)
 		Double_t angle_divisions = 0.2;

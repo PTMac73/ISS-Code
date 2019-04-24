@@ -16,6 +16,7 @@
 #include "PTP_drawExFull.h"
 #include "PTP_drawCutExamples.h"
 #include "PTF_GetPosNumber.h"
+#include "PTP_drawBestResolution.h"
 
 /*/
  *    |*********************************|

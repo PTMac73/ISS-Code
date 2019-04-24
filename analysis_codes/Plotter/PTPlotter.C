@@ -33,11 +33,12 @@ void PTPlotter( TFile *f ){
 	TCutG *cut3 = (TCutG*)f->Get("cut3");
 
 	// PLOT THE THINGS
-	if ( SWITCH_EVZ == true )drawEVZ( t, opt_s, pos_number );
+	if ( SWITCH_EVZ == true )DrawEVZ( t, opt_s, pos_number );
 	if ( SWITCH_XCAL_24 == true )drawXcal24( t, opt_s );
 	if ( SWITCH_TCUTS_24 == true )drawTCuts24( t, opt_s );
 	if ( SWITCH_EX_6 == true )drawEx6( t, opt_s, pos_number );
 	if ( SWITCH_EX_FULL == true )drawExFull( t, opt_s );
 	if ( SWITCH_CUT_EXAMPLES == true)drawCutExamples( t, opt_s, cut0 );
+	if ( SWITCH_DRAW_BEST_RESOLUTION == true)DrawBestResolution( t, opt_s );
 }
 

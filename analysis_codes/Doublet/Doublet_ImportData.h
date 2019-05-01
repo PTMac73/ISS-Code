@@ -30,7 +30,7 @@ void ImportData(){
 	// Store the data conveniently
 	Int_t i = 0;
 	while ( true ){
-		file_in >> X[i] >> Y[i] >> PT[0][i] >> PT[1][i] >> PT[2][i] >> PT[3][i];
+		file_in >> X[i] >> Y[i] >> E[i] >> PT[0][i] >> PT[1][i] >> PT[2][i] >> PT[3][i];
 		if ( !file_in.good() ){ break; }
 		i++;
 	}

@@ -6,6 +6,13 @@
 // School of Physics and Astronomy
 // The University of Manchester
 // ============================================================================================= //
+// CONTAINS
+//  * CreateFuncName
+//  * FindMinMax
+//  * GetRange
+//  * CreateFitFunc
+// ============================================================================================= //
+
 #ifndef DOUBLET_CREATE_FIT_FUNC_H_
 #define DOUBLET_CREATE_FIT_FUNC_H_
 
@@ -14,6 +21,7 @@
 #include <TCanvas.h>
 #include <TMatrixD.h>
 #include <TMath.h>
+#include <TAxis.h>
 #include "Doublet_Globals.h"
 
 // Create the polynomial name
@@ -28,8 +36,37 @@ TString CreateFuncName( Int_t N ){
 	return fit_name;
 }
 
+// Find the minimum and maximum of an array
+void FindMinMax( Double_t *arr, Int_t size_of_array, Double_t &min, Double_t &max ){
+	for ( Int_t i = 0; i < size_of_array; i++ ){
+		if ( arr[i] < min ){ min = arr[i]; }
+		if ( arr[i] > max ){ max = arr[i]; }
+	}
+}
 
+// Calculate the range for the functions and for plotting graphs
+Double_t GetRange( Double_t k_min, Double_t k_max, Int_t range_switch = 0 ){
+	Double_t fraction = 0.33;
+	Double_t result;
+	switch ( range_switch ){
+		// Return the lower bound
+		case 1:
+			result = k_min - fraction*(k_max - k_min);
+			break;
 
+		// Return the upper bound
+		case 2:
+			result = k_max + fraction*(k_max - k_min);
+			break;
+
+		// Return the range
+		default:
+			result = k_max - k_min;
+			break;
+
+	}
+	return result;
+}
 
 void CreateFitFunc( Double_t *x, Double_t *y, TF1 *fit ){
 	
@@ -49,42 +86,41 @@ void CreateFitFunc( Double_t *x, Double_t *y, TF1 *fit ){
 	// Calculate the fit parameters
 	TMatrixD fit_par = x_matrix.Invert()*y_matrix;
 
-	// Construct the fit
-	TString fit_name = CreateFuncName(NUM_DATA_POINTS - 1);
-	fit = new TF1( "fit", fit_name );
+	// Find the minimum and maximum values for x and y
+	Double_t x_min = 10000.0; Double_t x_max = 0;
+	Double_t y_min = 10000.0; Double_t y_max = 0;
+	FindMinMax( x, NUM_DATA_POINTS, x_min , x_max );
+	FindMinMax( y, NUM_DATA_POINTS, y_min, y_max );
+	
+	// Define the fit parameters
 	for ( Int_t i = 0; i < NUM_DATA_POINTS; i++ ){
 		fit->SetParameter(i, fit_par(i, 0) );
 	}
 
 	// Draw the fit
-	TGraph *graph = new TGraph( NUM_DATA_POINTS, x, y );
-	TCanvas *c = new TCanvas();
-	graph->Draw("AP");
-	graph->SetMarkerStyle(3);
-	fit->SetLineWidth(2);
-	fit->Draw("same");
-	fit_par.Print();
+	if ( SWITCH_DRAW_FITS == 1 ){
+		// Define a TCanvas
+		TCanvas *c = new TCanvas();
 
-// Construct a TGraph
-	/*TGraph *graph = new TGraph( NUM_DATA_POINTS, x, y );
-	
-	TCanvas *c = new TCanvas();
-	graph->Draw("AP");
+		// Define a graph for the points, and format it
+		TGraph *graph = new TGraph( NUM_DATA_POINTS, x, y );
+		graph->SetMarkerStyle(20);
+		graph->SetMarkerSize(1);
 
-	// Fit the TGraph
-	
-	//std::cout << fit_name << std::endl;
-	fit = new TF1( "fit", fit_name );
-	graph->Fit( fit->GetName() );*/
-	
+		// Format the fit
+		fit->SetLineWidth(2);
 
+		// Draw the fits
+		fit->Draw("C");
+		graph->Draw("P SAME");
 
+		// Edit the view of the axes
+		fit->GetXaxis()->SetRangeUser( GetRange( x_min, x_max, 1 ), GetRange( x_min, x_max, 2 ) );
+		fit->GetYaxis()->SetRangeUser( GetRange( y_min, y_max, 1 ), GetRange( y_min, y_max, 2 ) );
 
+		printf( "DRAWN A FIT\n" );
+
+	}
 }
-
-
-
-
-
 
 #endif

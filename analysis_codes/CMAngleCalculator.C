@@ -4,7 +4,7 @@
 #include "TMath.h"
 #include "TString.h"
 
-TString iFileDir = "/home/ptmac/Documents/07-CERN-ISS-Mg/Mg-Analysis/excitationEnergyList.txt";
+//TString iFileDir = "/home/ptmac/Documents/07-CERN-ISS-Mg/Mg-Analysis/excitationEnergyList.txt";
 
 
 // MAIN FUNCTION
@@ -70,7 +70,7 @@ void CMAngleCalculator(double ex, double z){
 }
 
 /*************************************************************************************************/
-void CMAngleBatch(){
+void CMAngleBatch( TString iFileDir ){
 	// Open the file for reading	
 	ifstream iFile;
 	iFile.open( iFileDir.Data() );

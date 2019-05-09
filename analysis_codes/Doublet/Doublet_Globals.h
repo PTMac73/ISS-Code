@@ -11,7 +11,7 @@
 
 // GLOBAL VARIABLES
 TString input_file_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis_codes/Doublet/doublet_data.dat";
-const int NUM_DATA_POINTS = 12;
+const int NUM_DATA_POINTS = 10;
 const int NUM_L = 4;
 
 // SWITCHES

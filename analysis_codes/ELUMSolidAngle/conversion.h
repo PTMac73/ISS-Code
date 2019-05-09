@@ -6,6 +6,9 @@
 // School of Physics and Astronomy
 // The University of Manchester
 // ============================================================================================= //
+#ifndef CONVERSION_H_
+#define CONVERSION_H_
+
 #include <TMath.h>
 
 // GLOBAL VARIABLES
@@ -37,5 +40,5 @@ Double_t EToCoulombs(){
 	return ELECTRIC_CHARGE;
 }
 
-
+#endif
 

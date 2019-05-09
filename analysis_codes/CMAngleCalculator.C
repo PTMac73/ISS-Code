@@ -1,8 +1,10 @@
 // Calculates the CM angle for the reaction 28Mg(d,p)29Mg in inverse kinematics given an array position and an excitation energy
 #include <iostream>
 #include <fstream>
-#include "TMath.h"
-#include "TString.h"
+#include <TMath.h>
+#include <TString.h>
+#include <TGraph.h>
+#include <TGraph2D.h>
 
 //TString iFileDir = "/home/ptmac/Documents/07-CERN-ISS-Mg/Mg-Analysis/excitationEnergyList.txt";
 
@@ -14,7 +16,7 @@
 //	* Velocities in terms of c
 //	* Charges in terms of e
 //	* Distances in terms of cm 
-void CMAngleCalculator(double ex, double z){
+Double_t CMAngleCalculator(double ex, double z){
 	// Define initial fixed quantities for the reaction
 	int n = 0;								// Number of iterations
 	double c = 299792458;					// Speed of light in m /s
@@ -67,6 +69,8 @@ void CMAngleCalculator(double ex, double z){
 	std::cout << ex << "\t" << z << "\t" << theta_cm << std::endl;
 	//std::cout << n << "\t" << ex << "\t" << z << "\t" << theta_cm << "\t" << theta << "\t" << e3-m3 << "\t" << std::endl;
 	//std::cout << p3 << "\t" << p_para << "\t" << p_perp << "\t" << p3_cm << "\t" << p_para_cm << "\t" << p_perp_cm << "\t" << p3_cm*TMath::Sin(theta_cm) << "\t" << p3*TMath::Sin(theta) << std::endl;
+
+	return theta_cm;
 }
 
 /*************************************************************************************************/
@@ -156,10 +160,77 @@ void CMAngleCalculatorRyan(){
 }
 */
 
+void CMAngleGraph2D( ){
+	// Define the z's
+	Double_t z_spacing = 0.05;
+	Double_t ex_spacing = 0.05;
+	Double_t z_lb = -45.0;
+	Double_t z_ub = -10.0;
+	Double_t ex_lb = 0.0;
+	Double_t ex_ub = 4.4;
+	
+	Int_t num_z = (Int_t)((z_ub - z_lb)/z_spacing);
+	Int_t num_ex = (Int_t)((ex_ub - ex_lb)/ex_spacing);
+
+	Double_t *z = new Double_t[ num_z*num_ex ];
+	Double_t *ex = new Double_t[ num_z*num_ex ];
+	Double_t *theta = new Double_t[ num_z*num_ex ];
+
+	TGraph2D *g = new TGraph2D();
+	gStyle->SetPalette(1);
+	g->SetTitle("SURFACE; Ex (MeV); z (cm); #theta_{cm} (#circ)");
+	
+	
+	for ( Int_t i = 0; i < num_z; i++ ){
+		for ( Int_t j = 0; j < num_ex; j++ ){
+			//ex[num_ex*i + j] = j*ex_spacing + ex_lb;
+			//z[num_ex*i + j] = i*z_spacing + z_lb;
+			/*theta[num_ex*i + j] = */CMAngleCalculator( ex[j], z[i]);
+			//g->SetPoint(num_ex*i + j, ex[num_ex*i + j], z[num_ex*i + j], theta[num_ex*i + j] );
+		}
+	}
+	//TCanvas *c = new TCanvas("c","CANVAS", 1200, 900 );
+	//g->Draw("surf1");
 
 
+	delete[] z;
+	delete[] theta;
+	return;
+
+}
 
 
+void CMAngleGraph1D( ){
+	// Define the z's
+	Double_t z_spacing = 0.005;
+	Double_t z_lb = -50.0;
+	Double_t z_ub = -10.0;
+	Double_t ex = 0.0;
+	
+	Int_t num_z = (Int_t)((z_ub - z_lb)/z_spacing);
+
+	Double_t *z = new Double_t[ num_z ];
+	Double_t *theta = new Double_t[ num_z ];
+
+	TGraph *g = new TGraph();
+	gStyle->SetPalette(1);
+	g->SetTitle( Form( "GRAPH: Ex = %2.1f; z (cm); #theta_{cm} (#circ)", ex ) );
+	
+	
+	for ( Int_t i = 0; i < num_z; i++ ){
+		z[i] = i*z_spacing + z_lb;
+		theta[i] = CMAngleCalculator( ex, z[i]);
+		g->SetPoint(i, z[i], theta[i] );
+	}
+	TCanvas *c = new TCanvas("c","CANVAS", 1200, 900 );
+	g->Draw("AL");
+
+
+	delete[] z;
+	delete[] theta;
+	return;
+
+}
 
 
 

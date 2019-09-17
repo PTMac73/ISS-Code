@@ -6,7 +6,7 @@
 // School of Physics and Astronomy
 // The University of Manchester
 // ============================================================================================= //
-#include "PTF_GetPosNumber.h"
+#include "../Plotter/PTF_GetPosNumber.h"
 #include <TFile.h>
 #include <TTree.h>
 #include <TH1F.h>
@@ -57,6 +57,17 @@ void PT_ElumDetectorCounts( TFile *f ){
 	Double_t d_ub = 750;
 	TF1 *f_fitting = new TF1("f_fitting", fitf, d_lb, d_ub, 6 );
 
+
+	TH1F *h2 = (TH1F*)h_elum->Clone();
+	for ( Int_t i = 0; i < h2->GetNbinsX(); i++ ){
+		if ( i < h2->GetXaxis()->FindBin(d_lb) || i > h2->GetXaxis()->FindBin(d_ub) ){
+			h2->SetBinContent( i, 0 );
+		}
+	}
+	
+	h2->SetFillColor(kOrange);
+	h2->Draw("same");
+
 	// Set the parameter limits
 	/*   A */ f_fitting->SetParLimits(0, 0, 1000);
 	/*  mu */ f_fitting->SetParLimits(1, 450, 600);
@@ -70,11 +81,15 @@ void PT_ElumDetectorCounts( TFile *f ){
 	h_elum->Fit( "f_fitting", "R" );
 
 	// Draw the background and Gaussian separately
-	TF1 *f_bg = new TF1("f_bg", bg, 0, 1400, 3);
+	TF1 *f_bg = new TF1("f_bg", bg, d_lb, d_ub, 3);
+	TF1 *f_bg_2 = new TF1("f_bg", bg, 0, 1000, 3);
 	f_bg->SetLineColor(kBlue);
 	f_bg->SetLineWidth(2);
+	f_bg_2->SetLineColor(kBlue);
+	f_bg_2->SetLineWidth(1);
+	f_bg_2->SetLineStyle(3);
 
-	TF1 *f_gaussian = new TF1("f_gaussian", gaussian, 0, 1400, 3);
+	TF1 *f_gaussian = new TF1("f_gaussian", gaussian, d_lb, d_ub, 3);
 	f_gaussian->SetLineColor(kGreen+3);
 	f_gaussian->SetLineWidth(2);
 
@@ -85,6 +100,8 @@ void PT_ElumDetectorCounts( TFile *f ){
 	f_gaussian->Draw("same");
 	
 	f_bg->SetParameters(&par[3]);
+	f_bg_2->SetParameters(&par[3]);
+	f_bg_2->Draw("same");
 	f_bg->Draw("same");
 
 	// Add a legend
@@ -101,19 +118,21 @@ void PT_ElumDetectorCounts( TFile *f ){
 	// Print window
 	printf("===============================================================================================\n");
 	printf(" GAUSSIAN FIT:\n");
-	printf(" Amp. =\t%5.4e\t +/- \t%5.4e\n", par[0], f_fitting->GetParError(0) );
-	printf(" Mu   =\t%5.4e\t +/- \t%5.4e\n", par[1], f_fitting->GetParError(1) );
-	printf(" Sig. =\t%5.4e\t +/- \t%5.4e\n", par[2], f_fitting->GetParError(2) );
+	printf(" * Amp. =\t%5.4e\t +/- \t%5.4e\n", par[0], f_fitting->GetParError(0) );
+	printf(" * Mu   =\t%5.4e\t +/- \t%5.4e\n", par[1], f_fitting->GetParError(1) );
+	printf(" * Sig. =\t%5.4e\t +/- \t%5.4e\n", par[2], f_fitting->GetParError(2) );
 	printf(" Integral =\t %5.4e\n\n", f_gaussian->Integral(0,1000));
 
 	printf(" BACKGROUND FIT (B2*x*x + B1*x + B0):\n");
 	printf(" * B2 =\t%5.4e\t +/-\t%5.4e\n", par[3], f_fitting->GetParError(3) );
 	printf(" * B1 =\t%5.4e\t +/-\t%5.4e\n", par[4], f_fitting->GetParError(4) );
 	printf(" * B0 =\t%5.4e\t +/-\t%5.4e\n", par[5], f_fitting->GetParError(5) );
+	TAxis *x_axis = h_elum->GetXaxis();
+	printf(" Hist. Int. =\t %5.4e\n", h2->Integral()*h2->GetBinWidth(0) );
 	printf("===============================================================================================\n");
 
 	// Print the canvas
-	c_elum->Print( Form( "../PLOTS/elum_plot%i.pdf", pos_num ) );
+	c_elum->Print( Form( "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/PLOTS/ELUM_DD/elum_plot%i.pdf", pos_num ) );
 
 
 }

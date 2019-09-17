@@ -8,8 +8,10 @@
 // ============================================================================================= //
 #ifndef PTPLOTTER_H_
 #define PTPLOTTER_H_
+
 #include "PTPlotterINIT.h"
 #include "PTP_drawEVZ.h"
+#include "PTP_gamma_branch.h"
 #include "PTP_drawXcal24.h"
 #include "PTP_drawTCuts24.h"
 #include "PTP_drawEx6.h"

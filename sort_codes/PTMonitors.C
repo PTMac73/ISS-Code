@@ -46,8 +46,8 @@ Int_t tacA[24];
 Float_t z_array_pos[6] = {35.868,29.987,24.111,18.248,12.412,6.676};//in cm
 
 // z offset
-Int_t OFF_POSITION = 1;
-Bool_t ALPHA_RUN = 1;
+Int_t OFF_POSITION = 2;
+Bool_t ALPHA_RUN = 0;
 Float_t z_off;
 
 Float_t xnCorr[24] = {0.907342,0.907342,0.976727,0.914866,1.021736,
@@ -95,12 +95,12 @@ Float_t eCorr[24][2] = {{256.060637	,0.021569},
 
 Float_t exCorr[6] = { 938.272,  // mass of proton [MeV/c^2]
 	                   1,        // charge of proton
-	                   27954.0982, // cm frame total energy
-	                   26996.5929, // mass of recoil
-	                   0.132178, // beta to CM frame
+	                   27954.0982, // cm frame total energy [correct]
+	                   26996.5929, // mass of recoil [correct]
+	                   0.132178, // beta to CM frame [correct]
 	                   2.5}; // Bfield [T]
 double a = 11.5 ; // perpendicular distance of detector to axis [mm]
-double Ex, thetaCM;
+//double Ex, thetaCM;
 
 double alpha, Et, beta, gamm, G, massB, mass; //variables for Ex calculation
 
@@ -143,6 +143,7 @@ typedef struct {
 	Float_t xncal[24];
 	Float_t ecrr[24];
 	Float_t Ex[24];
+	Float_t Ex_corrected[24];
 	Float_t thetaCM[24];
 	Int_t detID[24];
 	int td_rdt_e[24][4];
@@ -298,6 +299,7 @@ void PTMonitors::Begin(TTree *tree){
 	fin_tree->Branch("td_rdt_elum",fin.td_rdt_elum,"RDT-ELUM_TD[32][4]/I");
 	fin_tree->Branch("td_e_ebis",fin.td_e_ebis,"E-EBIS_TD[24]/I");
 	fin_tree->Branch("Ex",fin.Ex,"Ex[24]/F");
+	fin_tree->Branch("Ex_corrected",fin.Ex_corrected,"EX-CORRECTED[24]/F");
 	fin_tree->Branch("thetaCM",fin.thetaCM,"ThetaCM[24]/F");
 	fin_tree->Branch("detID",fin.detID,"DetID[24]/I");
 	fin_tree->Branch("td_rdt_e_cuts",td_rdt_e_cuts,"TD-RDT-E-CUTS[24][2]/I");
@@ -338,6 +340,7 @@ Bool_t PTMonitors::Process(Long64_t entry){
 		 		fin.xncal[i] = TMath::QuietNaN();
 		 		fin.ecrr[i] = TMath::QuietNaN();
 				fin.Ex[i] = TMath::QuietNaN();
+				fin.Ex_corrected[i] = TMath::QuietNaN();
 		 		fin.thetaCM[i] = TMath::QuietNaN();
 		 		fin.detID[i] = TMath::QuietNaN();
 				fin.td_e_ebis[i] = TMath::QuietNaN();
@@ -457,6 +460,7 @@ Bool_t PTMonitors::Process(Long64_t entry){
 						double momt = mass * TMath::Tan( x ); // momentum of particle b or B in CM frame
 						double EB = TMath::Sqrt(mass*mass + Et*Et - 2*Et*TMath::Sqrt(momt * momt + mass * mass));
 						fin.Ex[index] = EB - massB;
+						fin.Ex_corrected[index] = excitation_energy_corr_pars[OFF_POSITION - 1][j][0]*(450.0/9.0)*( fin.Ex[index] + 1.0 ) + excitation_energy_corr_pars[OFF_POSITION - 1][j][1];
 						
 						double hahaha1 = gamm* TMath::Sqrt(mass * mass + momt * momt) - y;
 						double hahaha2 = gamm* beta * momt;
@@ -465,11 +469,13 @@ Bool_t PTMonitors::Process(Long64_t entry){
 					}
 					else{
 						fin.Ex[index] = TMath::QuietNaN();
+						fin.Ex_corrected[index] = TMath::QuietNaN();
 						fin.thetaCM[index] = TMath::QuietNaN();
 					}	
 				}
 				else{
 					fin.Ex[index] = TMath::QuietNaN();
+					fin.Ex_corrected[index] = TMath::QuietNaN();
 					fin.thetaCM[index] = TMath::QuietNaN();
 				}
 				

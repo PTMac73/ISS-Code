@@ -18,71 +18,70 @@
 #include <TROOT.h>
 #include <TSystem.h>
 #include <THStack.h>
+#include <TCanvas.h>
 #include <iostream>
 
 struct plotterOptions;
 
 // Draw the full excitation spectrum
-void drawExFull( TTree *t, plotterOptions &opt_s ){
+void DrawExFull( TTree *t, plotterOptions &opt_s ){
 	// Print welcome message
 	printDiv(); printf("PLOTTING THE FULL EXCITATION SPECTRUM\n"); printDiv();
-	
+
 	// Define variables
 	TCanvas *cExFull[opt_s.numIter];
 	TH1F * hExFull[opt_s.numIter];
-
-	// Work out whether to iterate plots
-	Int_t first_index;
-	if ( SWITCH_ITERATE_PLOTS == 1 ){
-		first_index = 0;
-	}
-	else{
-		first_index = opt_s.numIter;
-	}
 	
 	// Declare a plot title for the histograms
-	TString plotTitle;
-
+	TString plot_title;
+	
 	// Iterate over the cuts applied (cumulatively)
-	for ( Int_t i = first_index; i < opt_s.numIter; i++ ){
+	for ( Int_t i = 0; i < opt_s.numIter; i++ ){
+
 		// Draw the plot
 		cExFull[i] = new TCanvas( Form( "Ex-Canvas%i", i ), Form( "Full Excitation Spectrum (%i/%i)", i+1, opt_s.numIter ), C_WIDTH, C_HEIGHT );
-		t->Draw( Form( "Ex>>ex_%i(450, -1, 8)", i ), opt_s.cutList[opt_s.numIter - i - 1].Data() );
-		
+		t->Draw( Form( "%s>>ex_%i(450, -1, 8)", excitation_mode[WHICH_EXCITATION].Data(), i ), opt_s.cutList[opt_s.numIter - i - 1].Data() );
+
 		// Store the plot
 		hExFull[i] = (TH1F*)gDirectory->Get( Form( "ex_%i", i ) );
 
 		// Format the plot
-		plotTitle = "Ex with ";
-		if (i == 0){plotTitle += opt_s.cutListDesc[opt_s.numIter - 1];}
-		else{
-			for ( Int_t j = 1; j < i + 1; j++ ){
-				plotTitle += opt_s.cutListDesc[opt_s.numIter - j - 1].Data();
-				if ( j != i ){plotTitle += ", ";}
-				if ( j == i - 1 ){plotTitle += "and ";}
+		if ( SWITCH_PLOT_DETAILS == 1 ){
+			plot_title = "Ex with ";
+			if (i == 0){plot_title += opt_s.cutListDesc[opt_s.numIter - 1];}
+			else{
+				for ( Int_t j = 1; j < i + 1; j++ ){
+					plot_title += opt_s.cutListDesc[opt_s.numIter - j - 1].Data();
+					if ( j != i ){plot_title += ", ";}
+					if ( j == i - 1 ){plot_title += "and ";}
+				}
 			}
+			plot_title +=" cut";
+			if (i != 1){ plot_title +="s"; }
 		}
-		plotTitle +=" cut";
-		if (i != 1){ plotTitle +="s"; }
+		else{
+			plot_title = "";
+		}
 
 		// Set the plot title and axes names
-		hExFull[i]->SetTitle( plotTitle.Data() );
-		hExFull[i]->GetXaxis()->SetTitle("Ex / MeV");
-		hExFull[i]->GetYaxis()->SetTitle("#");
+		hExFull[i]->SetTitle( plot_title.Data() );
+		hExFull[i]->GetXaxis()->SetTitle("Excitation Energy (MeV)");
+		hExFull[i]->GetYaxis()->SetTitle("Counts per 20 keV");
 
 		// Update the canvas
 		cExFull[i]->Modified(); cExFull[i]->Update();
-		
+
 		// Print the plot if desired
 		if ( SWITCH_PRINT_CANVAS == 1 ){
-			cExFull[i]->Print( Form( "%sExFull_%i%s", opt_s.printDir.Data(), i, PRINT_FORMAT.Data() ) );
+			cExFull[i]->Print( Form( "%s/EX/%s_full_%i%s", opt_s.printDir.Data(), excitation_mode[WHICH_EXCITATION].Data(), i, PRINT_FORMAT.Data() ), "EmbedFonts" );
+			WriteSPE( hExFull[i]->GetName(), Form( "%s/EX/%s_full_%i", opt_s.printDir.Data(), excitation_mode[WHICH_EXCITATION].Data(), i ) );
 		}
 		printf("===> PLOTTED SPECTRUM %i/%i\n\n", i + 1, opt_s.numIter);
 	}
 
 
 	// NOW PRINT COMPARITIVE PLOTS
-	if (SWITCH_ITERATE_PLOTS == 1){
+	if (SWITCH_COMPARE_PLOTS == 1){
 		// Define some new canvases
 		TCanvas *cComp[opt_s.numIter-1];
 		
@@ -127,7 +126,7 @@ void drawExFull( TTree *t, plotterOptions &opt_s ){
 			
 			// Print the plot if desired
 			if ( SWITCH_PRINT_CANVAS == 1 ){
-				cComp[k]->Print( Form( "%sExCompCuts_%i%s", opt_s.printDir.Data(), k, PRINT_FORMAT.Data() ) );
+				cComp[k]->Print( Form( "%s/EX/%sCompCuts_%i%s", opt_s.printDir.Data(), excitation_mode[WHICH_EXCITATION].Data(), k, PRINT_FORMAT.Data() ) );
 			}
 			
 			// Append a comma and space to cutString

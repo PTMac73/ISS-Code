@@ -40,8 +40,10 @@ void drawXcal24( TTree *t, plotterOptions &opt_s ){
 			c1->cd(6*j + i + 1);
 
 			// Draw using the TTree, but don't draw graphically
-			t->Draw( Form( "xcal[%i]>>a%i(201,-0.5,1.5)", 6*j + i, 6*j + i ), "(cut0 || cut1 || cut2 || cut3) && xcal[] > xcal_cuts[][0] && xcal[] < xcal_cuts[][1]", "goff" );		
-			t->Draw( Form( "xcal[%i]>>b%i(201,-0.5,1.5)", 6*j + i, 6*j + i ), "cut0 || cut1 || cut2 || cut3", "goff" );
+		//	t->Draw( Form( "xcal[%i]>>a%i(201,-0.5,1.5)", 6*j + i, 6*j + i ), "(cut0 || cut1 || cut2 || cut3) && xcal[] > xcal_cuts[][0] && xcal[] < xcal_cuts[][1]", "goff" );		
+		//	t->Draw( Form( "xcal[%i]>>b%i(201,-0.5,1.5)", 6*j + i, 6*j + i ), "cut0 || cut1 || cut2 || cut3", "goff" );
+			t->Draw( Form( "xcal[%i]>>a%i(201,-0.5,1.5)", 6*j + i, 6*j + i ), "(cut0 || cut1 || cut2 || cut3) && thetaCM > 11 && td_rdt_e[] > td_rdt_e_cuts[][0] && td_rdt_e[] < td_rdt_e_cuts[][1] && xcal[] > xcal_cuts[][0] && xcal[] < xcal_cuts[][1]", "goff" );		
+			t->Draw( Form( "xcal[%i]>>b%i(201,-0.5,1.5)", 6*j + i, 6*j + i ), "(cut0 || cut1 || cut2 || cut3) && thetaCM > 11 && td_rdt_e[] > td_rdt_e_cuts[][0] && td_rdt_e[] < td_rdt_e_cuts[][1]", "goff" );
 
 			// Store the histogram
 			a[6*j + i] = (TH1F*)gDirectory->Get( Form("a%i", 6*j + i ) );

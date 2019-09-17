@@ -5,7 +5,6 @@
 // Nuclear Physics Research Group
 // School of Physics and Astronomy
 // The University of Manchester
-// LAST EDITED: 27/02/19
 // ============================================================================================= //
 #include <TFile.h>
 #include <TString.h>

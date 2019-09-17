@@ -24,6 +24,7 @@
 #include <TGraph.h>
 #include <TH2.h>
 #include <TCanvas.h>
+#include <TPaletteAxis.h>
 #include <iostream>
 
 struct plotterOptions;
@@ -35,16 +36,7 @@ void DrawEVZ( TTree *t, plotterOptions &opt_s, Int_t pos_number ){
 	
 	// Print welcome message
 	printDiv(); printf("PLOTTING THE E v.s. z PLOTS IN POSITION %i\n", pos_number ); printDiv();
-
-	// Work out whether to iterate plots
-	Int_t last_index;
-	if ( SWITCH_ITERATE_PLOTS == 1 ){
-		last_index = opt_s.numIter;
-	}
-	else{
-		last_index = 1;
-	}
-
+	
 	// Define variables
 	TCanvas *c_evz[opt_s.numIter];
 	TH2F *h_evz[opt_s.numIter];
@@ -129,11 +121,10 @@ void DrawEVZ( TTree *t, plotterOptions &opt_s, Int_t pos_number ){
 
 
 	// Loop to create histograms
-	TString plotTitle;
-	for ( Int_t i = 0; i < last_index; i++ ){
+	TString plot_title;
+	for ( Int_t i = 0; i < opt_s.numIter; i++ ){
 		// Call the canvas
 		c_evz[i] = new TCanvas( Form( "c_evz%i", i ), Form( "E v.s. z (%i/%i)", i+1, opt_s.numIter - 1 ), C_WIDTH, C_HEIGHT );
-		
 		
 		// Define the histogram
 		t->Draw( Form( "ecrr:z>>evz_%i(400, %f, %f, 900, %f, %f)", i, x[0], x[2], x[1], x[3] ), opt_s.cutList[i], "colz" );
@@ -146,22 +137,27 @@ void DrawEVZ( TTree *t, plotterOptions &opt_s, Int_t pos_number ){
 		h_evz[i]->GetYaxis()->SetTitle("E / MeV");
 		
 		// Produce title of histogram
-		plotTitle = "E v.s. z with ";
+		if ( SWITCH_PLOT_DETAILS == 1 ){
+			plot_title = "E v.s. z with ";
 
-		// Create the cut names
-		if ( i == opt_s.numIter - 1 ){ plotTitle += opt_s.cutListDesc[i].Data(); }
-		else{
-			for ( Int_t j = i; j <= opt_s.numIter - 2; j++ ){
-				plotTitle += opt_s.cutListDesc[j].Data();
-				if ( j < opt_s.numIter - 2 ){ plotTitle += ", "; }
-				if ( j == opt_s.numIter - 3 ){ plotTitle += "and "; }
+			// Create the cut names
+			if ( i == opt_s.numIter - 1 ){ plot_title += opt_s.cutListDesc[i].Data(); }
+			else{
+				for ( Int_t j = i; j <= opt_s.numIter - 2; j++ ){
+					plot_title += opt_s.cutListDesc[j].Data();
+					if ( j < opt_s.numIter - 2 ){ plot_title += ", "; }
+					if ( j == opt_s.numIter - 3 ){ plot_title += "and "; }
+				}
 			}
+			plot_title +=" cut";
+			if (i != opt_s.numIter - 2){ plot_title +="s"; }
+			printf("%i: %s\n", i, plot_title.Data() );
 		}
-		plotTitle +=" cut";
-		if (i != opt_s.numIter - 2){ plotTitle +="s"; }
-		printf("%i: %s\n", i, plotTitle.Data() );
+		else{
+			plot_title = "";
+		}
 		
-		h_evz[i]->SetTitle( plotTitle.Data() );
+		h_evz[i]->SetTitle( plot_title.Data() );
 		
 		// DRAW SI STRIP DIVIDING LINES
 		if ( DRAW_SI_STRIP_DIVIDERS == 1 ){
@@ -177,7 +173,7 @@ void DrawEVZ( TTree *t, plotterOptions &opt_s, Int_t pos_number ){
 					l_divider[j][k]->SetY2( x[3] );
 
 					// Define styles
-					l_divider[j][k]->SetLineWidth(2);
+					l_divider[j][k]->SetLineWidth(1);
 					if ( j % 2 == 0 ){
 						l_divider[j][k]->SetLineColor(kBlack);
 					}
@@ -199,11 +195,12 @@ void DrawEVZ( TTree *t, plotterOptions &opt_s, Int_t pos_number ){
 		
 		// Update the canvas
 		c_evz[i]->Modified(); c_evz[i]->Update();
-
+		
 		// Print if desired
 		// Print the canvas
 		if ( SWITCH_PRINT_CANVAS == 1 ){
-			c_evz[i]->Print( Form( "%sevz_%i%s", opt_s.printDir.Data(), i, PRINT_FORMAT.Data() ) );
+			c_evz[i]->Print( Form( "%s/EVZ/EVZ_%i%s", opt_s.printDir.Data(), i, PRINT_FORMAT.Data() ), "EmbedFonts" );
+			c_evz[i]->Print( Form( "%s/EVZ/EVZ_%i%s", opt_s.printDir.Data(), i, ".png" ) );
 		}
 	}
 	gStyle->SetOptStat(kTRUE);

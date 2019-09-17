@@ -10,12 +10,12 @@
 #define ALPHA_GLOBALS_H
 
 // SWITCHES
-Bool_t SWITCH_WRITE_SPECTRA = 0;
+Bool_t SWITCH_WRITE_SPECTRA = 1;
 Bool_t SWITCH_DISPLAY_CANVAS = 0;
 Bool_t SWITCH_PRINT_CANVAS = 1;
 Bool_t SWITCH_WRITE_SPE = 1;
 
 // DIRECTORIES
-TString PRINT_DIRECTORY = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/PLOTS/";
+TString PRINT_DIRECTORY = "/home/ptmac/Documents/07-CERN-ISS-Mg/Mg-Analysis/Alpha_Calibration/Run19(narrow-cut)/";
 
 #endif

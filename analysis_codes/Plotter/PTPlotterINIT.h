@@ -21,22 +21,32 @@
 
 // DEFINE GLOBAL VARIABLES
 // Switches for functions
-const Bool_t SWITCH_EVZ = 1;
+const Bool_t SWITCH_EVZ = 0;
+const Bool_t SWITCH_GAMMA_BRANCH = 0;
 const Bool_t SWITCH_XCAL_24 = 0;
 const Bool_t SWITCH_TCUTS_24 = 0;
 const Bool_t SWITCH_EX_6 = 0;
-const Bool_t SWITCH_EX_FULL = 0;
+const Bool_t SWITCH_EX_FULL = 1;
 const Bool_t SWITCH_CUT_EXAMPLES = 0;
 const Bool_t SWITCH_DRAW_BEST_RESOLUTION = 0;
 
 // Global switches
-const Bool_t SWITCH_ITERATE_PLOTS = 0;
-const Bool_t SWITCH_DISPLAY_CANVAS = 1;
-const Bool_t SWITCH_PRINT_CANVAS = 0;
+const Bool_t SWITCH_ITERATE_PLOTS = 0;			// Iterates plots over cuts
+const Bool_t SWITCH_COMPARE_PLOTS = 0;			// Compares plots between cuts
+const Bool_t SWITCH_DISPLAY_CANVAS = 0;			// Displays the canvas before the program ends
+const Bool_t SWITCH_PRINT_CANVAS = 1;			// Prints to file
+const Bool_t SWITCH_PLOT_DETAILS = 0;			// Adds OptStat box
 
-const Bool_t DRAW_SI_STRIP_DIVIDERS = 1;
-const Bool_t DRAW_THEORETICAL_LINES_NR = 1;
+// EVZ plotting options
+const Bool_t DRAW_SI_STRIP_DIVIDERS = 0;
+const Bool_t DRAW_THEORETICAL_LINES_NR = 0;
+
+// Number of cut iterations (4 cuts = 5 different states)
 const Int_t NUM_CUT_ITER = 5;
+
+// Choose which excitation energy to use (0 = Ex, 1 = Ex_corrected)
+const Int_t WHICH_EXCITATION = 1;
+const TString excitation_mode[2] = { "Ex", "Ex_corrected" };
 
 // Canvas size (for 4:3 screen)
 const Int_t C_WIDTH = 1200;
@@ -57,6 +67,43 @@ struct plotterOptions{
 	Int_t numIter;
 	TString printDir;
 };
+
+// Declare global TStyle pointer
+TStyle *ptm_style;
+
+void SetPadMargins( TStyle *st, Int_t opt = 1, Int_t ratio = 43 ){
+	if ( ratio == 11 ){
+		if ( opt == 1 ){
+			// 1D HIST
+			st->SetPadLeftMargin(0.12);
+			st->SetPadRightMargin(0.04);
+		}
+		else if ( opt == 2 ){
+			// 2D HIST
+			st->SetPadLeftMargin(0.12);
+			st->SetPadRightMargin(0.12);
+		}
+	}
+	else if ( ratio == 43 ){
+		if ( opt == 1 ){
+			// 1D HIST
+			st->SetPadLeftMargin(0.08);
+			st->SetPadRightMargin(0.02);
+		}
+		else if ( opt == 2 ){
+			// 2D HIST
+			//st->SetPadLeftMargin(0.12);
+			//st->SetPadRightMargin(0.12);
+		}
+	}
+	return;
+}
+
+Int_t GetRatio( Int_t width, Int_t height ){
+	if ( width == height ){ return 11; }
+	else if ( (Double_t)height/(Double_t)width == 0.75 ){ return 43; }
+	else{ return 0; }
+}
 
 
 /* ********************************************************************************************* //
@@ -100,15 +147,42 @@ void initialiseOptions( plotterOptions &opt_s ){
 		opt_s.numIter = NUM_CUT_ITER;
 	}
 	else{
-		opt_s.numIter = 0;
+		opt_s.numIter = 1;
 	}
 	
 	// Directory for saving files
-	opt_s.printDir = "/PLOTS/";
+	opt_s.printDir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/PLOTS";
+	
+	ptm_style = (TStyle*)gStyle->Clone();
+	ptm_style->SetName("ptm_style");
 	
 	// Style Options
-	gStyle->SetOptStat("meni");
-	gStyle->SetPalette(kRainBow);
+	if ( SWITCH_PLOT_DETAILS == 1 ){
+		ptm_style->SetOptStat("meni");
+		ptm_style->SetPadTopMargin(0.08);
+	}
+	else{
+		ptm_style->SetOptStat(0);
+		ptm_style->SetPadTopMargin(0.02);
+	}
+	ptm_style->SetPadBottomMargin(0.08);
+	
+	// Set Pad margins for left and right
+	SetPadMargins( ptm_style, 1, GetRatio( C_WIDTH, C_HEIGHT ) );
+	
+	ptm_style->SetTitleOffset(1.1,"y");
+	ptm_style->SetTitleOffset(1.1,"xz");
+
+
+	//ptm_style->SetPalette(kRainBow);
+	ptm_style->SetLabelFont(62, "xyz");
+	ptm_style->SetTitleFont(62, "xyz");
+	ptm_style->SetTitleFont(62, "w");
+	ptm_style->SetLegendFont(62);
+	ptm_style->SetStatFont(62);
+	
+	gROOT->SetStyle("ptm_style");
+	ptm_style->cd();
 
 	// Clear the terminal
 	gSystem->Exec("clear");

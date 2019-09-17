@@ -31,8 +31,10 @@ void AlphaDetByDet( TTree *t ){
 	for ( Int_t i = 0; i < NUM_DETECTORS; i++ ){
 		// Plot the detectors
 		c_det[i] = new TCanvas( Form( "c_det%i", i ), Form( "Detector Canvas (%i/%i)", i + 1, NUM_DETECTORS ), 1200, 900 );
-		t->Draw( Form( "e>>h_det%i(1000, 0, 2000)", i ), Form( "detID == %i && xcal[%i] > xcal_cuts[%i][0] && xcal[%i] < xcal_cuts[%i][1]", i, i, i, i, i ), "goff" );
-		
+		//t->Draw( Form( "e>>h_det%i(1000, 0, 2000)", i ), Form( "detID == %i && xcal[%i] > xcal_cuts[%i][0] && xcal[%i] < xcal_cuts[%i][1]", i, i, i, i, i ), "goff" );
+		t->Draw( Form( "e>>h_det%i(1000, 0, 2000)", i ), Form( "detID == %i && xcal[%i] > 0.11 && xcal[%i] < 0.84", i, i, i ), "goff" );
+		//t->Draw( Form( "e>>h_det%i(1000, 0, 2000)", i ), Form( "detID == %i", i ), "goff" );
+
 		// Grab the histograms
 		h_det[i] = (TH1F*)gDirectory->Get( Form ( "h_det%i", i ) );
 

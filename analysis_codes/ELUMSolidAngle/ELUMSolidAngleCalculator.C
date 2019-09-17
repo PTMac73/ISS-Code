@@ -263,8 +263,8 @@ Double_t SolidAngleCalculator( Double_t z_elum = 134.8 ){
 // BATCH FUNCTION ============================================================================== //
 void ELUMSolidAngleCalculator(){
 	// Calculate solid angles for different values of z_elum
-	const Int_t num_z = 3;
-	Double_t z_elum[num_z] = { 124.7, 125.7, 126.7 };
+	const Int_t num_z = 5;
+	Double_t z_elum[num_z] = { 120.7, 124.7, 125.7, 126.7, 130.7 };
 	Double_t solid_angle[num_z];
 	if (SWITCH_VERBOSE == 0 ){ std::cout << "  Z (mm)\tmin(\u03b8CM)\tmax(\u03b8CM)\tSOLID_ANGLE" << std::endl; }
 	for ( Int_t i = 0; i < num_z; i++ ){

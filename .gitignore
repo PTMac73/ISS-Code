@@ -66,6 +66,8 @@ dkms.conf
 *.dat
 *.txt
 
+tags
+
 # ROOT compile files
 *ACLiC*
 

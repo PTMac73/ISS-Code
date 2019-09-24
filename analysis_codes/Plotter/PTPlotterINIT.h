@@ -21,25 +21,25 @@
 
 // DEFINE GLOBAL VARIABLES
 // Switches for functions
-const Bool_t SWITCH_EVZ = 0;
+const Bool_t SWITCH_EVZ = 1;
 const Bool_t SWITCH_GAMMA_BRANCH = 0;
 const Bool_t SWITCH_XCAL_24 = 0;
 const Bool_t SWITCH_TCUTS_24 = 0;
 const Bool_t SWITCH_EX_6 = 0;
-const Bool_t SWITCH_EX_FULL = 1;
+const Bool_t SWITCH_EX_FULL = 0;
 const Bool_t SWITCH_CUT_EXAMPLES = 0;
 const Bool_t SWITCH_DRAW_BEST_RESOLUTION = 0;
 
 // Global switches
 const Bool_t SWITCH_ITERATE_PLOTS = 0;			// Iterates plots over cuts
 const Bool_t SWITCH_COMPARE_PLOTS = 0;			// Compares plots between cuts
-const Bool_t SWITCH_DISPLAY_CANVAS = 0;			// Displays the canvas before the program ends
-const Bool_t SWITCH_PRINT_CANVAS = 1;			// Prints to file
+const Bool_t SWITCH_DISPLAY_CANVAS = 1;			// Displays the canvas before the program ends
+const Bool_t SWITCH_PRINT_CANVAS = 0;			// Prints to file
 const Bool_t SWITCH_PLOT_DETAILS = 0;			// Adds OptStat box
 
 // EVZ plotting options
-const Bool_t DRAW_SI_STRIP_DIVIDERS = 0;
-const Bool_t DRAW_THEORETICAL_LINES_NR = 0;
+const Bool_t DRAW_SI_STRIP_DIVIDERS = 1;
+const Bool_t DRAW_THEORETICAL_LINES_NR = 1;
 
 // Number of cut iterations (4 cuts = 5 different states)
 const Int_t NUM_CUT_ITER = 5;

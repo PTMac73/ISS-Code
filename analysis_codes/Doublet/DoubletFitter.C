@@ -17,9 +17,9 @@
 #include "Doublet_Globals.h"
 
 
-void DoubletFitter(){
+void DoubletFitter( TString in_file_loc = input_file_dir ){
 	// Import the data for creating polynomial fits
-	ImportData();
+	ImportData( in_file_loc );
 
 	// Calculate the x range
 	Double_t X_min = 10000.0; Double_t X_max = 0;
@@ -56,7 +56,9 @@ void DoubletFitter(){
 				Eta[i][j][2] = CalculateEtas( X, E, exp_fit, pt_fit[i], pt_fit[j], Eta[i][j][0], Eta[i][j][1] );
 
 				// Print the result
-				printf("%i --> %i:\t%8.8f\t%8.8f\t%8.8f\n", i, j, Eta[i][j][0], Eta[i][j][1], Eta[i][j][2] );
+				if ( SWITCH_VERBOSE == 1 ){
+					printf("%i --> %i:\t%8.8f\t%8.8f\t%8.8f\n", i, j, Eta[i][j][0], Eta[i][j][1], Eta[i][j][2] );
+				}
 			}
 			else{
 				// Fill eta with -1
@@ -68,17 +70,22 @@ void DoubletFitter(){
 	}
 	
 	// Print summary of useful information
-	printf("================================================================================\n");
-	printf("L1\tL2\tEta_1\tEta_2\tChi^2\n");
-	printf("--------------------------------------------------------------------------------\n");
-	for ( Int_t j = 0; j < NUM_L; j++ ){
-		for ( Int_t i = 0; i < NUM_L; i++ ){
-			if ( i > j ){
-				printf("%i\t%i\t%8.8f\t%8.8f\t%8.8f\n", j, i, Eta[i][j][1], Eta[i][j][0], Eta[i][j][2] );
-			}
+		if ( SWITCH_VERBOSE == 1 ){
+			printf("================================================================================\n");
+			printf("L1\tL2\tEta_1\tEta_2\tChi^2\n");
+			printf("--------------------------------------------------------------------------------\n");
 		}
-	} 
-	printf("================================================================================\n");
+		for ( Int_t j = 0; j < NUM_L; j++ ){
+			for ( Int_t i = 0; i < NUM_L; i++ ){
+				if ( i > j ){
+					printf("%i\t%i\t%8.8f\t%8.8f\t%8.8f\n", j, i, Eta[i][j][1], Eta[i][j][0], Eta[i][j][2] );
+				}
+			}
+		} 
+		if ( SWITCH_VERBOSE == 1 ){
+			printf("================================================================================\n");
+		}
+	
 
 	// Loop over the different l-values and work out the "best chi^2"
 	/*	

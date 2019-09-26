@@ -94,8 +94,9 @@ Double_t BruteForce( Double_t spacing, Double_t &eta_0, Double_t &eta_1, Double_
 	eta_1 = eta_1_min;
 	
 	// Print the final value
-	printf("%2.1e\t( %08.8f --> %08.8f )\t%08.8f\t( %08.8f --> %08.8f )\t%08.8f\t%8.4f\n", spacing, lb_0, ub_0, eta_0, lb_1, ub_1, eta_1, chi2_min );
-
+	if ( SWITCH_VERBOSE == 1 ){
+		printf("%2.1e\t( %08.8f --> %08.8f )\t%08.8f\t( %08.8f --> %08.8f )\t%08.8f\t%8.4f\n", spacing, lb_0, ub_0, eta_0, lb_1, ub_1, eta_1, chi2_min );
+	}
 	// Return the final value
 	return chi2_min;
 }
@@ -165,14 +166,15 @@ Double_t HillClimb( Double_t &eta_0, Double_t &eta_1, TMatrixD *matrix_array ){
 		}
 		
 		// Iterate the number of steps
-		if ( num_steps % 20000 == 0 ){
+		if ( num_steps % 20000 == 0 && SWITCH_VERBOSE == 1){
 			printf("%0000000i:\t%12.8f\t%12.8f\t%12.8f\n", num_steps, eta_0, eta_1, chi2 );
 		}
 		num_steps++;
 	}
+	if ( SWITCH_VERBOSE == 1 ){
+		printf(">>>\t%8.4f\t%8.4f\t%8.4f\n", eta_0, eta_1, chi2 );
+	}
 
-	printf(">>>\t%8.4f\t%8.4f\t%8.4f\n", eta_0, eta_1, chi2 );
-	
 	// BRUTE FORCE IT NOW IN RIGHT REGION
 	// Now brute force the way there
 	step_size = 1;

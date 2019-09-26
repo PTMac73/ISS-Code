@@ -17,6 +17,7 @@ const int NUM_L = 4;
 // SWITCHES
 Bool_t SWITCH_DRAW_FITS = 0;
 Bool_t SWITCH_BRUTE_FORCE = 1;
+Bool_t SWITCH_VERBOSE = 0;
 
 // Define storage containers
 Double_t X[NUM_DATA_POINTS];

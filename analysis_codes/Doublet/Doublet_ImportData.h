@@ -16,10 +16,10 @@
 #include <TString.h>
 #include "Doublet_Globals.h"
 
-void ImportData(){
+void ImportData( TString in_file_dir ){
 	// Open the file
 	std::ifstream file_in;
-	file_in.open( input_file_dir );
+	file_in.open( in_file_dir );
 	
 	// Check if the file is open
 	if ( !file_in.is_open() ){

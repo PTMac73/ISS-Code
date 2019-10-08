@@ -13,6 +13,7 @@
 #include <TMath.h>
 #include <TGraph2D.h>
 #include <TStyle.h>
+#include <TStopwatch.h>
 
 #include "Doublet_Globals.h"
 /*
@@ -56,7 +57,7 @@ Double_t BruteForce( Double_t spacing, Double_t &eta_0, Double_t &eta_1, Double_
 	TMatrixD beta_exp_vector = matrix_array[4];
 
 	// Define initial quantities
-	Double_t diff = 2000*spacing/2.0;		// Defines the range over which you search
+	Double_t diff = 1.5*1e4*spacing;		// Defines the range over which you search
 	Double_t lb_0 = 0.0, ub_0 = 0.0, lb_1 = 0.0, ub_1 = 0.0;
 
 	if ( diff < eta_0 ){ lb_0 = eta_0 - diff; }	// Define the upper and lower bounds for each eta
@@ -69,6 +70,11 @@ Double_t BruteForce( Double_t spacing, Double_t &eta_0, Double_t &eta_1, Double_
 	TMatrixD mu = CalculateMu( beta_exp_vector, beta_1_vector, beta_2_vector, eta_0, eta_1 );	// Define initial mu
 	
 	// Begin loop over each eta
+	TStopwatch stopwatch;
+	stopwatch.Start();
+	Int_t divisor = (Int_t)( 4/(20*spacing*spacing) );
+
+
 	for (Int_t i = 0; i < (Int_t)((ub_0 - lb_0)/spacing); i++ ){
 		for (Int_t j = 0; j < (Int_t)((ub_1 - lb_1)/spacing); j++ ){
 			
@@ -80,6 +86,12 @@ Double_t BruteForce( Double_t spacing, Double_t &eta_0, Double_t &eta_1, Double_
 
 			// Iterate the counter for the number of points
 			num_points_ctr++;
+
+			if ( SWITCH_VERBOSE == 1 && num_points_ctr % divisor == 0){
+				std::cout << std::setprecision(4) << num_points_ctr*spacing*spacing/4 << "% complete at " << spacing << " scale\n";
+				std::cout << "Time elapsed: " << std::setprecision(4) << stopwatch.RealTime() << " s\n\n";
+				stopwatch.Start(kFALSE);
+			}
 		
 			// Store the new minimum
 			if ( chi2 < chi2_min ){
@@ -89,7 +101,7 @@ Double_t BruteForce( Double_t spacing, Double_t &eta_0, Double_t &eta_1, Double_
 			}
 		}
 	}
-	
+	stopwatch.Stop();
 	eta_0 = eta_0_min;
 	eta_1 = eta_1_min;
 	

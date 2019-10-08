@@ -37,6 +37,7 @@ void PTPlotter( TFile *f ){
 	if ( SWITCH_GAMMA_BRANCH == true )DrawGammaBranch( t, opt_s, pos_number );
 	if ( SWITCH_XCAL_24 == true )drawXcal24( t, opt_s );
 	if ( SWITCH_TCUTS_24 == true )drawTCuts24( t, opt_s );
+	if ( SWITCH_PLOT_24 == true ) Draw24( t, opt_s, 5 );
 	if ( SWITCH_EX_6 == true )drawEx6( t, opt_s, pos_number );
 	if ( SWITCH_EX_FULL == true )DrawExFull( t, opt_s );
 	if ( SWITCH_CUT_EXAMPLES == true)drawCutExamples( t, opt_s, cut0 );

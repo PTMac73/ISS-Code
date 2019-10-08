@@ -19,6 +19,7 @@
 #include "PTP_drawCutExamples.h"
 #include "PTF_GetPosNumber.h"
 #include "PTP_drawBestResolution.h"
+#include "PTP_detector-by-detector.h"
 
 /*/
  *    |*********************************|

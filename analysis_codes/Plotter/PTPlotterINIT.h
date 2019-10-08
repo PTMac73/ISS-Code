@@ -21,7 +21,7 @@
 
 // DEFINE GLOBAL VARIABLES
 // Switches for functions
-const Bool_t SWITCH_EVZ = 1;
+const Bool_t SWITCH_EVZ = 0;
 const Bool_t SWITCH_GAMMA_BRANCH = 0;
 const Bool_t SWITCH_XCAL_24 = 0;
 const Bool_t SWITCH_TCUTS_24 = 0;
@@ -29,13 +29,15 @@ const Bool_t SWITCH_EX_6 = 0;
 const Bool_t SWITCH_EX_FULL = 0;
 const Bool_t SWITCH_CUT_EXAMPLES = 0;
 const Bool_t SWITCH_DRAW_BEST_RESOLUTION = 0;
+const Bool_t SWITCH_PLOT_24 = 1;
 
 // Global switches
 const Bool_t SWITCH_ITERATE_PLOTS = 0;			// Iterates plots over cuts
 const Bool_t SWITCH_COMPARE_PLOTS = 0;			// Compares plots between cuts
-const Bool_t SWITCH_DISPLAY_CANVAS = 1;			// Displays the canvas before the program ends
-const Bool_t SWITCH_PRINT_CANVAS = 0;			// Prints to file
+const Bool_t SWITCH_DISPLAY_CANVAS = 0;			// Displays the canvas before the program ends
+const Bool_t SWITCH_PRINT_CANVAS = 1;			// Prints to file
 const Bool_t SWITCH_PLOT_DETAILS = 0;			// Adds OptStat box
+const Bool_t SWITCH_INDIVIDUAL_CANVASES = 1;	// Changes one canvas with many graphs to many canvases with one graph
 
 // EVZ plotting options
 const Bool_t DRAW_SI_STRIP_DIVIDERS = 1;
@@ -95,6 +97,17 @@ void SetPadMargins( TStyle *st, Int_t opt = 1, Int_t ratio = 43 ){
 			//st->SetPadLeftMargin(0.12);
 			//st->SetPadRightMargin(0.12);
 		}
+
+		// 24 plots
+		if ( SWITCH_INDIVIDUAL_CANVASES == 1 ){
+			st->SetPadLeftMargin(0.1);
+			st->SetPadRightMargin(0.02);
+			st->SetPadBottomMargin(0.1);
+			st->SetPadTopMargin(0.02);
+			st->SetTitleOffset(0.7,"xy");
+		} 
+
+
 	}
 	return;
 }
@@ -167,12 +180,8 @@ void initialiseOptions( plotterOptions &opt_s ){
 	}
 	ptm_style->SetPadBottomMargin(0.08);
 	
-	// Set Pad margins for left and right
-	SetPadMargins( ptm_style, 1, GetRatio( C_WIDTH, C_HEIGHT ) );
-	
 	ptm_style->SetTitleOffset(1.1,"y");
 	ptm_style->SetTitleOffset(1.1,"xz");
-
 
 	//ptm_style->SetPalette(kRainBow);
 	ptm_style->SetLabelFont(62, "xyz");
@@ -180,6 +189,9 @@ void initialiseOptions( plotterOptions &opt_s ){
 	ptm_style->SetTitleFont(62, "w");
 	ptm_style->SetLegendFont(62);
 	ptm_style->SetStatFont(62);
+
+	// Set Pad margins for left and right
+	SetPadMargins( ptm_style, 1, GetRatio( C_WIDTH, C_HEIGHT ) );
 	
 	gROOT->SetStyle("ptm_style");
 	ptm_style->cd();

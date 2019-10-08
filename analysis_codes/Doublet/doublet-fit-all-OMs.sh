@@ -32,8 +32,8 @@ TEMPLATE_LOC="${FIT_CODE_DIR}/doublet_data_template.dat"
 DATA_DIR="${FIT_CODE_DIR}/model-data"
 
 SWITCH_MAKE_ARRAYS=1
-SWITCH_CREATE_INPUT_FILES=0
-SWITCH_RUN_ROOT=0
+SWITCH_CREATE_INPUT_FILES=1
+SWITCH_RUN_ROOT=1
 SWITCH_MAKE_TABLE=1
 
 line_array=()
@@ -113,6 +113,9 @@ do
 
 		# Fix the output file by removing the first two lines (1,2d means delete lines 1 and 2)
 		sed '1,2d' "${OUTPUT_FILE_NAME_TEMP}" > "${OUTPUT_FILE_NAME}"
+
+		# Print output message to the console
+		echo -e "${MOD_NAME} parameters calculated.\n"
 
 	fi
 done

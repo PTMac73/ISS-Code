@@ -47,10 +47,10 @@ void DoubletFitter( TString in_file_loc = input_file_dir ){
 		for ( Int_t j = 0; j < NUM_L; j++ ){
 			
 			// Only fill if j < i so that you only test between two angular distributions once
-			if ( j < i ){
+			if ( i == 2 && j == 0 /*j < i*/ ){
 				// Put in some initial estimates
-				Eta[i][j][0] = 100;
-				Eta[i][j][1] = 100;
+				Eta[i][j][0] = 1.5;
+				Eta[i][j][1] = 1.5;
 
 				// Now calculate properly
 				Eta[i][j][2] = CalculateEtas( X, E, exp_fit, pt_fit[i], pt_fit[j], Eta[i][j][0], Eta[i][j][1] );

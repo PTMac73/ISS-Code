@@ -55,7 +55,7 @@ Double_t CalculateEtas( Double_t *x, Double_t *error, TF1 *beta_exp, TF1 *beta_1
 	// CALCULATE MINIMUM CHI^2 VALUE
 	if ( SWITCH_BRUTE_FORCE == 1 ){
 		// Define initial variables
-		Double_t step_size = 0.1;
+		Double_t step_size = 1e-4;
 		TMatrixD mu = CalculateMu( beta_exp_vector, beta_1_vector, beta_2_vector, eta_0, eta_1 );
 		Double_t chi2 = CalculateChi2( mu, x_matrix, error_matrix );
 		Double_t chi2_old = 1e10;

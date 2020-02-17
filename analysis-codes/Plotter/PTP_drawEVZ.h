@@ -3,7 +3,7 @@
 // ============================================================================================= //
 // Patrick MacGregor
 // Nuclear Physics Research Group
-// School of Physics and Astronomy
+// Department of Physics and Astronomy
 // The University of Manchester
 // ============================================================================================= //
 #ifndef PTP_DRAW_EVZ_H_
@@ -38,8 +38,8 @@ void DrawEVZ( TTree *t, plotterOptions &opt_s, Int_t pos_number ){
 	printDiv(); printf("PLOTTING THE E v.s. z PLOTS IN POSITION %i\n", pos_number ); printDiv();
 	
 	// Define variables
-	TCanvas *c_evz[opt_s.numIter];
-	TH2F *h_evz[opt_s.numIter];
+	TCanvas* c_evz[opt_s.numIter];
+	TH2F* h_evz[opt_s.numIter];
 
 	// Define axis limits
 	Double_t x[4] = {-50,0,-10,9};
@@ -121,10 +121,16 @@ void DrawEVZ( TTree *t, plotterOptions &opt_s, Int_t pos_number ){
 
 
 	// Loop to create histograms
-	TString plot_title;
+	TString plot_title = "";
 	for ( Int_t i = 0; i < opt_s.numIter; i++ ){
 		// Call the canvas
-		c_evz[i] = new TCanvas( Form( "c_evz%i", i ), Form( "E v.s. z (%i/%i)", i+1, opt_s.numIter - 1 ), C_WIDTH, C_HEIGHT );
+		c_evz[i] = new TCanvas( Form( "c_evz%i", i ), Form( "EVZ-%i/%i", i+1, opt_s.numIter - 1 ), C_WIDTH, C_HEIGHT );
+		TPad* pad = (TPad*)c_evz[i]->GetPad(0);
+		pad->SetLeftMargin(0.06);
+		pad->SetRightMargin(0.02);
+		pad->SetTopMargin(0.02);
+		pad->SetBottomMargin(0.06);
+
 		
 		// Define the histogram
 		t->Draw( Form( "ecrr:z>>evz_%i(400, %f, %f, 900, %f, %f)", i, x[0], x[2], x[1], x[3] ), opt_s.cutList[i], "scat" );
@@ -136,30 +142,15 @@ void DrawEVZ( TTree *t, plotterOptions &opt_s, Int_t pos_number ){
 		h_evz[i]->GetXaxis()->SetTitle("z / cm");
 		h_evz[i]->GetYaxis()->SetTitle("E / MeV");
 		h_evz[i]->SetMarkerSize(0.5);
+		h_evz[i]->SetMarkerColor(kRed);
 
 		// Produce title of histogram
 		if ( SWITCH_PLOT_DETAILS == 1 ){
-			plot_title = "E v.s. z with ";
+			plot_title = opt_s.cutListDesc[i].Data();
+		}
+		h_evz[i]->SetTitle(plot_title);	
 
-			// Create the cut names
-			if ( i == opt_s.numIter - 1 ){ plot_title += opt_s.cutListDesc[i].Data(); }
-			else{
-				for ( Int_t j = i; j <= opt_s.numIter - 2; j++ ){
-					plot_title += opt_s.cutListDesc[j].Data();
-					if ( j < opt_s.numIter - 2 ){ plot_title += ", "; }
-					if ( j == opt_s.numIter - 3 ){ plot_title += "and "; }
-				}
-			}
-			plot_title +=" cut";
-			if (i != opt_s.numIter - 2){ plot_title +="s"; }
-			printf("%i: %s\n", i, plot_title.Data() );
-		}
-		else{
-			plot_title = "";
-		}
-		
-		h_evz[i]->SetTitle( plot_title.Data() );
-		
+
 		// DRAW SI STRIP DIVIDING LINES
 		if ( DRAW_SI_STRIP_DIVIDERS == 1 ){
 			// Define dividers

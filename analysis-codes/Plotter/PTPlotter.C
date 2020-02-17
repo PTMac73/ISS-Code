@@ -4,7 +4,7 @@
 // ============================================================================================= //
 // Patrick MacGregor
 // Nuclear Physics Research Group
-// School of Physics and Astronomy
+// Department of Physics and Astronomy
 // The University of Manchester
 // ============================================================================================= //
 #include "PTPlotter.h"
@@ -41,6 +41,7 @@ void PTPlotter( TFile *f ){
 	if ( SWITCH_EX_FULL == true )DrawExFull( t, opt_s );
 	if ( SWITCH_CUT_EXAMPLES == true)drawCutExamples( t, opt_s, cut0 );
 	if ( SWITCH_DRAW_BEST_RESOLUTION == true)DrawBestResolution( t, opt_s );
-	if ( SWITCH_THETACM == true)DrawThetaCM( t, opt_s, pos_number );  
+	if ( SWITCH_THETACM == true)DrawThetaCM( t, opt_s, pos_number );
+	if ( SWITCH_DRAW_EX_CUT_DIFFERENCE == true )DrawExCutDiff( t, opt_s );
 }
 

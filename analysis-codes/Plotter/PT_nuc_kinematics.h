@@ -45,12 +45,9 @@ Double_t MToCM(){
  *  X2 is the point furthest right of the origin
  *  height is the height of the array                                                            */
 Double_t ISSArrayRadius( Double_t X1, Double_t X2, Double_t height ){
-	Double_t av_rad, term_1, term_2, term_3;
-	term_1 = height*(X2-X1)/2;
-	term_2 = ( TMath::Power(X2,3) - TMath::Power(X1,3) )/(2*height);
-	term_3 = ( height*height/2.0 )*TMath::Log( TMath::Abs( ( height*height + X2*height + X2*X2 )/( height*height + X1*height + X1*X1 ) ) );
-	av_rad = ( term_1 + term_2 + term_3 )/( X2 - X1 );
-	return av_rad;
+	Double_t A1 = X1/height;
+	Double_t A2 = X2/height;
+	return ( height*height/( 2*( X2 - X1 ) ) )*( A2*TMath::Sqrt( 1 + A2*A2 ) - A1*TMath::Sqrt( 1 + A1*A1 ) + TMath::Log( TMath::Abs( A2 + TMath::Sqrt( 1 + A2*A2 ) ) ) - TMath::Log( TMath::Abs( A1 + TMath::Sqrt( 1 + A1*A1 ) ) ) );
 }
 
 

@@ -3,7 +3,7 @@
 // ============================================================================================= //
 // Patrick MacGregor
 // Nuclear Physics Research Group
-// School of Physics and Astronomy
+// Department of Physics and Astronomy
 // The University of Manchester
 // ============================================================================================= //
 #ifndef PTP_DRAW_EXFULL_H_
@@ -18,6 +18,7 @@
 #include <TSystem.h>
 #include <THStack.h>
 #include <TCanvas.h>
+#include <TPad.h>
 #include <iostream>
 
 struct plotterOptions;
@@ -28,55 +29,52 @@ void DrawExFull( TTree *t, plotterOptions &opt_s ){
 	printDiv(); printf("PLOTTING THE FULL EXCITATION SPECTRUM\n"); printDiv();
 
 	// Define variables
-	TCanvas *cExFull[opt_s.numIter];
-	TH1F * hExFull[opt_s.numIter];
+	TCanvas *c_ex_full[opt_s.numIter];
+	TH1F* h_ex_full[opt_s.numIter];
+	TPad* pad;
 	
 	// Declare a plot title for the histograms
-	TString plot_title;
+	TString plot_title = "";
 	
 	// Iterate over the cuts applied (cumulatively)
 	for ( Int_t i = 0; i < opt_s.numIter; i++ ){
 
 		// Draw the plot
-		cExFull[i] = new TCanvas( Form( "Ex-Canvas%i", i ), Form( "Full Excitation Spectrum (%i/%i)", i+1, opt_s.numIter ), C_WIDTH, C_HEIGHT );
-		t->Draw( Form( "%s>>ex_%i(450, -1, 8)", excitation_mode[WHICH_EXCITATION].Data(), i ), opt_s.cutList[opt_s.numIter - i - 1].Data() );
+		c_ex_full[i] = new TCanvas( Form( "c_ex_full_%i", i ), Form( "FULL-EX-%i/%i", i+1, opt_s.numIter ), C_WIDTH, C_HEIGHT );
+
+		pad = (TPad*)c_ex_full[i]->GetPad(0);
+		pad->SetLeftMargin(0.08);
+		pad->SetRightMargin(0.01);
+		pad->SetTopMargin(0.07);
+		pad->SetBottomMargin(0.09);
+
+		t->Draw( Form( "%s>>h_ex_full_%i(450, -1, 8)", excitation_mode[WHICH_EXCITATION].Data(), i ), opt_s.cutList[i].Data() );
 
 		// Store the plot
-		hExFull[i] = (TH1F*)gDirectory->Get( Form( "ex_%i", i ) );
+		h_ex_full[i] = (TH1F*)gDirectory->Get( Form( "h_ex_full_%i", i ) );
 
 		// Format the plot
 		if ( SWITCH_PLOT_DETAILS == 1 ){
-			plot_title = "Ex with ";
-			if (i == 0){plot_title += opt_s.cutListDesc[opt_s.numIter - 1];}
-			else{
-				for ( Int_t j = 1; j < i + 1; j++ ){
-					plot_title += opt_s.cutListDesc[opt_s.numIter - j - 1].Data();
-					if ( j != i ){plot_title += ", ";}
-					if ( j == i - 1 ){plot_title += "and ";}
-				}
-			}
-			plot_title +=" cut";
-			if (i != 1){ plot_title +="s"; }
-		}
-		else{
-			plot_title = "";
+			plot_title = opt_s.cutListDesc[i].Data();
 		}
 
 		// Set the plot title and axes names
-		hExFull[i]->SetTitle( plot_title.Data() );
-		hExFull[i]->GetXaxis()->SetTitle("Excitation Energy (MeV)");
-		hExFull[i]->GetYaxis()->SetTitle("Counts per 20 keV");
+		h_ex_full[i]->SetTitle( plot_title.Data() );
+		h_ex_full[i]->GetXaxis()->SetTitle("Excitation Energy (MeV)");
+		h_ex_full[i]->GetYaxis()->SetTitle("Counts per 20 keV");
+
+		h_ex_full[i]->SetLineColor(kRed);
 
 		// Update the canvas
-		cExFull[i]->Modified(); cExFull[i]->Update();
+		c_ex_full[i]->Modified(); c_ex_full[i]->Update();
 
 		// Print the plot if desired
 		if ( SWITCH_PRINT_CANVAS == 1 ){
-			cExFull[i]->Print( Form( "%s/EX/%s_full_%i%s", opt_s.printDir.Data(), excitation_mode[WHICH_EXCITATION].Data(), i, PRINT_FORMAT.Data() ), "EmbedFonts" );
-			WriteSPE( hExFull[i]->GetName(), Form( "%s/EX/%s_full_%i", opt_s.printDir.Data(), excitation_mode[WHICH_EXCITATION].Data(), i ) );
+			c_ex_full[i]->Print( Form( "%s/EX/%s_full_%i%s", opt_s.printDir.Data(), excitation_mode[WHICH_EXCITATION].Data(), i, PRINT_FORMAT.Data() ) );
 		}
 		printf("===> PLOTTED SPECTRUM %i/%i\n\n", i + 1, opt_s.numIter);
 	}
+
 
 
 	// NOW PRINT COMPARITIVE PLOTS
@@ -87,7 +85,7 @@ void DrawExFull( TTree *t, plotterOptions &opt_s ){
 		// Clone the histograms so that they can be changed
 		TH1F* h_Comp[opt_s.numIter];
 		for ( Int_t l = 0; l < opt_s.numIter; l++ ){
-			h_Comp[l] = (TH1F*)hExFull[l]->Clone( Form( "h_Comp%i", l ) );
+			h_Comp[l] = (TH1F*)h_ex_full[l]->Clone( Form( "h_Comp%i", l ) );
 		}
 
 		// Define a histogram stack

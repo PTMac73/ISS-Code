@@ -4,7 +4,7 @@
 // ============================================================================================= //
 // Patrick MacGregor
 // Nuclear Physics Research Group
-// School of Physics and Astronomy
+// Department of Physics and Astronomy
 // The University of Manchester
 // ============================================================================================= //
 
@@ -23,9 +23,123 @@ const Int_t NUM_DETECTORS_PER_ROW = 4;
 const Int_t NUM_DETECTORS = NUM_ROWS*NUM_DETECTORS_PER_ROW;
 const Int_t NUM_STRIPS_PER_SI = 1;
 
+// Cut value
+const Double_t THETA_CM_LIMIT[2] = {
+	16.6278,
+	11.0000
+};
+
+// CHOOSE WHICH DETECTORS TO USE --------------------------------------------------------------- //
+// * 0 = All detectors
+// * 1 = Best detectors
+const Int_t DETECTOR_MODE = 0;
+
+// CHOOSE HOW TO LAYOUT SPECTRA ---------------------------------------------------------------- //
+// * 0 = Row-by-row
+// * 1 = Detector-by-detector
+// * 2 = Full excitation spectrum
+const Int_t SPECTRUM_LAYOUT = 0;
+
+// CHOOSE WHICH CUTS TO USE -------------------------------------------------------------------- //
+// * 0 = Full cuts
+// * 1 = Cuts for singles spectra
+const Int_t CUTS_MODE = 1;
+
+// This determines the detectors to use if all the detectors are being used. The split is for
+// between states 1-6 and 7-9.
+Bool_t use_detector_1[24][2] = {
+	{ 1, 1 },  // DET #0
+	{ 1, 1 },  // DET #1
+	{ 0, 0 },  // DET #2
+	{ 1, 1 },  // DET #3
+	{ 1, 1 },  // DET #4
+	{ 1, 1 },  // DET #5
+	{ 1, 1 },  // DET #6
+	{ 0, 0 },  // DET #7
+	{ 0, 0 },  // DET #8
+	{ 1, 1 },  // DET #9
+	{ 1, 1 },  // DET #10
+	{ 1, 1 },  // DET #11
+	{ 1, 0 },  // DET #12
+	{ 0, 0 },  // DET #13
+	{ 1, 0 },  // DET #14
+	{ 0, 0 },  // DET #15
+	{ 1, 0 },  // DET #16
+	{ 0, 0 },  // DET #17
+	{ 1, 1 },  // DET #18
+	{ 1, 1 },  // DET #19
+	{ 1, 1 },  // DET #20
+	{ 1, 1 },  // DET #21
+	{ 1, 1 },  // DET #22
+	{ 1, 1 }   // DET #23
+};
+
+// This determines the detectors to use if the best resolution detectors are being used.
+Bool_t use_detector_2[24][1] = {
+	{ 1 },  // DET #0
+	{ 1 },  // DET #1
+	{ 0 },  // DET #2
+	{ 1 },  // DET #3
+	{ 0 },  // DET #4
+	{ 0 },  // DET #5
+	{ 0 },  // DET #6
+	{ 0 },  // DET #7
+	{ 1 },  // DET #8
+	{ 0 },  // DET #9
+	{ 1 },  // DET #10
+	{ 0 },  // DET #11
+	{ 0 },  // DET #12
+	{ 0 },  // DET #13
+	{ 0 },  // DET #14
+	{ 0 },  // DET #15
+	{ 0 },  // DET #16
+	{ 0 },  // DET #17
+	{ 0 },  // DET #18
+	{ 0 },  // DET #19
+	{ 0 },  // DET #20
+	{ 0 },  // DET #21
+	{ 0 },  // DET #22
+	{ 1 }   // DET #23
+};
+
+
+// This labels the mode of operation
+TString label_1[2] = {
+	"states1-6",
+	"states7-9"
+};
+
+TString label_2[1] = { "best_res" };
+
+// ID string array for different spectrum types
+TString SPEC_TYPE_ID[4] = {
+	"",			// 0
+	"row",		// 1
+	"det",		// 2
+	"full",		// 3
+};
+
+TString CUTS_MODE_ID[2] = {
+	"all",
+	"sing"
+};
+
+
+
+// MODE OF OPERATION FUNCTIONS + VARIABLES ----------------------------------------------------- //
+// This tells you how large the use_detector arrays are based on the mode
+Int_t GetNumSpectrumVariants( Int_t det_mode ){
+	Int_t a = 0;
+	if ( det_mode == 0 ){ a = 2; }
+	else if ( det_mode == 1 ){ a = 1; }
+	return a;
+}
+
+
 // FUNCTIONS ----------------------------------------------------------------------------------- //
 // Makes the names for an object depending on whether it's a histogram or a canvas
-TString MakeObjectName( Int_t type, Int_t spectrum_type, Int_t id_number, Int_t strip_number ){
+// N.B. ID number can be detID or row number
+TString MakeObjectName( Int_t type, Int_t spec_layout, Int_t id_number, Int_t strip_number, Int_t cuts_mode ){
 	// TYPE 0 --> histogram
 	// TYPE 1 --> canvas
 	Char_t type_char;
@@ -33,35 +147,45 @@ TString MakeObjectName( Int_t type, Int_t spectrum_type, Int_t id_number, Int_t 
 	else if ( type == 1 ){ type_char = 'c'; }
 	else { std::cout << "Unknown type declared." << std::endl; exit(1); }
 
-	TString name = TString::Format( "%c_spectrum%i_%i_%i", type_char, spectrum_type, id_number, strip_number );
+	TString name = TString::Format( "%c_spec%i_%i_%i_%i", type_char, spec_layout, id_number, strip_number, cuts_mode );
 	return name;
 }
 
 
 
 // Makes the file names for all of the printed spectra
-TString MakePrintFileName( Int_t pos_number, TString LABEL , Int_t id_number, Int_t strip_number, Int_t num_strips, TString file_type, Int_t spectrum_type ){
-	TString name, det_identifier;
-	if ( spectrum_type == 1 ){
-		det_identifier = "row";
-	}
-	else if ( spectrum_type == 2 ){
-		det_identifier = "det";
-	}
-	else{
-		det_identifier = "";
-	}
+TString MakePrintFileName( Int_t pos_number, TString LABEL , Int_t id_number, Int_t strip_number, Int_t num_strips, TString file_type, Int_t spec_layout, Int_t cuts_mode ){
+	TString name;
+	TString det_identifier = SPEC_TYPE_ID[spec_layout+1];
+	TString cut_identifier = CUTS_MODE_ID[cuts_mode];
 
 	if ( strip_number == 0 && num_strips == 1 ){
-		name = TString::Format( "pos%i_%s%i_%s%s", pos_number, det_identifier.Data(), id_number, LABEL.Data(), file_type.Data() );
+		// Full spectrum
+		if ( spec_layout == 3 ){
+			name = TString::Format( "pos%i_%s_%s-cuts%s", pos_number, det_identifier.Data(), cut_identifier.Data(), file_type.Data() );
+		}
+		// Rows/Dets
+		else{
+			name = TString::Format( "pos%i_%s%i_%s_%s-cuts%s", pos_number, det_identifier.Data(), id_number, LABEL.Data(), cut_identifier.Data(), file_type.Data() );
+		}
 	}
 	else{
-		name = TString::Format( "pos%i_%s%i_strip%i-of-%i_%s%s", pos_number, det_identifier.Data(), id_number, strip_number+1, num_strips, LABEL.Data(), file_type.Data() );
+		name = TString::Format( "pos%i_%s%i_strip%i-of-%i_%s_%s-cuts%s", pos_number, det_identifier.Data(), id_number, strip_number+1, num_strips, LABEL.Data(), cut_identifier.Data(), file_type.Data() );
 	}
 	return name;
 }
 
-// Function to spit out the thetaCM cuts
+
+TString MakeRootFileName( Int_t pos_number, Int_t spec_layout, Int_t cuts_mode ){
+	TString det_identifier = SPEC_TYPE_ID[spec_layout+1];
+	TString cut_identifier = CUTS_MODE_ID[cuts_mode];
+	TString name = TString::Format( "%s/pos%i_%s_%s.root", print_dir.Data(), pos_number, cut_identifier.Data(), det_identifier.Data() );
+	return name;
+	
+}
+
+
+// Function to spit out the thetaCM cuts **OBSOLETE**
 TString GenerateThetaCMCutString( Int_t NUM_STATES = 9 ){
 	TString out_str = "( ";
 	for ( Int_t i = 0; i < NUM_STATES; i++ ){
@@ -101,94 +225,7 @@ TString GenerateXCALCutString( Int_t NUM_STRIPS_PER_SI, Int_t strip_number ){
 
 
 
-// CHOOSE MODE OF OPERATION -------------------------------------------------------------------- //
-// * 1 = All detectors
-// * 2 = Best detectors
-const Int_t MODE = 1;
 
-// CHOOSE TYPE OF SPECTRA ---------------------------------------------------------------------- //
-// * 1 = Row-by-row
-// * 2 = Detector-by-detector
-const Int_t SPECTRUM_TYPE = 1;
-
-// MODE OF OPERATION FUNCTIONS + VARIABLES ----------------------------------------------------- //
-// This tells you how large the use_detector arrays are based on the mode
-Int_t GetNumDiffTypesSpectra( Int_t mode ){
-	Int_t a = 0;
-
-	if ( mode == 1 ){
-		a = 2;
-	}
-	else if ( mode == 2 ){
-		a = 1;
-	}
-	return a;
-}
-
-// This determines the detectors to use if all the detectors are being used. The split is for
-// between states 1-6 and 7-9.
-Bool_t use_detector_1[24][2] = {
-	{ 1, 1 },  // DET #0
-	{ 1, 1 },  // DET #1
-	{ 0, 0 },  // DET #2
-	{ 1, 1 },  // DET #3
-	{ 1, 1 },  // DET #4
-	{ 1, 1 },  // DET #5
-	{ 1, 1 },  // DET #6
-	{ 0, 0 },  // DET #7
-	{ 0, 0 },  // DET #8
-	{ 1, 1 },  // DET #9
-	{ 1, 1 },  // DET #10
-	{ 1, 1 },  // DET #11
-	{ 1, 0 },  // DET #12
-	{ 0, 0 },  // DET #13
-	{ 1, 0 },  // DET #14
-	{ 0, 0 },  // DET #15
-	{ 1, 0 },  // DET #16
-	{ 0, 0 },  // DET #17
-	{ 1, 1 },  // DET #18
-	{ 1, 1 },  // DET #19
-	{ 1, 1 },  // DET #20
-	{ 1, 1 },  // DET #21
-	{ 1, 1 },  // DET #22
-	{ 1, 1 }  // DET #23
-};
-
-// This determines the detectors to use if the best resolution detectors are being used.
-Bool_t use_detector_2[24][1] = {
-	{ 1 },  // DET #0
-	{ 1 },  // DET #1
-	{ 0 },  // DET #2
-	{ 1 },  // DET #3
-	{ 0 },  // DET #4
-	{ 0 },  // DET #5
-	{ 0 },  // DET #6
-	{ 0 },  // DET #7
-	{ 1 },  // DET #8
-	{ 0 },  // DET #9
-	{ 1 },  // DET #10
-	{ 0 },  // DET #11
-	{ 0 },  // DET #12
-	{ 0 },  // DET #13
-	{ 0 },  // DET #14
-	{ 0 },  // DET #15
-	{ 0 },  // DET #16
-	{ 0 },  // DET #17
-	{ 0 },  // DET #18
-	{ 0 },  // DET #19
-	{ 0 },  // DET #20
-	{ 0 },  // DET #21
-	{ 0 },  // DET #22
-	{ 1 }   // DET #23
-};
-
-// This labels the mode of operation
-TString label_1[2] = {
-	"states1-6",
-	"states7-9"
-};
-
-TString label_2[1] = { "best_res" };
 
 
 

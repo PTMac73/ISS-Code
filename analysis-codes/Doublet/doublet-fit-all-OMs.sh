@@ -140,9 +140,17 @@ then
 		CSV_FILE_NAME="${CSV_LOC_TEMP}-${MOD_NAME_START}.csv"
 		CreateFileIfItDoesntExistNoDelete "${CSV_FILE_NAME}"
 
-		# Append the data
+		# PRINT DATA
+		# Print header (uses unicode characters
 		printf "%s,\u21132,\u03b71,\u03b72,\u03c7^2,\n" "${MOD_NAME}" >> "${CSV_FILE_NAME}"
-		cat "${i}" | sed -r 's/\t/,/g' | sed -r 's/$/,/g' >> "${CSV_FILE_NAME}"
+
+		# Format the output - print the data, but:
+		#   * Remove the " : " and replace with a ,
+		#   * Remove any remaining spaces and replace with nothing
+		#   * Change the last character to be a comma
+		cat "${i}" | sed -r 's/ : /,/g' | sed -r 's/ //g'| sed -r 's/$/,/g' >> "${CSV_FILE_NAME}"
+
+		# Print a blank line
 		printf ",,,,,\n" >> "${CSV_FILE_NAME}"
 	done
 

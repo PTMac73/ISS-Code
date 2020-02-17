@@ -21,6 +21,7 @@
 #include "PTP_drawBestResolution.h"
 #include "PTP_detector-by-detector.h"
 #include "PTP_DrawThetaCM.h"
+#include "PTP_DrawExCutDiff.h"
 
 /*/
  *    |*********************************|

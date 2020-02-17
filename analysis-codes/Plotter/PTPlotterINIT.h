@@ -3,7 +3,7 @@
 // ============================================================================================= //
 // Patrick MacGregor
 // Nuclear Physics Research Group
-// School of Physics and Astronomy
+// Department of Physics and Astronomy
 // The University of Manchester
 // ============================================================================================= //
 #ifndef PTPLOTTER_INIT_H_
@@ -26,18 +26,19 @@ const Bool_t SWITCH_GAMMA_BRANCH = 0;
 const Bool_t SWITCH_XCAL_24 = 0;
 const Bool_t SWITCH_TCUTS_24 = 0;
 const Bool_t SWITCH_EX_6 = 0;
-const Bool_t SWITCH_EX_FULL = 0;
+const Bool_t SWITCH_EX_FULL = 1;
 const Bool_t SWITCH_CUT_EXAMPLES = 0;
 const Bool_t SWITCH_DRAW_BEST_RESOLUTION = 0;
 const Bool_t SWITCH_PLOT_24 = 0;
-const Bool_t SWITCH_THETACM = 1;
+const Bool_t SWITCH_THETACM = 0;
+const Bool_t SWITCH_DRAW_EX_CUT_DIFFERENCE = 0;
 
 // Global switches
-const Bool_t SWITCH_ITERATE_PLOTS = 0;			// Iterates plots over cuts
+const Bool_t SWITCH_ITERATE_PLOTS = 1;			// Iterates plots over cuts
 const Bool_t SWITCH_COMPARE_PLOTS = 0;			// Compares plots between cuts
 const Bool_t SWITCH_DISPLAY_CANVAS = 0;			// Displays the canvas before the program ends
 const Bool_t SWITCH_PRINT_CANVAS = 1;			// Prints to file
-const Bool_t SWITCH_PLOT_DETAILS = 0;			// Adds OptStat box
+const Bool_t SWITCH_PLOT_DETAILS = 1;			// Adds OptStat box
 const Bool_t SWITCH_INDIVIDUAL_CANVASES = 1;	// Changes one canvas with many graphs to many canvases with one graph
 
 // EVZ plotting options
@@ -62,6 +63,17 @@ Double_t Z_ARRAY_POS[6] = {35.868, 29.987, 24.111, 18.248, 12.412, 6.676};
 // Print format
 const TString PRINT_FORMAT = ".pdf";
 
+// Theta max variable
+const Double_t THETA_CUT = 16.6278;	
+
+// Cuts
+TString CUTS[4] = {
+	"( cut0 || cut1 || cut2 || cut3 )",
+	Form( "thetaCM > %5.4f", THETA_CUT ),
+	"td_rdt_e[] > td_rdt_e_cuts[][0] && td_rdt_e[] < td_rdt_e_cuts[][1]",
+	"xcal[] >= xcal_cuts[][0] && xcal[] <= xcal_cuts[][1] && ( xcal[] <= xcal_cuts[][2] || xcal[] >= xcal_cuts[][3] )"
+};
+
 // Declare options struct
 struct plotterOptions{
 	TString printCanvasOption;
@@ -75,6 +87,7 @@ struct plotterOptions{
 TStyle *ptm_style;
 
 void SetPadMargins( TStyle *st, Int_t opt = 1, Int_t ratio = 43 ){
+/*
 	if ( ratio == 11 ){
 		if ( opt == 1 ){
 			// 1D HIST
@@ -110,6 +123,7 @@ void SetPadMargins( TStyle *st, Int_t opt = 1, Int_t ratio = 43 ){
 
 
 	}
+*/
 	return;
 }
 
@@ -143,18 +157,18 @@ void initialiseOptions( plotterOptions &opt_s ){
 	}
 	
 	// Iterating cuts
-	opt_s.cutList[4] = "";
-	opt_s.cutList[3] = "( cut0 || cut1 || cut2 || cut3 )";
-	opt_s.cutList[2] = opt_s.cutList[3] + " && thetaCM > 11";
-	opt_s.cutList[1] = opt_s.cutList[2] + " && td_rdt_e[] > td_rdt_e_cuts[][0] && td_rdt_e[] < td_rdt_e_cuts[][1]";
-	opt_s.cutList[0] = opt_s.cutList[1] + " && xcal[] >= xcal_cuts[][0] && xcal[] <= xcal_cuts[][1] && ( xcal[] <= xcal_cuts[][2] || xcal[] >= xcal_cuts[][3] )";
+	opt_s.cutList[0] = "";
+	opt_s.cutList[1] = CUTS[0];
+	opt_s.cutList[2] = opt_s.cutList[1] + " && " + CUTS[1];
+	opt_s.cutList[3] = opt_s.cutList[2] + " && " + CUTS[2];
+	opt_s.cutList[4] = opt_s.cutList[3] + " && " + CUTS[3];
 	
 	// Iterating cut descriptions
-	opt_s.cutListDesc[4] = "no";
-	opt_s.cutListDesc[3] = "Recoil";
-	opt_s.cutListDesc[2] = "Angle";
-	opt_s.cutListDesc[1] = "Timing";
-	opt_s.cutListDesc[0] = "Position";
+	opt_s.cutListDesc[0] = "Raw Data";
+	opt_s.cutListDesc[1] = "Recoil cuts";
+	opt_s.cutListDesc[2] = "Recoil and \theta_cm cuts";
+	opt_s.cutListDesc[3] = "Recoil, #theta_{cm}, and timing cuts";
+	opt_s.cutListDesc[4] = "Recoil, #theta_{cm}, timing, and position cuts";
 
 	// Iterate plots
 	if ( SWITCH_ITERATE_PLOTS == 1 ){

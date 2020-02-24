@@ -179,6 +179,7 @@ void ExtractYieldsHist( TH1D* h, Int_t row_num, Int_t pos, Int_t spectrum_type )
 	
 	TLatex* tNSE = new TLatex( 0.95*NEUTRON_SEP_ENERGY, 0.9*h->GetMaximum(), Form( "S_{n} = %4.3f MeV", NEUTRON_SEP_ENERGY ) );
 	tNSE->SetTextAlign(32);
+	tNSE->SetTextFont(132);
 	tNSE->Draw("SAME");
 	
 	// Print the last line

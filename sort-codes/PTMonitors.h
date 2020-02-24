@@ -13,11 +13,14 @@
 #include <TStopwatch.h>
 #include <TStyle.h>
 #include <TCanvas.h>
+#include <TMath.h>
 #include <TCutG.h>
+#include <iostream>
 
 // CUT ARRAYS
 // Time difference between recoil detectors and array detectors
-Int_t td_rdt_e_cuts[24][2] = 	{ {-9, 6},
+Int_t td_rdt_e_cuts[24][2] = {
+	{-9, 6},
 	{-11, 4},
 	{-9, 3},
 	{-14, 3},
@@ -40,7 +43,8 @@ Int_t td_rdt_e_cuts[24][2] = 	{ {-9, 6},
 	{-11, 8},
 	{-18, 5},
 	{-22, 6},
-	{-21, 6} };
+	{-21, 6} 
+};
 
 // Cuts on xcal for each of the detectors in the array for both positions
 // Format is [ LB, UB, mid-LB, mid-UB ] for each detector
@@ -106,21 +110,26 @@ Float_t xcal_cuts2[24][4] = {
 // Define the correction parameters based on [position][row #][gradient/intercept]
 Double_t excitation_energy_corr_pars[2][6][2] = {
 	{
-		{ 0.02012, -1.00236 },
-		{ 0.02037, -1.03572 },
-		{ 0.01988, -0.97739 },
-		{ 0.01962, -0.90813 },
-		{ 0.01954, -0.89121 },
-		{ 0.01949, -0.86839 }
+		{ 0.01963, -0.92447 },
+		{ 0.01888, -0.85955 },
+		{ 0.02057, -1.06259 },
+		{ 0.01988, -0.95548 },
+		{ 0.01937, -0.87164 },
+		{ 0.01944, -0.87309 }
 	},
 	{
-		{ 0.02012, -1.00236 },
-		{ 0.01987, -0.97342 },
-		{ 0.02, -0.99215 },
-		{ 0.01936, -0.87484 },
-		{ 0.01945, -0.8742 },
-		{ 0.01939, -0.86215 }
+		{ 0.01979, -0.93888 },
+		{ 0.02025, -1.01499 },
+		{ 0.01996, -0.99294 },
+		{ 0.02007, -0.97508 },
+		{ 0.01936, -0.86454 },
+		{ 0.01931, -0.84685 }
 	}
+};
+
+Double_t ex_corr[2][2] = {
+	{ 1.0056800, 0.00411759 },
+	{ 0.0127572, 0.00629672 }
 };
 
 // ThetaCM limits (based on eyeballing, with array size 2 for position)
@@ -132,7 +141,70 @@ Double_t thetaCM_limsBOTH[2][9] = {
 // This needs to be continuous - excitation spectrum limits
 Double_t ex_lims[10] = { -5, 0.5, 1.3, 1.9, 2.4, 2.7, 3.0, 3.5, 4.1, 8.0 };
 
+// --------------------------------------------------------------------------------------------- //
+TString ConstructFinFileName( TTree *t ){
+	// Get the name of the file
+	TString file_name;
+	TString out_name = "";
+	Bool_t alpha_run = 0;
+	
+	if ( t->GetCurrentFile() != NULL ){
+		// Get the file name from the TTree
+		file_name = t->GetCurrentFile()->GetName();
+		
+		if ( !file_name.Contains("/") ){
+			// Manipulate the string - looks like gen_run##.root or genPos##.root
+			if ( file_name != "" ){
+				if ( file_name.Contains( "gen_run" ) ){
+					file_name.Remove( 0, 7 );
+				}
+				else if ( file_name.Contains( "genPos" ) ){
+					file_name.Remove( 0, 6 );
+				}
+				else if ( file_name.Contains( "genAlpha" ) ){
+					file_name.Remove( 0, 8 );
+					alpha_run = 1;
+				}
+				else{
+					file_name = "XXX.root";
+				}
+				out_name = out_name + "fin" + ( alpha_run == 1 ? "Alpha" : "" ) + file_name;
+			}
+			else{
+				out_name = "finERROR.root";
+			}
+		}
+		else{
+			out_name = "fin0.root";
+		}
+	}
+	else{
+		out_name = "fin0.root";
+	}
+	return out_name;
+}
+// --------------------------------------------------------------------------------------------- //
+Int_t GetArrayPosition( TTree *t ){
+	// Get the name of the file
+	TString file_name;
+	if ( t->GetCurrentFile() != NULL ){
+		file_name = t->GetCurrentFile()->GetName();
+	}
+	Int_t pos = 2;	// Assume it's 1
 
+	// Manipulate the string - looks like gen_run##.root or genPos##.root
+	if ( file_name.Contains( "genPos" ) ){
+		file_name.Remove( 0, 6 );
+		file_name.Remove( file_name.Length() - 5, 5 );
+		pos = file_name.Atoi();
+	}
+	else{
+		std::cout << "Double check position! Assuming it's " << pos << " ...\n";
+	}
+	
+	return pos;
+}
+// --------------------------------------------------------------------------------------------- //
 
 // DEFINE PTMONITORS TSelector CLASS HERE ------------------------------------------------------ //
 class PTMonitors : public TSelector {
@@ -241,6 +313,17 @@ Bool_t PTMonitors::Notify()
    // user if needed. The return value is currently not used.
 
    return kTRUE;
+}
+
+// Calculates the average radius of the ISS array (be consistent with units!!)
+/*/ The X-axis has its origin in the centre of the array (not necessarily the centre of the strip)
+ *  X1 is the point furthest left of the origin
+ *  X2 is the point furthest right of the origin
+ *  height is the height of the array                                                            */
+Double_t ISSArrayRadius( Double_t X1, Double_t X2, Double_t height ){
+	Double_t A1 = X1/height;
+	Double_t A2 = X2/height;
+	return ( height*height/( 2*( X2 - X1 ) ) )*( A2*TMath::Sqrt( 1 + A2*A2 ) - A1*TMath::Sqrt( 1 + A1*A1 ) + TMath::Log( TMath::Abs( A2 + TMath::Sqrt( 1 + A2*A2 ) ) ) - TMath::Log( TMath::Abs( A1 + TMath::Sqrt( 1 + A1*A1 ) ) ) );
 }
 
 #endif // #ifdef PTMonitors_cxx

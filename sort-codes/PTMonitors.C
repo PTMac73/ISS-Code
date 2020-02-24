@@ -32,8 +32,8 @@ TCutG* cutG; //!
 TObjArray * cutList;
 TString cutTag;
 Bool_t isCutFileOpen;
-int numCut;
-vector<int> countFromCut;
+Int_t numCut;
+vector<Int_t> countFromCut;
 
 // Times in secondsf
 Float_t timeZero=0;
@@ -46,7 +46,7 @@ Int_t tacA[24];
 Float_t z_array_pos[6] = {35.868,29.987,24.111,18.248,12.412,6.676};//in cm
 
 // z offset
-Int_t OFF_POSITION = 2;
+Int_t OFF_POSITION = 0;
 Bool_t ALPHA_RUN = 0;
 Float_t z_off;
 Float_t xcal_cuts[24][4];
@@ -101,10 +101,10 @@ Float_t exCorr[6] = { 938.272,  // mass of proton [MeV/c^2]
 	                   26996.5929, // mass of recoil [correct]
 	                   0.132178, // beta to CM frame [correct]
 	                   2.5}; // Bfield [T]
-double a = 11.5 ; // perpendicular distance of detector to axis [mm]
+Double_t array_radius = ISSArrayRadius(-4.5,4.5,11.5); // perpendicular distance of detector to axis [mm]
 //double Ex, thetaCM;
 
-double alpha, Et, beta, gamm, G, massB, mass; //variables for Ex calculation
+Double_t alpha, Et, beta, gamm, G, massB, mass; //variables for Ex calculation
 
 
 Float_t tempTime=-1000;
@@ -160,6 +160,9 @@ FIN fin;
 // TSELECTOR BEGIN FUNCTION -------------------------------------------------------------------- //
 void PTMonitors::Begin(TTree *tree){
 	// Define offset (array position - offset position = 70mm???)
+	OFF_POSITION = GetArrayPosition( tree );
+
+
 	if ( OFF_POSITION == 0 ){
 		z_off = 4.9765;
 	}
@@ -203,7 +206,7 @@ void PTMonitors::Begin(TTree *tree){
 	alpha = 299.792458 * exCorr[5] * exCorr[1] / TMath::TwoPi() / 1000; //MeV/mm
 	beta = exCorr[4];
 	gamm = 1./TMath::Sqrt(1-beta*beta);
-	G = alpha * gamm * beta * a;
+	G = alpha*gamm*beta*array_radius;
 	massB = exCorr[3];
 	mass = exCorr[0];
 	Et = exCorr[2];
@@ -223,7 +226,7 @@ void PTMonitors::Begin(TTree *tree){
 	sharpyStyle->SetTitleX(0.5);
 	sharpyStyle->SetMarkerStyle(7);
 	sharpyStyle->cd();
-	
+
 	// DEFINE HISTOGRAMS AND SET OPTIONS
 	// Gated energy v.s. position
 	EVZ = new TH2F("EVZ", "",700, -50, -5, 750 , 0 , 10);
@@ -270,49 +273,45 @@ void PTMonitors::Begin(TTree *tree){
 	}
 
 	// NEW TTREE STUFF
-	if ( ALPHA_RUN == 0 ){
-		outFile = new TFile( Form( "fin%i.root", OFF_POSITION ), "RECREATE");
-	}
-	else{
-		outFile = new TFile( "finAlpha18.root", "RECREATE");
-	}
-	
+	std::cout << ConstructFinFileName( tree ) << "\n";
+	outFile = new TFile( ConstructFinFileName( tree ), "RECREATE");
+
 	fin_tree = new TTree( "fin_tree", "Tree containing everything" );
-	fin_tree->Branch("e",e,"Energy[100]/F");
-	fin_tree->Branch("e_t",e_t,"EnergyTimestamp[100]/l");
-	fin_tree->Branch("xf",xf,"XF[100]/F");
-	fin_tree->Branch("xf_t",xf_t,"XFTimestamp[100]/l");
-	fin_tree->Branch("xn",xn,"XN[100]/F");
-  	fin_tree->Branch("xn_t",xn_t,"XNTimestamp[100]/l"); 
-	fin_tree->Branch("rdt",rdt,"RDT[100]/F");
-	fin_tree->Branch("rdt_t",rdt_t,"RDTTimestamp[100]/l"); 
-	fin_tree->Branch("tac",tac,"TAC[100]/F");
-	fin_tree->Branch("tac_t",tac_t,"TACTimestamp[100]/l"); 
-	fin_tree->Branch("elum",elum,"ELUM[32]/F");
-	fin_tree->Branch("elum_t",elum_t,"ELUMTimestamp[32]/l");
-	fin_tree->Branch("ezero",ezero,"EZERO[10]/F");
-	fin_tree->Branch("ezero_t",ezero_t,"EZEROTimestamp[10]/l");
+	fin_tree->Branch("e",e,"e[100]/F");
+	fin_tree->Branch("e_t",e_t,"e_t[100]/l");
+	fin_tree->Branch("xf",xf,"xf[100]/F");
+	fin_tree->Branch("xf_t",xf_t,"xf_t[100]/l");
+	fin_tree->Branch("xn",xn,"xn[100]/F");
+  	fin_tree->Branch("xn_t",xn_t,"xn_t[100]/l"); 
+	fin_tree->Branch("rdt",rdt,"rdt[100]/F");
+	fin_tree->Branch("rdt_t",rdt_t,"rdt_t[100]/l"); 
+	fin_tree->Branch("tac",tac,"tac[100]/F");
+	fin_tree->Branch("tac_t",tac_t,"tac_t[100]/l"); 
+	fin_tree->Branch("elum",elum,"elum[32]/F");
+	fin_tree->Branch("elum_t",elum_t,"elum_t[32]/l");
+	fin_tree->Branch("ezero",ezero,"ezero[10]/F");
+	fin_tree->Branch("ezero_t",ezero_t,"ezero_t[10]/l");
 	//fin_tree->Branch("ebis_t",ebis_t,"EBISTimestamp/l"); 
-	
-	fin_tree->Branch("x",fin.x,"X[24]/F");
-	fin_tree->Branch("z",fin.z,"Z[24]/F");
-	fin_tree->Branch("xcal",fin.xcal,"XCalibrated[24]/F");
-	fin_tree->Branch("ecal",fin.ecal,"ECalibrated[24]/F");
-	fin_tree->Branch("xfcal",fin.xfcal,"XFCalibrated[24]/F");
-	fin_tree->Branch("xncal",fin.xncal,"XNCalibrated[24]/F");
-	fin_tree->Branch("ecrr",fin.ecrr,"ECalibrated[24]/F");
-	fin_tree->Branch("td_rdt_e",fin.td_rdt_e,"RDT-E_TD[24][4]/I");
-	fin_tree->Branch("td_rdt_elum",fin.td_rdt_elum,"RDT-ELUM_TD[32][4]/I");
-	fin_tree->Branch("td_e_ebis",fin.td_e_ebis,"E-EBIS_TD[24]/I");
+
+	fin_tree->Branch("x",fin.x,"x[24]/F");
+	fin_tree->Branch("z",fin.z,"z[24]/F");
+	fin_tree->Branch("xcal",fin.xcal,"xcal[24]/F");
+	fin_tree->Branch("ecal",fin.ecal,"ecal[24]/F");
+	fin_tree->Branch("xfcal",fin.xfcal,"xfcal[24]/F");
+	fin_tree->Branch("xncal",fin.xncal,"xncal[24]/F");
+	fin_tree->Branch("ecrr",fin.ecrr,"ecrr[24]/F");
+	fin_tree->Branch("td_rdt_e",fin.td_rdt_e,"td_rdt_e[24][4]/I");
+	fin_tree->Branch("td_rdt_elum",fin.td_rdt_elum,"td_rdt_elum[32][4]/I");
+	fin_tree->Branch("td_e_ebis",fin.td_e_ebis,"td_e_ebis[24]/I");
 	fin_tree->Branch("Ex",fin.Ex,"Ex[24]/F");
-	fin_tree->Branch("Ex_corrected",fin.Ex_corrected,"EX-CORRECTED[24]/F");
-	fin_tree->Branch("thetaCM",fin.thetaCM,"ThetaCM[24]/F");
-	fin_tree->Branch("detID",fin.detID,"DetID[24]/I");
-	fin_tree->Branch("td_rdt_e_cuts",td_rdt_e_cuts,"TD-RDT-E-CUTS[24][2]/I");
-	fin_tree->Branch("xcal_cuts",xcal_cuts,"XCAL-E-CUTS[24][4]/F");
-	fin_tree->Branch("xold",fin.xold,"XOLD[24]/F");
-	fin_tree->Branch("thetaCM_lims", thetaCM_lims, "THETACM-LIMS[9]/F");
-	fin_tree->Branch("ex_lims", ex_lims, "EX-LIMS[10]/F");
+	fin_tree->Branch("Ex_corrected",fin.Ex_corrected,"Ex_corrected[24]/F");
+	fin_tree->Branch("thetaCM",fin.thetaCM,"thetaCM[24]/F");
+	fin_tree->Branch("detID",fin.detID,"detID[24]/I");
+	fin_tree->Branch("td_rdt_e_cuts",td_rdt_e_cuts,"td_rdt_e_cuts[24][2]/I");
+	fin_tree->Branch("xcal_cuts",xcal_cuts,"xcal_cuts[24][4]/F");
+	fin_tree->Branch("xold",fin.xold,"xold[24]/F");
+	fin_tree->Branch("thetaCM_lims", thetaCM_lims, "thetaCM_lims[9]/F");
+	fin_tree->Branch("ex_lims", ex_lims, "ex_lims[10]/F");
 
 	printf("======== number of cuts found : %d \n", numCut);
 	StpWatch.Start();
@@ -473,7 +472,8 @@ Bool_t PTMonitors::Process(Long64_t entry){
 						double momt = mass * TMath::Tan( x ); // momentum of particle b or B in CM frame
 						double EB = TMath::Sqrt(mass*mass + Et*Et - 2*Et*TMath::Sqrt(momt * momt + mass * mass));
 						fin.Ex[index] = EB - massB;
-						fin.Ex_corrected[index] = excitation_energy_corr_pars[OFF_POSITION - 1][j][0]*(450.0/9.0)*( fin.Ex[index] + 1.0 ) + excitation_energy_corr_pars[OFF_POSITION - 1][j][1];
+						//fin.Ex_corrected[index] = excitation_energy_corr_pars[OFF_POSITION - 1][j][0]*(450.0/9.0)*( fin.Ex[index] + 1.0 ) + excitation_energy_corr_pars[OFF_POSITION - 1][j][1];
+						fin.Ex_corrected[index] = ex_corr[0][0]*fin.Ex[index] + ex_corr[1][0];
 						
 						double hahaha1 = gamm* TMath::Sqrt(mass * mass + momt * momt) - y;
 						double hahaha2 = gamm* beta * momt;

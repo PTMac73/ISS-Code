@@ -46,10 +46,10 @@ void FormatHistogram( TH1D* h ){
 	h->GetXaxis()->SetTitleSize(1.5*font_size);
 	h->GetYaxis()->SetTitleSize(1.5*font_size);
 	
-	h->SetTitleFont(62, "xy");
-	h->SetLabelFont(62, "xy");
+	h->SetTitleFont(132, "xy");
+	h->SetLabelFont(132, "xy");
 	h->SetLineColor( kBlack );
-	gStyle->SetTitleFont(62,"t");
+	gStyle->SetTitleFont(132,"t");
 
 	return;
 }

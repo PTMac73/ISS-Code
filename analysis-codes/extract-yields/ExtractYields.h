@@ -176,11 +176,11 @@ TString GetDataFileName( Int_t pos, Int_t spectrum_type, Int_t row_num ){
 }
 
 void SetPadMargins( TPad* pad ){
-	pad->SetLeftMargin(0.09);
+	pad->SetLeftMargin(0.12);
 	pad->SetRightMargin(0.01);
 	if ( SW_HIST_TITLE == 1 ){ pad->SetTopMargin(0.08); }
 	else{ pad->SetTopMargin(0.01); }
-	pad->SetBottomMargin(0.09);
+	pad->SetBottomMargin(0.12);
 	return;
 }
 

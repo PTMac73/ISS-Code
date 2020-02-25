@@ -11,6 +11,7 @@
 
 #include <TCanvas.h>
 #include <TCutG.h>
+#include <TFile.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <TString.h>
@@ -18,90 +19,94 @@
 #include <iostream>
 
 #include "AT_Settings.h"
+#include "AT_HistogramGlobals.h"
 #include "WriteSPE.h"
-
-
-// --------------------------------------------------------------------------------------------- //
-// GLOBAL FUNCTIONS
-// Set canvas margins
-void GlobSetCanvasMargins( TCanvas *c, Double_t l = 0.1, Double_t r = 0.02, Double_t t = 0.02, Double_t b = 0.1 ){
-	TPad* pad = (TPad*)c;
-	pad->SetLeftMargin( l );
-	pad->SetRightMargin( r );
-	pad->SetTopMargin( t );
-	pad->SetBottomMargin( b );
-	return;
-}
-
-// Set histogram fonts
-void GlobSetHistFonts( TH1* h ){
-	h->GetXaxis()->SetTitleFont(62);
-	h->GetXaxis()->SetLabelFont(62);
-	h->GetYaxis()->SetTitleFont(62);
-	h->GetYaxis()->SetLabelFont(62);
-	return;
-}
-
-void GlobSetHistFonts( TH2* h ){
-	h->GetXaxis()->SetTitleFont(62);
-	h->GetXaxis()->SetLabelFont(62);
-	h->GetYaxis()->SetTitleFont(62);
-	h->GetYaxis()->SetLabelFont(62);
-	return;
-}
-
-// Write error message about spe files
-void ErrorSPE( TString str = "This mode" ){
-	std::cout << str << " cannot have a valid .spe file" << "\n";
-}
-
 
 // --------------------------------------------------------------------------------------------- //
 // Compare excitation energy spectra for given cuts on a row-by-row basis
 // Switch for this is SW_EX_COMPARE
-TH1F* h_ex_compare1[6];
-TH1F* h_ex_compare2[6];
+TH1F* h_ex_compare1[6];		// Singles spectrum
+TH1F* h_ex_compare2[6];		// Clean spectrum
 
 
 void HCreateExCompare(){
 	// *LOOP* over rows
 	for ( Int_t i = 0; i < 6; i++ ){
+	
+		// Check row number
 		if ( i == ROW_NUMBER || ROW_NUMBER == -1 ){
+		
+			// Create histograms
 			h_ex_compare1[i] = new TH1F( Form( "h_ex_compare1_%i", i ), "", 450, -1, 8 );
 			h_ex_compare2[i] = new TH1F( Form( "h_ex_compare2_%i", i ), "", 450, -1, 8 );
 			
+			// Format histograms
 			h_ex_compare1[i]->SetTitle("");
 			h_ex_compare1[i]->GetXaxis()->SetTitle("Excitation Energy (MeV)");
 			h_ex_compare1[i]->GetYaxis()->SetTitle("Counts per 20 keV");
-			h_ex_compare1[i]->SetLineColor(kBlack);
 			
+			h_ex_compare1[i]->SetLineColor(kBlack);
 			h_ex_compare2[i]->SetLineColor(kRed);
 			
 			GlobSetHistFonts( h_ex_compare1[i] );
 		}
 	}
+	
+	return;
 }
 
 
 void HDrawExCompare(){
-	TCanvas *c_ex_compare[6];
+	// Define some local variables
+	TCanvas* c_ex_compare[6];
+	
+	TString root_name = Form( "%s/ex_comp_th%s-%s_posXXX%s", print_dir.Data(), DoubleToString( THETA_LB ).Data(), DoubleToString( THETA_UB ).Data(), ( ROW_NUMBER == -1 ? "" : Form( "_row%i", ROW_NUMBER ) ) );
+	TFile* f;
+	
+	// Open root file if desired
+	if ( SW_EX_COMPARE[1] == 1 && PRINT_ROOT == 1 ){
+		f = new TFile( ( root_name + ".root" ).Data(), "RECREATE" );
+	}
+	
+	
+	// *LOOP* over rows (i)
 	for ( Int_t i = 0; i < 6; i++ ){
+	
+		// Check row number
 		if ( i == ROW_NUMBER || ROW_NUMBER == -1 ){
+		
+			// Define canvas and draw
 			c_ex_compare[i] = new TCanvas( Form( "c_ex_compare_%i", i ), Form( "COMPARE HISTOGRAMS | ROW %i", i ),  C_WIDTH, C_HEIGHT );
 			GlobSetCanvasMargins( c_ex_compare[i] );
+			
 			h_ex_compare1[i]->Draw();
 			h_ex_compare2[i]->Draw("SAME");
 			
+			// Define a file name for printing
+			TString spec_name = ( ROW_NUMBER == -1 ? root_name + Form( "_row%i", i ) : root_name );
+			
+			
+			// Print spectrum if desired
 			if ( SW_EX_COMPARE[1] == 1 ){
-				// PRINT ME
-				std::cout << "DEVELOP PRINTING" << "\n"; /*TODO*/
+				PrintAll( c_ex_compare[i], spec_name );
+				if ( PRINT_ROOT == 1 ){
+					f->cd();
+					h_ex_compare1[i]->Write();
+					h_ex_compare2[i]->Write();
+				}
 			}
+			
+			// Write SPE file if desired
 			if ( SW_EX_COMPARE[2] == 1 ){
-				// SPE ME
-				//WriteSPE( h_ex_compare1[i], "" ); /*TODO*/
+				WriteSPE( h_ex_compare1[i]->GetName(), Form( "%s", spec_name.Data() ) );
 			}
-		}
+			
+		}	// *LOOP* over rows (i)
+	
 	}
+	// Close the root file
+	if ( SW_EX_COMPARE[1] == 1 && PRINT_ROOT == 1 && f != NULL ){ if ( f->IsOpen() ){ f->Close(); } }
+	return;
 }
 
 
@@ -123,6 +128,8 @@ void HCreateRDTCuts(){
 		
 		GlobSetHistFonts( h_rdt_cuts[i] );
 	}
+	
+	return;
 }
 
 
@@ -138,13 +145,24 @@ void HDrawRDTCuts(){
 		}
 	}
 	
+	// Print spectrum if desired
 	if ( SW_RDT_CUTS[1] == 1 ){
-		// PRINT ME
-		std::cout << "DEVELOP PRINTING" << "\n"; /*TODO*/
+		TString spec_name = Form( "%s/rdt_cuts_posXXX", print_dir.Data() );
+		PrintAll( c_rdt_cuts, spec_name );
+		if ( PRINT_ROOT == 1 ){
+			for ( Int_t i = 0; i < 4; i++ ){
+				out_root_file->cd();
+				h_rdt_cuts[i]->Write();
+			}
+		}
 	}
+	
+	// Write SPE file if desired
 	if ( SW_RDT_CUTS[2] == 1 ){
 		ErrorSPE( "c_rdt_cuts" );
 	}
+	
+	return;
 }
 
 // --------------------------------------------------------------------------------------------- //
@@ -163,6 +181,8 @@ void HCreateEVZCompare(){
 		h_evz_compare[i]->GetXaxis()->SetTitle( "z (cm)" );
 		GlobSetHistFonts( h_evz_compare[i] );
 	}
+	
+	return;
 }
 
 
@@ -177,14 +197,34 @@ void HDrawEVZCompare(){
 	h_evz_compare[2]->Draw();
 	h_evz_compare[3]->Draw("SAME");
 	
+	
+	
+	// Print spectra if desired
 	if ( SW_EVZ_COMPARE[1] == 1 ){
-		// PRINT ME
-		std::cout << "DEVELOP PRINTING" << "\n"; /*TODO*/
+		TString base = "%s/evz_comp%s_th_%3.2f-%3.2f_posXXX";
+		TString root_name = Form( base.Data(), print_dir.Data(), "", THETA_LB, THETA_UB );
+		TString spec_name_sing = Form( base.Data(), print_dir.Data(), "_sing", THETA_LB, THETA_UB );
+		PrintAll( c_evz_compare_sing, spec_name_sing );
+		
+		TString spec_name_clean = Form( base.Data(), print_dir.Data(), "_clean", THETA_LB, THETA_UB );
+		PrintAll( c_evz_compare_clean, spec_name_clean );
+		
+		if ( PRINT_ROOT == 1 ){
+			TFile* f = new TFile( ( root_name + ".root" ).Data(), "RECREATE" );
+			for ( Int_t i = 0; i < 4; i++ ){
+				f->cd();
+				h_evz_compare[i]->Write();
+			}
+			f->Close();
+		}
 	}
+	
+	// Write SPE file if desired
 	if ( SW_EVZ_COMPARE[2] == 1 ){
 		ErrorSPE( "c_evz_compare_sing and c_evz_compare_clean" );
 	}
 
+	return;
 }
 
 // --------------------------------------------------------------------------------------------- //
@@ -209,13 +249,24 @@ void HDrawEVZ(){
 	GlobSetCanvasMargins( c_evz );
 	h_evz->Draw();
 	
+	// Print spectrum if desired
 	if ( SW_EVZ[1] == 1 ){
-		// PRINT ME
-		std::cout << "DEVELOP PRINTING" << "\n"; /*TODO*/
+		TString spec_name = Form( "%s/evz_posXXX", print_dir.Data() );
+		PrintAll( c_evz, spec_name );
+		
+		if ( PRINT_ROOT == 1 ){
+			out_root_file->cd();
+			h_evz->Write();
+		}
+		
 	}
+	
+	// Write SPE file if desired
 	if ( SW_EVZ[2] == 1 ){
 		ErrorSPE( "c_evz" );
 	}
+	
+	return;
 }
 
 

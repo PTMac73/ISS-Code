@@ -26,6 +26,7 @@
 
 
 #include "AnalyseTree.h"
+#include "AT_Globals.h"
 #include "AT_Histograms.h"
 #include "AT_Settings.h"
 #include <TCanvas.h>
@@ -37,30 +38,12 @@
 #include <TStopwatch.h>
 #include <TStyle.h>
 
-
-/* TODO
- * Header file to contain all of the histograms
- * Make a function to make new histograms and format them all
- * Header file to contain the settings and switches
- 
- PLOTS
- * EVZ
- * RDT
- * Anything in Plotter
-
-
-
-*/
-
-
-// VARIABLES
-
-
 // Progress report
 TStopwatch stopwatch;
 ULong64_t processed_entries = 0;
 ULong64_t num_entries;
 Double_t entry_frac = 0.1;
+
 
 
 // BEGIN ANALYSIS
@@ -70,6 +53,9 @@ void AnalyseTree::Begin(TTree* t)
 	// When running with PROOF Begin() is only called on the client.
 	// The tree argument is deprecated (on PROOF 0 is passed).
 	gStyle->SetOptStat(0);
+	
+	// Print summary of options
+	PrintSummaryOfOptions();
 	
 	// Create histograms
 	if ( SW_EX_COMPARE[0] == 1 ){ HCreateExCompare(); }
@@ -85,11 +71,15 @@ void AnalyseTree::Begin(TTree* t)
 	TFile *f = new TFile( "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/working/ALL-MgCuts3.root" );
 	if ( f->IsOpen() ){
 		cut_list = (TObjArray*)f->FindObjectAny("cutList");
+		f->Close();
 	}
 	else{
 		std::cout << "NO CUTS" << "\n";
 		std::exit(1);
 	}
+	
+	// Open the root file for writing
+	if ( PRINT_ROOT == 1 ){ out_root_file = new TFile( Form( "%s/posXXX.root", print_dir.Data() ), "RECREATE" ); }
 
 	// Start timing
 	stopwatch.Start();
@@ -264,6 +254,7 @@ void AnalyseTree::Terminate()
 	if ( SW_EVZ_COMPARE[0] == 1 ){ HDrawEVZCompare(); }
 	if ( SW_EVZ[0] == 1 ){ HDrawEVZ(); }
 	
+	if ( PRINT_ROOT == 1 ){ if ( out_root_file->IsOpen() ){ out_root_file->Close(); } }
 	
 	stopwatch.Start(kFALSE);
 }

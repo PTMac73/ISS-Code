@@ -49,6 +49,10 @@ void PrintColumn( TString col1, TString col2, TString col3, TString col4 ){
 
 }
 
+void PrintSingleOption( Bool_t opt, TString text ){
+	std::cout << " * " << std::left << std::setfill('.') << std::setw(46) << text << " " << ( opt == 1 ? "Y" : "." ) << "\n";
+}
+
 void PrintSummaryOfOptions(){
 	// PRINT HEADER
 	PrintHorzDiv();
@@ -63,6 +67,11 @@ void PrintSummaryOfOptions(){
 	
 	// PRINT DIVIDER
 	PrintHorzDiv();
+	PrintSingleOption( PRINT_PDF, "Printing pdfs?" );
+	PrintSingleOption( PRINT_PNG, "Printing pngs?" );
+	PrintSingleOption( PRINT_ROOT, "Producing ROOT files?" );
+	PrintSingleOption( CANVAS_COMBINE, "Combining canvases?" );
+	PrintSingleOption( DRAW_NEW_CUTS, "Drawing new cuts?" );
 	
 	// RESET COUT STREAM
 	std::cout << std::right << std::setfill(' ');

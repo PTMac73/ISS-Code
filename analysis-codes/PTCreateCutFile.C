@@ -3,7 +3,7 @@
 // ============================================================================================= //
 // Patrick MacGregor
 // Nuclear Physics Research Group
-// School of Physics and Astronomy
+// Department of Physics and Astronomy
 // The University of Manchester
 // ============================================================================================= //
 #include <TFile.h>
@@ -13,22 +13,22 @@
 
 TString DIR_PREFIX = "../root_data/cut";
 
-void PTCreateCutFile( TString outputName = "../working/rootcutFile.root" ){
+void PTCreateCutFile( TString outputName = "../working/custard.root" ){
 	// Define a TObjArray to hold the cuts
-	TObjArray *cutList = new TObjArray();
+	TObjArray *cut_list = new TObjArray();
 	
 	// Loop over the four cuts and store the cut array
 	for ( Int_t i = 0; i < 4; i++ ){
-		TFile *cutFile = new TFile( Form( "%s%i.root", DIR_PREFIX.Data(), i ), "r" );
-		TCutG *cut = (TCutG*)cutFile->Get( Form( "cut%i", i ) );
-		cutList->Add(cut);
-		if ( cutFile != NULL ) cutFile->Close();
+		TFile *cut_file = new TFile( Form( "%s%i.root", DIR_PREFIX.Data(), i ), "r" );
+		TCutG *cut = (TCutG*)cut_file->Get( Form( "cut%i", i ) );
+		cut_list->Add(cut);
+		if ( cut_file != NULL ) cutFile->Close();
 	}
 
 	// Write the four cuts to file
-	TFile *outFile = new TFile( outputName.Data(), "RECREATE" );	
-	cutList->Write("cutList", TObject::kSingleKey );	
+	TFile *out_file = new TFile( outputName.Data(), "RECREATE" );	
+	cut_list->Write("cut_list", TObject::kSingleKey );	
 	
 	// Close the final cut file
-	if ( outFile != NULL ) outFile->Close();
+	if ( out_file != NULL ) out_file->Close();
 }

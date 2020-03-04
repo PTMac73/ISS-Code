@@ -1,3 +1,12 @@
+// PTCutCreator.C
+// Create cuts for the recoil detectors
+// ============================================================================================= //
+// Patrick MacGregor
+// Nuclear Physics Research Group
+// Department of Physics and Astronomy
+// The University of Manchester
+// ============================================================================================= //
+
 #include <TH2F.h>
 #include <TFile.h>
 #include <TChain.h>

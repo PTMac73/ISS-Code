@@ -66,7 +66,7 @@ Double_t CMAngleCalculator(double ex, double z, Bool_t print = 1 ){
 	double p_perp = p_perp_cm;
 	p_para = TMath::Sqrt( p3*p3 - p_perp*p_perp );
 	double theta = TMath::ACos( gamLab_CM*( p_para_cm + beta*e3_cm )/p3 )*180/TMath::Pi();
-	if ( print == 1 ){ std::cout << std::setprecision(12) << ex << "\t" << std::setprecision(12) << z << "\t" << std::setprecision(12) << theta_cm << std::endl; }
+	if ( print == 1 ){ std::cout << std::left << std::setprecision(12) << std::setw(12) << ex << "\t" << std::setprecision(12) << std::setw(12) << z << "\t" << std::setprecision(12) << std::setw(12) << theta_cm << std::endl; }
 	//std::cout << n << "\t" << ex << "\t" << z << "\t" << theta_cm << "\t" << theta << "\t" << e3-m3 << "\t" << std::endl;
 	//std::cout << p3 << "\t" << p_para << "\t" << p_perp << "\t" << p3_cm << "\t" << p_para_cm << "\t" << p_perp_cm << "\t" << p3_cm*TMath::Sin(theta_cm) << "\t" << p3*TMath::Sin(theta) << std::endl;
 
@@ -74,24 +74,49 @@ Double_t CMAngleCalculator(double ex, double z, Bool_t print = 1 ){
 }
 
 /*************************************************************************************************/
-void CMAngleBatch( TString iFileDir, Bool_t b_draw = 0 ){
+void CMAngleBatch( TString in_file_Dir, Bool_t b_draw = 0 ){
 	// Open the file for reading	
-	ifstream iFile;
-	iFile.open( iFileDir.Data() );
+	ifstream in_file;
+	in_file.open( in_file_Dir.Data() );
 
 	// Check that it opened
-	if ( iFile.is_open() ){
+	if ( in_file.is_open() ){
 		// Print success message
 		std::cout << "File opened successfully!" << std::endl;
 
 		// Read the data
 		Double_t ex, z, theta;
+		std::string line;
+		TString ex_str, z_str;
 		Int_t num_lines = 0;
-		std::cout << "EX\tz\tTH_CM" << std::endl;
-
-		while ( !iFile.eof() ){
+		std::cout << std::left << std::setw(12) << "EX" << "\t" << std::setw(12) << "z" << "\t" << std::setw(12) << "TH_CM" << std::endl;
+		
+		while( getline( in_file, line ) ){
+			TObjArray* obj_arr = ( (TString)line ).Tokenize("\t");
+			
+			if ( obj_arr->GetEntries() >= 2 ){
+				ex_str = ( (TObjString*)( obj_arr->At(0) ) )->String();
+				z_str = ( (TObjString*)( obj_arr->At(1) ) )->String();
+				
+				if ( ex_str.IsFloat() && z_str.IsFloat() ){
+					ex = ex_str.Atof();
+					z = z_str.Atof();
+					theta = CMAngleCalculator( ex, z );
+				}
+				else{
+					std::cout << std::left << std::setw(12) << "--" << "\t" << std::setw(12) << "--" << "\t" << std::setw(12) << "--" << "\n";
+				}
+				
+				num_lines++;
+			}
+		}
+		
+		
+		
+/*
+		while ( !in_file.eof() ){
 			// Store the values
-			iFile >> ex >> z;
+			in_file >> ex >> z;
 
 			num_lines++;
 			
@@ -99,9 +124,9 @@ void CMAngleBatch( TString iFileDir, Bool_t b_draw = 0 ){
 			theta = CMAngleCalculator( ex, z );
 
 		}
-
+*/
 		// Close the file
-		iFile.close();
+		in_file.close();
 		std::cout << "File closed (I think...)!" << std::endl;
 
 		// Draw it if desired
@@ -109,14 +134,14 @@ void CMAngleBatch( TString iFileDir, Bool_t b_draw = 0 ){
 			const Int_t arr_size = num_lines;
 			Double_t* arr_z = new Double_t[arr_size];
 			Double_t* arr_th = new Double_t[arr_size];
-			iFile.open( iFileDir.Data() );
+			in_file.open( in_file_Dir.Data() );
 			Int_t i = 0;
-			while ( !iFile.eof() ){
-				iFile >> ex >> arr_z[i];
+			while ( !in_file.eof() ){
+				in_file >> ex >> arr_z[i];
 				arr_th[i] = CMAngleCalculator( ex, arr_z[i], 0 );
 				i++;
 			}
-			iFile.close();
+			in_file.close();
 	
 
 			TGraph *g = new TGraph( arr_size, arr_z, arr_th);

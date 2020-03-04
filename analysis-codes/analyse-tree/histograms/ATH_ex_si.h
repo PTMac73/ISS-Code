@@ -1,4 +1,3 @@
-// AT_Histograms.h
 // Defines all the histogram formatting and functions etc for the AnalyseTree.C script
 // ============================================================================================= //
 // Patrick MacGregor
@@ -6,15 +5,25 @@
 // Department of Physics and Astronomy
 // The University of Manchester
 // ============================================================================================= //
-#ifndef AT_HISTOGRAMS_H_
-#define AT_HISTOGRAMS_H_
+
+#include <TCanvas.h>
+#include <TCutG.h>
+#include <TFile.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TString.h>
+
+#include <iostream>
+
+#include "AT_HistogramGlobals.h"
+#include "../AT_Settings.h"
+#include "WriteSPE.h"
 
 
-#include "histograms/ATH_ex_compare.h"
-#include "histograms/ATH_rdt_cuts.h"
-#include "histograms/ATH_evz_compare.h"
-#include "histograms/ATH_evz.h"
+#ifndef ATH_EX_COMPARE_H_
+#define ATH_EX_COMPARE_H_
 
 
+//TODO
 
 #endif

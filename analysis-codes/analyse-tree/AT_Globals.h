@@ -64,6 +64,8 @@ void PrintSummaryOfOptions(){
 	PrintColumn( "RDT_cuts"   , BoolToStr( SW_RDT_CUTS[0]    ) , BoolToStr( SW_RDT_CUTS[1]    ), BoolToStr( SW_RDT_CUTS[2]    ) );
 	PrintColumn( "EVZ_compare", BoolToStr( SW_EVZ_COMPARE[0] ) , BoolToStr( SW_EVZ_COMPARE[1] ), BoolToStr( SW_EVZ_COMPARE[2] ) );
 	PrintColumn( "EVZ"        , BoolToStr( SW_EVZ[0]         ) , BoolToStr( SW_EVZ[1]         ), BoolToStr( SW_EVZ[2]         ) );
+	PrintColumn( "EVZ_SI"     , BoolToStr( SW_EVZ_SI[0]      ) , BoolToStr( SW_EVZ_SI[1]      ), BoolToStr( SW_EVZ_SI[2]      ) );
+	PrintColumn( "EX_SI"      , BoolToStr( SW_EX_SI[0]       ) , BoolToStr( SW_EX_SI[1]       ), BoolToStr( SW_EX_SI[2]       ) );
 	
 	// PRINT DIVIDER
 	PrintHorzDiv();

@@ -14,6 +14,8 @@
 #include "histograms/ATH_rdt_cuts.h"
 #include "histograms/ATH_evz_compare.h"
 #include "histograms/ATH_evz.h"
+#include "histograms/ATH_evz_si.h"
+#include "histograms/ATH_ex_si.h"
 
 
 

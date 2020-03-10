@@ -62,22 +62,35 @@ void AnalyseTree::Begin(TTree* t)
 	if ( SW_RDT_CUTS[0] == 1 ){ HCreateRDTCuts(); }
 	if ( SW_EVZ_COMPARE[0] == 1 ){ HCreateEVZCompare(); }
 	if ( SW_EVZ[0] == 1 ){ HCreateEVZ(); }
+	if ( SW_EVZ_SI[0] == 1 ){ HCreateEVZSi(); }
+	if ( SW_EX_SI[0] == 1 ){ HCreateExSi(); }
 	
 	// Get the number of entries
 	num_entries = t->GetEntries();
 	TString option = GetOption();
 	
 	// Get the cuts
-	TFile *f = new TFile( "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/working/ALL-MgCuts3.root" );
+	TFile *f = new TFile( cut_dir.Data() );
 	if ( f->IsOpen() ){
 		cut_list = (TObjArray*)f->FindObjectAny("cutList");
 		f->Close();
 	}
 	else{
-		std::cout << "NO CUTS" << "\n";
+		std::cout << "NO MG CUTS" << "\n";
 		std::exit(1);
 	}
-	
+
+	// Get the Si cuts
+	TFile* f_si = new TFile( cut_dir_si.Data() );
+	if ( f_si->IsOpen() ){
+		cut_list_si = (TObjArray*)f_si->FindObjectAny("cuttlefish");
+		f_si->Close();
+		found_si_cuts = 1;
+	}
+	else{
+		std::cout << "NO SI CUTS FOUND. Will carry on without them." << "\n";
+	}
+
 	// Open the root file for writing
 	if ( PRINT_ROOT == 1 ){ out_root_file = new TFile( Form( "%s/posXXX.root", print_dir.Data() ), "RECREATE" ); }
 
@@ -92,7 +105,6 @@ void AnalyseTree::SlaveBegin(TTree* t)
 	// The tree argument is deprecated (on PROOF 0 is passed).
 
 	TString option = GetOption();
-
 }
 
 Bool_t AnalyseTree::Process(Long64_t entry)
@@ -146,11 +158,16 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 
 
 	// Work out if it is inside the cut(s)
-	is_in_rdt = 0;
+	is_in_rdt = 0; is_in_rdt_si = 0;
 	for ( Int_t i = 0; i < 4; i++ ){
 		if ( is_in_rdt == 0 ){
 			TCutG* cut = (TCutG*)cut_list->At(i);
 			is_in_rdt += cut->IsInside( rdt[i+4], rdt[i] );
+		}
+		
+		if ( found_si_cuts && is_in_rdt_si == 0 ){
+			TCutG* cut_si = (TCutG*)cut_list_si->At(i);
+			is_in_rdt_si += cut_si->IsInside( rdt[i+4], rdt[i] );
 		}
 	}
 	
@@ -170,22 +187,35 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		// Do the required cuts for a singles spectrum, but not the upper angle
 		if ( is_in_used_det && is_in_xcal && is_in_theta_min ){
 			
-			// *HIST* Compare E v.s. z plots no angle cut - singles 1
+			// *HIST* E v.s. z plot - singles
 			if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[0]->Fill( z[i], ecrr[i] ); }
+			if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[0]->Fill( z[i], ecrr[i] ); }
 			
-			
-			// Do full cuts
+			// Do full cuts (Mg)
 			if ( is_in_rdt && is_in_td ){
 			
-				// *HIST* Full E v.s. z
+				// *HIST* Full E v.s. z (Mg)
 				if ( SW_EVZ[0] == 1 ){ h_evz->Fill( z[i], ecrr[i] ); }
-				
-				// *HIST* Compare E v.s. z plots no angle cut - clean 1
+				if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[1]->Fill( z[i], ecrr[i] ); }
 				if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[2]->Fill( z[i], ecrr[i] ); }
+				if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_evz_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( z[i], ecrr[i] ); }
+				
+				// *HIST* Full excitation plot (Mg)
+				if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_ex_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( Ex[i] ); }
+				if ( SW_EX_SI[0] == 1 ){ h_ex_si[0]->Fill( Ex[i] ); }
 				
 			}	// If in the full cuts
 			
-			
+			// Do full cuts (Si)
+			if ( found_si_cuts && is_in_rdt_si && is_in_td ){
+				
+				// *HIST* Full E v.s. z (Si)
+				if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[2]->Fill( z[i], ecrr[i] ); }
+				
+				// *HIST* Full Ex (Si)
+				if ( SW_EX_SI[0] == 1 ){ h_ex_si[1]->Fill( Ex[i] ); }
+				
+			}
 			
 			// Add lower and upper angular range cut
 			if ( is_in_theta_range ){
@@ -198,6 +228,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 				
 					// *HIST* Compare E v.s. z plots no angle cut - clean 1
 					if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[3]->Fill( z[i], ecrr[i] ); }
+
 				}
 					
 				// Implement the desired row numbers only
@@ -250,9 +281,11 @@ void AnalyseTree::Terminate()
 	
 	// Draw stuff
 	if ( SW_EX_COMPARE[0] == 1 ){ HDrawExCompare(); }
-	if ( SW_RDT_CUTS[0] == 1 ){ HDrawRDTCuts(); }
+	if ( SW_RDT_CUTS[0] == 1 ){ HDrawRDTCuts( fChain ); }
 	if ( SW_EVZ_COMPARE[0] == 1 ){ HDrawEVZCompare(); }
 	if ( SW_EVZ[0] == 1 ){ HDrawEVZ(); }
+	if ( SW_EVZ_SI[0] == 1 ){ HDrawEVZSi(); }
+	if ( SW_EX_SI[0] == 1 ){ HDrawExSi(); }
 	
 	if ( PRINT_ROOT == 1 ){ if ( out_root_file->IsOpen() ){ out_root_file->Close(); } }
 	

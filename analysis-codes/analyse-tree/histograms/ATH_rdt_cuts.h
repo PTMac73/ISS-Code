@@ -12,6 +12,7 @@
 #include <TFile.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <TTree.h>
 #include <TString.h>
 
 #include <iostream>
@@ -27,6 +28,9 @@
 
 // Switch for this is SW_RDT_CUTS
 TH2F* h_rdt_cuts[4];
+TH1F* h_rdt_ex_mg[4];
+TH2F* h_rdt_evz_mg[4];
+TObjArray* arr_rdt = new TObjArray();
 
 
 void HCreateRDTCuts(){
@@ -34,25 +38,45 @@ void HCreateRDTCuts(){
 		h_rdt_cuts[i] = new TH2F( Form( "h_rdt_cuts_%i", i ), "", 900, 0, 9000, 1000, 0, 8500 );
 		h_rdt_cuts[i]->SetMarkerStyle(20);
 		h_rdt_cuts[i]->SetMarkerSize(0.5);
-		h_rdt_cuts[i]->SetMarkerColor(kRed);
+		h_rdt_cuts[i]->SetMarkerColor(kBlack);
 		h_rdt_cuts[i]->GetYaxis()->SetTitle( Form( "rdt[%i]", i ) );
 		h_rdt_cuts[i]->GetXaxis()->SetTitle( Form( "rdt[%i]", i + 4 ) );
 		
 		GlobSetHistFonts( h_rdt_cuts[i] );
+	
+		h_rdt_ex_mg[i] = new TH1F( Form( "h_rdt_ex_mg_%i", i ), "", 450, -1, 8 );
+		h_rdt_ex_mg[i]->SetFillColorAlpha(kBlack, 0.3);
+		h_rdt_ex_mg[i]->SetLineColor(kWhite);
+		h_rdt_ex_mg[i]->SetLineWidth(0);
+		h_rdt_ex_mg[i]->GetYaxis()->SetTitle("Counts per 20 keV" );
+		h_rdt_ex_mg[i]->GetXaxis()->SetTitle( "Excitation Energy (MeV)" );
+		
+		h_rdt_evz_mg[i] = new TH2F( Form( "h_rdt_evz_mg_%i", i ), "", 400, -50, -10, 900, 0, 9);
+		h_rdt_evz_mg[i]->SetMarkerStyle(20);
+		h_rdt_evz_mg[i]->SetMarkerSize(0.5);
+		h_rdt_evz_mg[i]->SetMarkerColor(kBlack);
+		h_rdt_evz_mg[i]->GetYaxis()->SetTitle( "Energy (MeV)" );
+		h_rdt_evz_mg[i]->GetXaxis()->SetTitle( "z (cm)" );
+		
+		arr_rdt->Add(h_rdt_ex_mg[i]);
+		arr_rdt->Add(h_rdt_evz_mg[i]);
+		
+		GlobSetHistFonts( h_rdt_ex_mg[i] );
+		GlobSetHistFonts( h_rdt_evz_mg[i] );
 	}
 	
 	return;
 }
 
 
-void HDrawRDTCuts(){
+void HDrawRDTCuts( TTree* t ){
 	TCanvas* c_rdt_cuts_comb;
 	TCanvas* c_rdt_cuts[4];
-	TObjArray* cuttlefish = new TObjArray();
+	cuttlefish = new TObjArray();
 	TCutG* cuttle;
 
 	// If combining canvases, then divide up
-	if ( CANVAS_COMBINE == 1 ){
+	if ( CANVAS_COMBINE == 1 && DRAW_NEW_CUTS == 0 ){
 		TCanvas* c_rdt_cuts_comb = new TCanvas( "c_rdt_cuts_comb", "c_rdt_cuts_comb", C_WIDTH, C_HEIGHT );
 		c_rdt_cuts_comb->Divide(2,2);
 	}
@@ -63,12 +87,12 @@ void HDrawRDTCuts(){
 		if ( CANVAS_COMBINE == 1 ){ c_rdt_cuts_comb->cd(i+1); }
 		else{
 			c_rdt_cuts[i] = new TCanvas( Form( "c_rdt_cuts_%i", i ), Form( "c_rdt_cuts_%i", i ), C_WIDTH, C_HEIGHT );
-			GlobSetCanvasMargins( c_rdt_cuts[i] );	
+			GlobSetCanvasMargins( c_rdt_cuts[i] );
 		}
 		
 		// Draw the spectrum and the cuts
 		if ( DRAW_NEW_CUTS == 1 && CANVAS_COMBINE == 0 ){
-			cuttle = CreateCut( h_rdt_cuts[i], c_rdt_cuts[i], Form("cuttle%i", i ) );
+			cuttle = CreateCut( h_rdt_cuts[i], c_rdt_cuts[i], Form("cuttle%i", i ), t, arr_rdt );
 			cuttlefish->Add( cuttle );
 		}
 		else{

@@ -29,7 +29,7 @@ TH2F* h_evz;
 
 
 void HCreateEVZ(){
-	h_evz = new TH2F( "h_evz", "", 450, -50, -10, 900, 0, 9 );
+	h_evz = new TH2F( "h_evz", "", 400, -50, -10, 900, 0, 9 );
 	h_evz->SetMarkerStyle(20);
 	h_evz->SetMarkerSize(0.5);
 	h_evz->SetMarkerColor( kRed );

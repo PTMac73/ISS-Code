@@ -53,6 +53,10 @@ void AnalyseTree::Begin(TTree* t)
 	// When running with PROOF Begin() is only called on the client.
 	// The tree argument is deprecated (on PROOF 0 is passed).
 	gStyle->SetOptStat(0);
+	gStyle->SetTitleFont(62);
+	
+	if ( DISPLAY_CANVAS == 1 ){ gROOT->SetBatch(kFALSE); }
+	else{ gROOT->SetBatch(kTRUE); }
 	
 	// Print summary of options
 	PrintSummaryOfOptions();
@@ -64,6 +68,9 @@ void AnalyseTree::Begin(TTree* t)
 	if ( SW_EVZ[0] == 1 ){ HCreateEVZ(); }
 	if ( SW_EVZ_SI[0] == 1 ){ HCreateEVZSi(); }
 	if ( SW_EX_SI[0] == 1 ){ HCreateExSi(); }
+	if ( SW_EX[0] == 1 ){ HCreateEx(); }
+	if ( SW_XNXF[0] == 1 ){ HCreateXNXF(); }
+	if ( SW_XCAL[0] == 1 ){ HCreateXCAL(); }
 	
 	// Get the number of entries
 	num_entries = t->GetEntries();
@@ -89,6 +96,16 @@ void AnalyseTree::Begin(TTree* t)
 	}
 	else{
 		std::cout << "NO SI CUTS FOUND. Will carry on without them." << "\n";
+	}
+	
+	// Get the alpha cuts for XNXF stuff
+	TFile* f_xnxf = new TFile( xnxfcut_dir.Data() );
+	if ( f_xnxf->IsOpen() ){
+		cut_list_xnxf = GetXNXFCutArray( f_xnxf );
+		f_xnxf->Close();
+	}
+	else{
+		std::cout << "NO XNXF CUTS FOUND. Will carry on without them." << "\n";
 	}
 
 	// Open the root file for writing
@@ -135,19 +152,20 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 
 	// Get branches
 	/*
-	b_Energy->GetEntry(entry);            b_XF->GetEntry(entry);
-	b_XN->GetEntry(entry);
 	b_TAC->GetEntry(entry);               b_ELUM->GetEntry(entry);
 	b_EZERO->GetEntry(entry);             b_EnergyTimestamp->GetEntry(entry);
 	b_RDTTimestamp->GetEntry(entry);      b_TACTimestamp->GetEntry(entry);
 	b_ELUMTimestamp->GetEntry(entry);     b_EZEROTimestamp->GetEntry(entry);
 	b_X->GetEntry(entry);                 
-	
 	b_TD_RDT_ELUM->GetEntry(entry);       b_XOLD->GetEntry(entry);
 	b_Ex_CORRECTED->GetEntry(entry);
-	b_XFCAL->GetEntry(entry);             b_XNCAL->GetEntry(entry);
 	b_ECAL->GetEntry(entry);
 	*/
+	//std::cout << "Get branches" << "\n";
+	b_Energy->GetEntry(entry);
+	b_XF->GetEntry(entry);                b_XN->GetEntry(entry);
+	b_XFCAL->GetEntry(entry);             b_XNCAL->GetEntry(entry);
+	//std::cout << "Get more branches" << "\n";
 	b_Z->GetEntry(entry);
 	b_RDT->GetEntry(entry);
 	b_XCAL->GetEntry(entry);              
@@ -155,7 +173,6 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 	b_Ex->GetEntry(entry);                
 	b_ThetaCM->GetEntry(entry);           b_DetID->GetEntry(entry);
 	b_TD_RDT_E_CUTS->GetEntry(entry);     b_XCAL_CUTS->GetEntry(entry);
-
 
 	// Work out if it is inside the cut(s)
 	is_in_rdt = 0; is_in_rdt_si = 0;
@@ -171,86 +188,146 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		}
 	}
 	
+	// Create some doubles for use in the loop
+	Double_t XNCAL, XFCAL, XNcal, XFcal;
+	
 	// *LOOP* OVER DETECTORS IN THE ARRAY
 	for ( Int_t i = 0; i < 24; i++ ){
-	
+
 		// Calculate cut booleans
 		is_in_used_det = ( det_array[ i % 6 ][ (Int_t)TMath::Floor( i/6 ) ] == 1 );
+		// is_in_rdt goes here
 		is_in_td = ( ( td_rdt_e[i][0] > td_rdt_e_cuts[i][0] && td_rdt_e[i][0] < td_rdt_e_cuts[i][1] ) || \
 		             ( td_rdt_e[i][1] > td_rdt_e_cuts[i][0] && td_rdt_e[i][1] < td_rdt_e_cuts[i][1] ) || \
 		             ( td_rdt_e[i][2] > td_rdt_e_cuts[i][0] && td_rdt_e[i][2] < td_rdt_e_cuts[i][1] ) || \
 		             ( td_rdt_e[i][3] > td_rdt_e_cuts[i][0] && td_rdt_e[i][3] < td_rdt_e_cuts[i][1] ) );
-		is_in_xcal = ( xcal[i] >= xcal_cuts[i][0] && xcal[i] <= xcal_cuts[i][1] && ( xcal[i] <= xcal_cuts[i][2] || xcal[i] >= xcal_cuts[i][3] ) );
 		is_in_theta_min = ( thetaCM[i] >= THETA_MIN );
 		is_in_theta_range = ( thetaCM[i] >= THETA_LB && thetaCM[i] <= THETA_UB );
+		is_in_xcal = ( xcal[i] >= xcal_cuts[i][0] && xcal[i] <= xcal_cuts[i][1] );
+		is_in_xcal_mid = ( xcal[i] <= xcal_cuts[i][2] || xcal[i] >= xcal_cuts[i][3] );
 		
-		// Do the required cuts for a singles spectrum, but not the upper angle
-		if ( is_in_used_det && is_in_xcal && is_in_theta_min ){
+		// XNXF cut boolean
+		TCutG* cut_xnxf = (TCutG*)cut_list_xnxf->At(i);
+		if ( cut_xnxf != NULL ){
+			is_in_xnxf_cut = cut_xnxf->IsInside( xf[i], xn[i] );
+		}
+		else{
+			is_in_xnxf_cut = 0;
+		}
+		
+		// CREATE HISTOGRAMS ------------------------------------------------------------------- //
+		// Order of cuts should be as written above
+		XNCAL = xfxneCorr[i][1]*xnCorr[i]*xn[i] + xfxneCorr[i][0];
+		XFCAL = xfxneCorr[i][1]*xf[i] + xfxneCorr[i][0];
+		XNcal = xnCorr[i]*xn[i];
+		XFcal = xf[i];
+
+		// *HIST* XN-XF
+		if ( SW_XNXF[0] == 1 && ( DET_NUMBER == i || DET_NUMBER == -1 ) ){ 
+			h_xnxf[i]->Fill( xf[i], xn[i] );
 			
+			if ( !TMath::IsNaN( xf[i] ) && !TMath::IsNaN( xn[i] ) ){
+				if ( XNCAL <  0.5*e[i] && XFCAL >= 0.5*e[i] ){ h_xnxf_colour[i][0]->Fill( xf[i], xn[i] ); }
+				if ( XNCAL >= 0.5*e[i] && XFCAL >= 0.5*e[i] ){ h_xnxf_colour[i][1]->Fill( xf[i], xn[i] ); }
+				if ( XNCAL <  0.5*e[i] && XFCAL <  0.5*e[i] ){ h_xnxf_colour[i][2]->Fill( xf[i], xn[i] ); }
+				if ( XNCAL >= 0.5*e[i] && XFCAL <  0.5*e[i] ){ h_xnxf_colour[i][3]->Fill( xf[i], xn[i] ); }
+			}
+			if ( is_in_xnxf_cut ){ p_xnxf[i]->Fill( xf[i], xn[i] ); }
+			
+			h_xnE[i]->Fill( xn[i], e[i] );
+			h_xfE[i]->Fill( xf[i], e[i] );
+			
+			if ( XNCAL <  0.5*e[i] ){ h_xnE_colour[i][0]->Fill( xn[i], e[i] ); }
+			if ( XNCAL >= 0.5*e[i] ){ h_xnE_colour[i][1]->Fill( xn[i], e[i] ); }
+			
+			if ( XFCAL <  0.5*e[i] ){ h_xfE_colour[i][0]->Fill( xf[i], e[i] ); }
+			if ( XFCAL >= 0.5*e[i] ){ h_xfE_colour[i][1]->Fill( xf[i], e[i] ); }
+
+			if ( !TMath::IsNaN( xf[i] ) && !TMath::IsNaN( xn[i] ) && !TMath::IsNaN( e[i] ) ){
+				if ( XNcal != 0.0 && XNcal/XFcal <= XNXF_FRAC ){ h_xnxfE_colour[i][0]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] ); }
+				else if ( XFcal != 0.0 && XNcal/XFcal >= ( 1 - XNXF_FRAC ) ){ h_xnxfE_colour[i][1]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] ); }
+				else{ 
+					h_xnxfE_colour[i][2]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] );
+					h_xnxfE[i]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] );
+					p_xnxfE[i]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] );
+				}
+			}
+
+			
+		}
+
+		// *HIST* xcal no cuts
+		if ( is_in_used_det && is_in_rdt && is_in_td && is_in_theta_min ){
+			if ( SW_XCAL[0] == 1 ){ h_xcal[i]->Fill( xcal[i] ); }
+		}
+			
+		// *HIST* xcal with cuts
+		if ( is_in_used_det && is_in_rdt && is_in_td && is_in_theta_min && is_in_xcal ){ 
+			if ( SW_XCAL[0] == 1 ){ h_xcal_cut[i]->Fill( xcal[i] );  }
+		}
+		
+		// Do singles cuts
+		if ( is_in_used_det && is_in_theta_min && is_in_xcal && is_in_xcal_mid ){
 			// *HIST* E v.s. z plot - singles
 			if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[0]->Fill( z[i], ecrr[i] ); }
 			if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[0]->Fill( z[i], ecrr[i] ); }
 			
-			// Do full cuts (Mg)
-			if ( is_in_rdt && is_in_td ){
-			
-				// *HIST* Full E v.s. z (Mg)
-				if ( SW_EVZ[0] == 1 ){ h_evz->Fill( z[i], ecrr[i] ); }
-				if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[1]->Fill( z[i], ecrr[i] ); }
-				if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[2]->Fill( z[i], ecrr[i] ); }
-				if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_evz_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( z[i], ecrr[i] ); }
-				
-				// *HIST* Full excitation plot (Mg)
-				if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_ex_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( Ex[i] ); }
-				if ( SW_EX_SI[0] == 1 ){ h_ex_si[0]->Fill( Ex[i] ); }
-				
-			}	// If in the full cuts
-			
-			// Do full cuts (Si)
-			if ( found_si_cuts && is_in_rdt_si && is_in_td ){
-				
-				// *HIST* Full E v.s. z (Si)
-				if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[2]->Fill( z[i], ecrr[i] ); }
-				
-				// *HIST* Full Ex (Si)
-				if ( SW_EX_SI[0] == 1 ){ h_ex_si[1]->Fill( Ex[i] ); }
-				
+			// Add additional angle cut
+			if ( is_in_theta_range ){
+				if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[1]->Fill( z[i], ecrr[i] ); }
 			}
 			
-			// Add lower and upper angular range cut
+			// Implement the desired row numbers only
+			if ( i % 6 == ROW_NUMBER || ROW_NUMBER == -1 ){
+				// *HIST* Compare excitation spectra 1
+				if ( SW_EX_COMPARE[0] == 1 ){ h_ex_compare1[i % 6]->Fill( Ex[i] ); }
+			}
+		}
+			
+		// Do full cuts (Mg)
+		if ( is_in_used_det && is_in_rdt && is_in_td && is_in_theta_min && is_in_xcal && is_in_xcal_mid ){
+			
+			// *HIST* Full E v.s. z (Mg)
+			if ( SW_EVZ[0] == 1 ){ h_evz->Fill( z[i], ecrr[i] ); }
+			if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[1]->Fill( z[i], ecrr[i] ); }
+			if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[2]->Fill( z[i], ecrr[i] ); }
+			if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_evz_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( z[i], ecrr[i] ); }
+			
+			// Add additional angle cut
 			if ( is_in_theta_range ){
+				if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[3]->Fill( z[i], ecrr[i] ); }
+			}
 			
-				// *HIST* Compare E v.s. z plots no additional angle cut 2
-				if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[1]->Fill( z[i], ecrr[i] ); }
-				
-				// Add full cuts
-				if ( is_in_rdt && is_in_td ){
-				
-					// *HIST* Compare E v.s. z plots no angle cut - clean 1
-					if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[3]->Fill( z[i], ecrr[i] ); }
+			
+			// *HIST* Full excitation plot (Mg)
+			if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_ex_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( Ex[i] ); }
+			if ( SW_EX_SI[0] == 1 ){ h_ex_si[0]->Fill( Ex[i] ); }
+			if ( SW_EX[0] == 1 ){
+				if ( ALL_ROWS == 1 ){ h_ex_full->Fill( Ex[i] ); }
+				if ( ROW_BY_ROW == 1 ){ h_ex_rbr[ i % 6 ]->Fill( Ex[i] ); }
+				if ( DET_BY_DET == 1 ){ h_ex_dbd[i]->Fill( Ex[i] ); }
+			}
+			
+			// Implement the desired row numbers only
+			if ( i % 6 == ROW_NUMBER || ROW_NUMBER == -1 ){
+				// *HIST* Compare excitation spectra 2
+				if ( SW_EX_COMPARE[0] == 1 ){ h_ex_compare2[i % 6]->Fill( Ex[i] ); }
+			}
+		}
 
-				}
-					
-				// Implement the desired row numbers only
-				if ( i % 6 == ROW_NUMBER || ROW_NUMBER == -1 ){
-					// *HIST* Compare excitation spectra 1
-					if ( SW_EX_COMPARE[0] == 1 ){ h_ex_compare1[i % 6]->Fill( Ex[i] ); }
-						
-					// Do the required cuts for a clean spectrum
-					if ( is_in_rdt && is_in_td ){
-						// *HIST* Compare excitation spectra 2
-						if ( SW_EX_COMPARE[0] == 1 ){ h_ex_compare2[i % 6]->Fill( Ex[i] ); }
-						
-					} // If in the full spectrum
-					
-				}	// If in the right row
-				
-			}	// If in range of theta
+
+		// Do full cuts (Si)
+		if ( is_in_used_det && found_si_cuts && is_in_rdt_si && is_in_td && is_in_theta_min && is_in_xcal && is_in_xcal_mid ){
+			// *HIST* Full E v.s. z (Si)
+			if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[2]->Fill( z[i], ecrr[i] ); }
 			
-		}	// If in the singles spectrum
+			// *HIST* Full Ex (Si)
+			if ( SW_EX_SI[0] == 1 ){ h_ex_si[1]->Fill( Ex[i] ); }
+		}
 		
-	}	// Loop over detectors (i)
-	
+	} // *LOOP* over detectors
+
+
 	// *LOOP* OVER RECOIL DETECTORS
 	for ( Int_t i = 0; i < 4; i++ ){
 	
@@ -259,8 +336,6 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			h_rdt_cuts[i]->Fill( rdt[i+4], rdt[i] );
 		}
 	}
-	
-	
 	
 	return kTRUE;
 }
@@ -286,6 +361,9 @@ void AnalyseTree::Terminate()
 	if ( SW_EVZ[0] == 1 ){ HDrawEVZ(); }
 	if ( SW_EVZ_SI[0] == 1 ){ HDrawEVZSi(); }
 	if ( SW_EX_SI[0] == 1 ){ HDrawExSi(); }
+	if ( SW_EX[0] == 1 ){ HDrawEx(); }
+	if ( SW_XNXF[0] == 1 ){ HDrawXNXF(); }
+	if ( SW_XCAL[0] == 1 ){ HDrawXCAL(); }
 	
 	if ( PRINT_ROOT == 1 ){ if ( out_root_file->IsOpen() ){ out_root_file->Close(); } }
 	

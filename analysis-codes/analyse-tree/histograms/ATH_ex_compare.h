@@ -37,8 +37,8 @@ void HCreateExCompare(){
 		if ( i == ROW_NUMBER || ROW_NUMBER == -1 ){
 		
 			// Create histograms
-			h_ex_compare1[i] = new TH1F( Form( "h_ex_compare1_%i", i ), "", 450, -1, 8 );
-			h_ex_compare2[i] = new TH1F( Form( "h_ex_compare2_%i", i ), "", 450, -1, 8 );
+			h_ex_compare1[i] = new TH1F( Form( "h_ex_sing1_%i", i ), "", 450, -1, 8 );
+			h_ex_compare2[i] = new TH1F( Form( "h_ex_sing2_%i", i ), "", 450, -1, 8 );
 			
 			// Format histograms
 			h_ex_compare1[i]->SetTitle("");
@@ -60,7 +60,7 @@ void HDrawExCompare(){
 	// Define some local variables
 	TCanvas* c_ex_compare[6];
 	
-	TString root_name = Form( "%s/ex_comp_th%s-%s_posXXX%s", print_dir.Data(), DoubleToString( THETA_LB ).Data(), DoubleToString( THETA_UB ).Data(), ( ROW_NUMBER == -1 ? "" : Form( "_row%i", ROW_NUMBER ) ) );
+	TString root_name = Form( "%s/posXXX%s_ex_sing_th%s-%s", print_dir.Data(), ( ROW_NUMBER == -1 ? "" : Form( "_row%i", ROW_NUMBER ) ),  DoubleToString( THETA_LB ).Data(), DoubleToString( THETA_UB ).Data() );
 	TFile* f;
 	
 	// Open root file if desired
@@ -76,14 +76,14 @@ void HDrawExCompare(){
 		if ( i == ROW_NUMBER || ROW_NUMBER == -1 ){
 		
 			// Define canvas and draw
-			c_ex_compare[i] = new TCanvas( Form( "c_ex_compare_%i", i ), Form( "COMPARE HISTOGRAMS | ROW %i", i ),  C_WIDTH, C_HEIGHT );
+			c_ex_compare[i] = new TCanvas( Form( "c_ex_sing_%i", i ), Form( "COMPARE HISTOGRAMS | ROW %i", i ),  C_WIDTH, C_HEIGHT );
 			GlobSetCanvasMargins( c_ex_compare[i] );
 			
 			h_ex_compare1[i]->Draw();
 			h_ex_compare2[i]->Draw("SAME");
 			
 			// Define a file name for printing
-			TString spec_name = ( ROW_NUMBER == -1 ? root_name + Form( "_row%i", i ) : root_name );
+			TString spec_name = Form( "%s/posXXX_row%i_ex_sing_th%s-%s", print_dir.Data(), i, DoubleToString( THETA_LB ).Data(), DoubleToString( THETA_UB ).Data() );
 			
 			
 			// Print spectrum if desired

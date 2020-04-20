@@ -190,7 +190,7 @@ Int_t GetArrayPosition( TTree *t ){
 	if ( t->GetCurrentFile() != NULL ){
 		file_name = t->GetCurrentFile()->GetName();
 	}
-	Int_t pos = 2;	// Assume it's 1
+	Int_t pos = 1;	// Assume it's 1
 
 	// Manipulate the string - looks like gen_run##.root or genPos##.root
 	if ( file_name.Contains( "genPos" ) ){

@@ -1,1 +1,1 @@
-/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-codes/WriteSPE.h
+../WriteSPE.h

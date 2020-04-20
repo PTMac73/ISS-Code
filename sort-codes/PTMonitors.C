@@ -46,12 +46,14 @@ Int_t tacA[24];
 Float_t z_array_pos[6] = {35.868,29.987,24.111,18.248,12.412,6.676};//in cm
 
 // z offset
-Int_t OFF_POSITION = 0;
+Int_t OFF_POSITION = 2;
 Bool_t ALPHA_RUN = 0;
 Float_t z_off;
 Float_t xcal_cuts[24][4];
 Float_t thetaCM_lims[9];
 
+// RYAN'S CORRECTION PARAMETERS
+/*
 Float_t xnCorr[24] = {0.907342,0.907342,0.976727,0.914866,1.021736,
 		      0.887032,0.923250,0.953968,1.020180,0.918340,
 		      0.983084,0.983084,0.997550,0.985319,0.959048,
@@ -70,6 +72,119 @@ Float_t xfxneCorr[24][2] = {{29.091896,0.919262},{-0.744352,0.989133},{5.332432,
 			    {15.249334,  0.887257},
 			    {14.071915,  1.095258},
 			    {-2.256993,  0.896878}};
+*/
+/* Ryan's code formatted better
+Float_t xnCorr[24] = {
+	0.907342,	// 00
+	0.907342,	// 01
+	0.976727,	// 02
+	0.914866,	// 03
+	1.021736,	// 04
+	0.887032,	// 05
+	0.923250,	// 06
+	0.953968,	// 07
+	1.020180,	// 08
+	0.918340,	// 09
+	0.983084,	// 10
+	0.983084,	// 11
+	0.997550,	// 12
+	0.985319,	// 13
+	0.959048,	// 14
+	1.008677,	// 15
+	0.959601,	// 16
+	1.066846,	// 17
+	0.927771,	// 18
+	0.985274,	// 19
+	0.921273,	// 20
+	0.976498,	// 22
+	1.062241,	// 22
+	1.079507	// 23
+};
+Float_t xfxneCorr[24][2] = {
+	{ 29.0918960, 0.919262 },	// 00
+	{ -0.7443520, 0.989133 },	// 01
+	{  5.3324320, 1.046711 },	// 02
+	{  4.7701140, 1.073863 },	// 03
+	{ -4.3528810, 0.901518 },	// 04
+	{ -8.5434590, 0.995114 },	// 05
+	{  4.6787050, 1.015215 },	// 06
+	{  3.9550900, 0.972769 },	// 07
+	{  5.1637300, 0.998306 },	// 08
+	{  3.8633140, 0.989275 },	// 09
+	{  2.2984290, 0.916884 },	// 10
+	{ -17.435897, 0.897436 },	// 11
+	{  8.1430490, 0.571533 },	// 12
+	{  5.4288280, 0.927071 },	// 13
+	{  4.5548760, 0.960028 },	// 14
+	{  4.4230830, 0.967342 },	// 15
+	{  1.4366830, 1.026855 },	// 16
+	{  0.7477820, 0.912706 },	// 17
+	{  6.0483600, 0.914865 },	// 18
+	{  2.1044600, 0.962689 },	// 19
+	{  1.0110060, 1.034467 },	// 20
+	{ 15.2493340, 0.887257 },	// 21
+	{ 14.0719150, 1.095258 },	// 22
+	{ -2.2569930, 0.896878 }	// 23
+};
+*/
+// PATRICK'S CORRECTION PARAMETERS
+Double_t xnCorr[24] = {
+	0.000000,	// 00
+	0.997927,	// 01
+	0.990507,	// 02
+	1.009003,	// 03
+	1.049186,	// 04
+	0.986054,	// 05
+	1.001958,	// 06
+	1.047586,	// 07
+	1.127148,	// 08
+	1.050395,	// 09
+	1.006817,	// 10
+	0.000000,	// 11
+	0.000000,	// 12
+	1.006816,	// 13
+	1.036812,	// 14
+	0.987357,	// 15
+	1.084745,	// 16
+	0.991116,	// 17
+	0.991950,	// 18
+	1.014983,	// 19
+	0.977601,	// 20
+	1.013553,	// 21
+	1.077098,	// 22
+	1.336393,	// 23
+};
+Double_t xfxneCorr[24][2] = {
+	{   0.000000, 0.000000 },	// 00
+	{  -2.746575, 0.939133 },	// 01
+	{   4.386378, 1.007202 },	// 02
+	{   2.187232, 1.065747 },	// 03
+	{  15.144995, 0.861050 },	// 04
+	{  -0.163298, 0.946565 },	// 05
+	{   2.041674, 1.024331 },	// 06
+	{   2.242639, 0.978949 },	// 07
+	{   0.572567, 0.981046 },	// 08
+	{   2.588552, 0.942166 },	// 09
+	{  11.703058, 0.820891 },	// 10
+	{   0.000000, 0.000000 },	// 11
+	{   0.000000, 0.000000 },	// 12
+	{   1.570924, 0.916432 },	// 13
+	{  -0.935325, 0.919930 },	// 14
+	{   0.972438, 0.973964 },	// 15
+	{  -1.999254, 0.991921 },	// 16
+	{   0.314475, 0.967195 },	// 17
+	{   0.038586, 0.918004 },	// 18
+	{   2.042134, 0.950578 },	// 19
+	{  -0.015331, 1.037333 },	// 20
+	{   2.055352, 0.889285 },	// 21
+	{  -2.960157, 1.065190 },	// 22
+	{   1.448493, 0.846523 },	// 23
+};
+
+
+
+
+
 Float_t eCorr[24][2] = {{256.060637	,0.021569},
 			{253.083810	,0.010404},
 			{275.757609	,-0.012115},
@@ -98,14 +213,20 @@ Float_t eCorr[24][2] = {{256.060637	,0.021569},
 Float_t exCorr[6] = { 938.272,  // mass of proton [MeV/c^2]
 	                   1,        // charge of proton
 	                   27954.0982, // cm frame total energy [correct]
-	                   26996.5929, // mass of recoil [correct]
+	                   26996.5929, // mass of recoil [correct] (Fully stripped of electrons)
 	                   0.132178, // beta to CM frame [correct]
+	                   2.5}; // Bfield [T]
+Float_t exCorr_si[6] = { 938.272,  // mass of proton [MeV/c^2]
+	                   1,        // charge of proton
+	                   27949.6742, // cm frame total energy
+	                   26984.277, // mass of recoil
+	                   0.132187, // beta to CM frame
 	                   2.5}; // Bfield [T]
 Double_t array_radius = ISSArrayRadius(-4.5,4.5,11.5); // perpendicular distance of detector to axis [mm]
 //double Ex, thetaCM;
 
 Double_t alpha, Et, beta, gamm, G, massB, mass; //variables for Ex calculation
-
+Double_t alpha_si, Et_si, beta_si, gamm_si, G_si, massB_si, mass_si; //variables for Ex calculation
 
 Float_t tempTime=-1000;
 Long64_t tempTimeLong=10001;
@@ -145,6 +266,7 @@ typedef struct {
 	Float_t xncal[24];
 	Float_t ecrr[24];
 	Float_t Ex[24];
+	Float_t Ex_si[24];
 	Float_t Ex_corrected[24];
 	Float_t thetaCM[24];
 	Int_t detID[24];
@@ -160,7 +282,7 @@ FIN fin;
 // TSELECTOR BEGIN FUNCTION -------------------------------------------------------------------- //
 void PTMonitors::Begin(TTree *tree){
 	// Define offset (array position - offset position = 70mm???)
-	OFF_POSITION = GetArrayPosition( tree );
+	//OFF_POSITION = GetArrayPosition( tree );
 
 
 	if ( OFF_POSITION == 0 ){
@@ -183,13 +305,13 @@ void PTMonitors::Begin(TTree *tree){
 
 	//Get any cuts;
 	TFile * fCut = new TFile( cutFileDir.Data() );			// open file
-	isCutFileOpen = fCut->IsOpen(); 
+	isCutFileOpen = fCut->IsOpen();
 	numCut = 0 ;
 	if( isCutFileOpen ){
 		cutList = (TObjArray *) fCut->FindObjectAny("cutList");
 		numCut = cutList->GetEntries();
 		printf("=========== found %d cutG in %s \n", numCut, fCut->GetName());
-	
+
 		cutG = new TCutG();
 		for(int i = 0; i < numCut ; i++){
 			printf(" cut name : %s , VarX: %s, VarY: %s, numPoints: %d \n",
@@ -202,7 +324,7 @@ void PTMonitors::Begin(TTree *tree){
 		}
 	}
 
-	
+
 	alpha = 299.792458 * exCorr[5] * exCorr[1] / TMath::TwoPi() / 1000; //MeV/mm
 	beta = exCorr[4];
 	gamm = 1./TMath::Sqrt(1-beta*beta);
@@ -210,6 +332,14 @@ void PTMonitors::Begin(TTree *tree){
 	massB = exCorr[3];
 	mass = exCorr[0];
 	Et = exCorr[2];
+	
+	alpha_si = 299.792458 * exCorr_si[5] * exCorr_si[1] / TMath::TwoPi() / 1000; //MeV/mm
+	beta_si = exCorr_si[4];
+	gamm_si = 1./TMath::Sqrt(1-beta_si*beta_si);
+	G_si = alpha_si*gamm_si*beta_si*array_radius;
+	massB_si = exCorr_si[3];
+	mass_si = exCorr_si[0];
+	Et_si = exCorr_si[2];
 
 	// SHARPY'S GRAPHS
 	// Make a new TStyle
@@ -232,13 +362,13 @@ void PTMonitors::Begin(TTree *tree){
 	EVZ = new TH2F("EVZ", "",700, -50, -5, 750 , 0 , 10);
 	EVZ->GetXaxis()->SetTitle("z (cm)");
 	EVZ->GetYaxis()->SetTitle("E (MeV)");
-	
+
 	// Gated excitation spectrum
 	EXE = new TH1F("EXE", "", 400, -1, 8 );
 	EXE->GetYaxis()->SetTitle("Counts");
 	EXE->GetXaxis()->SetTitle("E (MeV)");
 	EXE->SetFillColor(5);
-	
+
 	// Time difference on the EBIS-Energy time
 	TD_EBIS = new TH1F("TD_EBIS", "", 10001, -5000, 5000);
 	TD_EBIS->GetYaxis()->SetTitle("# counts");
@@ -250,13 +380,13 @@ void PTMonitors::Begin(TTree *tree){
 	TD_Recoil->GetYaxis()->SetTitle("# counts");
 	TD_Recoil->GetXaxis()->SetTitle("Time Difference / 10^{-8} s");
 	TD_Recoil->SetFillColor(5);
-	
-	// Gated recoil detector E-dE plots	
+
+	// Gated recoil detector E-dE plots
 	for ( Int_t ii = 0; ii < 4; ii++ ){
 		EdE[ii] = new TH2F( Form("EdE%d",ii ), "", 1000, 0, 10000, 1000, 0, 4000 );
 		EdE[ii]->SetTitle( Form( "Recoil %d", ii ) );
 	}
-	
+
 	// Gated excitation spectrum on the recoils.
 	for ( Int_t ii = 0; ii < 6; ii++ ){
 		EXE_Row[ii] = new TH1F( Form( "EXE_Row%i", ii ), "", 450, -1, 8 );
@@ -282,16 +412,16 @@ void PTMonitors::Begin(TTree *tree){
 	fin_tree->Branch("xf",xf,"xf[100]/F");
 	fin_tree->Branch("xf_t",xf_t,"xf_t[100]/l");
 	fin_tree->Branch("xn",xn,"xn[100]/F");
-  	fin_tree->Branch("xn_t",xn_t,"xn_t[100]/l"); 
+  	fin_tree->Branch("xn_t",xn_t,"xn_t[100]/l");
 	fin_tree->Branch("rdt",rdt,"rdt[100]/F");
-	fin_tree->Branch("rdt_t",rdt_t,"rdt_t[100]/l"); 
+	fin_tree->Branch("rdt_t",rdt_t,"rdt_t[100]/l");
 	fin_tree->Branch("tac",tac,"tac[100]/F");
-	fin_tree->Branch("tac_t",tac_t,"tac_t[100]/l"); 
+	fin_tree->Branch("tac_t",tac_t,"tac_t[100]/l");
 	fin_tree->Branch("elum",elum,"elum[32]/F");
 	fin_tree->Branch("elum_t",elum_t,"elum_t[32]/l");
 	fin_tree->Branch("ezero",ezero,"ezero[10]/F");
 	fin_tree->Branch("ezero_t",ezero_t,"ezero_t[10]/l");
-	//fin_tree->Branch("ebis_t",ebis_t,"EBISTimestamp/l"); 
+	//fin_tree->Branch("ebis_t",ebis_t,"EBISTimestamp/l");
 
 	fin_tree->Branch("x",fin.x,"x[24]/F");
 	fin_tree->Branch("z",fin.z,"z[24]/F");
@@ -304,6 +434,7 @@ void PTMonitors::Begin(TTree *tree){
 	fin_tree->Branch("td_rdt_elum",fin.td_rdt_elum,"td_rdt_elum[32][4]/I");
 	fin_tree->Branch("td_e_ebis",fin.td_e_ebis,"td_e_ebis[24]/I");
 	fin_tree->Branch("Ex",fin.Ex,"Ex[24]/F");
+	fin_tree->Branch("Ex_si",fin.Ex_si,"Ex_si[24]/F");
 	fin_tree->Branch("Ex_corrected",fin.Ex_corrected,"Ex_corrected[24]/F");
 	fin_tree->Branch("thetaCM",fin.thetaCM,"thetaCM[24]/F");
 	fin_tree->Branch("detID",fin.detID,"detID[24]/I");
@@ -326,7 +457,7 @@ void PTMonitors::SlaveBegin(TTree * /*tree*/){
 Bool_t PTMonitors::Process(Long64_t entry){
 	// Increment number of processed entries
 	ProcessedEntries++;
-	
+
 	// Print out the progress of the sort
 	if (ProcessedEntries<NUMSORT) {
 		if (ProcessedEntries>NumEntries*Frac-1) {
@@ -336,7 +467,7 @@ Bool_t PTMonitors::Process(Long64_t entry){
 			StpWatch.Start(kFALSE);
 			Frac+=0.1;
 		}
-		
+
 		// RESET ALL QUANTITIES TO NaN
 		for ( Int_t i = 0; i < 32; i++ ){
 			if ( i < 24 ){
@@ -348,6 +479,7 @@ Bool_t PTMonitors::Process(Long64_t entry){
 		 		fin.xncal[i] = TMath::QuietNaN();
 		 		fin.ecrr[i] = TMath::QuietNaN();
 				fin.Ex[i] = TMath::QuietNaN();
+				fin.Ex_si[i] = TMath::QuietNaN();
 				fin.Ex_corrected[i] = TMath::QuietNaN();
 		 		fin.thetaCM[i] = TMath::QuietNaN();
 		 		fin.detID[i] = TMath::QuietNaN();
@@ -357,13 +489,13 @@ Bool_t PTMonitors::Process(Long64_t entry){
 			for ( Int_t j = 0; j < 4; j++ ){
 				if ( i < 24 ){
 					fin.td_rdt_e[i][j] = TMath::QuietNaN();
-				}				
+				}
 				fin.td_rdt_elum[i][j] = TMath::QuietNaN();
 			}
 		}
-		 
-		 
-		
+
+
+
 		// Get the entries from the defined TTree (populates each of the leaves for processing)
 		b_Energy->GetEntry(entry);
 		b_XF->GetEntry(entry);
@@ -392,7 +524,7 @@ Bool_t PTMonitors::Process(Long64_t entry){
 				}
 			}
 		}
-			
+
 		/* ARRAY */
 		for (Int_t i = 0; i < 24; i++) {
 			// Calibrate each of the detectors
@@ -400,12 +532,12 @@ Bool_t PTMonitors::Process(Long64_t entry){
 			fin.xncal[i] = xn[i]*xnCorr[i]*xfxneCorr[i][1]+xfxneCorr[i][0];
 			fin.ecal[i] = e[i]/eCorr[i][0]+eCorr[i][1];
 			fin.ecrr[i] = e[i]/eCorr[i][0]+eCorr[i][1];
-		
+
 			// Calculate the uncalibrated position on the strip
 			if (xf[i]>0 || xn[i]>0 || !TMath::IsNaN(xf[i]) || !TMath::IsNaN(xn[i])) {
 				fin.x[i] = 0.5*((xf[i]-xn[i]) / (xf[i]+xn[i]))+0.5;
 			}
-		
+
 			// Calculate the calibrated position on the strip
 			if ( fin.xfcal[i] > 0.5*e[i] ) {
 				fin.xcal[i] = fin.xfcal[i]/e[i];
@@ -415,10 +547,10 @@ Bool_t PTMonitors::Process(Long64_t entry){
 
 			fin.xold[i] = 0.5*( ( fin.xfcal[i] - fin.xncal[i] )/e[i] + 1 );
 
-		  
+
 			// Calculate the exact position on the z axis
 			fin.z[i] = 5.0*( fin.xcal[i] - 0.5 ) - z_off - z_array_pos[i%6];
-			
+
 			/* Fill the E-dE histograms if:
 				* The position x (position on the strip) is between -1.1 and 1.1
 				* The energy is greater than 100
@@ -430,30 +562,30 @@ Bool_t PTMonitors::Process(Long64_t entry){
 					EdE[ii]->Fill( rdt[ii+4], rdt[ii] );
 				}
 			}
-		  
+
 		} //Array loop
 		/* TACs */
 		for(Int_t i = 0; i < 4 ; i++){				// Loop over each side of array
 			for(Int_t j = 0; j < 6; j++){			// Loop over each strip of side
-		
+
 				// Label the strip from 0 --> 23
 				Int_t index = i*6+j;
 				fin.detID[index] = index;
-		
-				//======== Ex calculation by Ryan 
+
+				//======== Ex calculation by Ryan
 				double y = fin.ecrr[index] + mass; // to give the KE + mass of proton;
 				double Z = alpha * gamm * beta * fin.z[index] * 10.;
 				double H = TMath::Sqrt(TMath::Power(gamm * beta,2) * (y*y - mass * mass) ) ;
 
 				// Calculate the angle
 				if( TMath::Abs(Z) < H ) {
-					// Use Newton's method to solve 0 ==  H * sin(phi) - G * tan(phi) - Z = f(phi) 
+					// Use Newton's method to solve 0 ==  H * sin(phi) - G * tan(phi) - Z = f(phi)
 					double tolerance = 0.001;	// Desired precision
 			 	 	double phi = 0; 			// Initial phi = 0 -> ensure the solution has f'(phi) > 0
 					double nPhi = 0; 			// New phi
 
 					int iter = 0;				// Number of iterations
-						
+
 					// Now calculate the angle using Newton-Raphson process
 					do{
 						phi = nPhi;
@@ -474,17 +606,17 @@ Bool_t PTMonitors::Process(Long64_t entry){
 						fin.Ex[index] = EB - massB;
 						//fin.Ex_corrected[index] = excitation_energy_corr_pars[OFF_POSITION - 1][j][0]*(450.0/9.0)*( fin.Ex[index] + 1.0 ) + excitation_energy_corr_pars[OFF_POSITION - 1][j][1];
 						fin.Ex_corrected[index] = ex_corr[0][0]*fin.Ex[index] + ex_corr[1][0];
-						
+
 						double hahaha1 = gamm* TMath::Sqrt(mass * mass + momt * momt) - y;
 						double hahaha2 = gamm* beta * momt;
 						fin.thetaCM[index] = TMath::ACos(hahaha1/hahaha2) * TMath::RadToDeg();
-				 
+
 					}
 					else{
 						fin.Ex[index] = TMath::QuietNaN();
 						fin.Ex_corrected[index] = TMath::QuietNaN();
 						fin.thetaCM[index] = TMath::QuietNaN();
-					}	
+					}
 				}
 				else{
 					fin.Ex[index] = TMath::QuietNaN();
@@ -492,13 +624,67 @@ Bool_t PTMonitors::Process(Long64_t entry){
 					fin.thetaCM[index] = TMath::QuietNaN();
 				}
 				
+				// <> SI CALCULATION
+				double y_si = fin.ecrr[index] + mass_si; // to give the KE + mass of proton;
+				double Z_si = alpha * gamm_si * beta_si * fin.z[index] * 10.;
+				double H_si = TMath::Sqrt(TMath::Power(gamm_si * beta_si,2) * (y_si*y_si - mass_si * mass_si) ) ;
+
+				// Calculate the angle
+				if( TMath::Abs(Z_si) < H_si ) {
+					// Use Newton's method to solve 0 ==  H * sin(phi) - G * tan(phi) - Z = f(phi)
+					double tolerance_si = 0.001;	// Desired precision
+			 	 	double phi_si = 0; 			// Initial phi = 0 -> ensure the solution has f'(phi) > 0
+					double nPhi_si = 0; 			// New phi
+
+					int iter_si = 0;				// Number of iterations
+
+					// Now calculate the angle using Newton-Raphson process
+					do{
+						phi_si = nPhi_si;
+						nPhi_si = phi_si - (H_si * TMath::Sin(phi_si) - G_si * TMath::Tan(phi_si) - Z_si) / (H_si * TMath::Cos(phi_si) - G_si /TMath::Power( TMath::Cos(phi_si), 2));
+						iter_si++;
+						if( iter_si > 10 || TMath::Abs(nPhi_si) > TMath::PiOver2()) break;
+					} while( TMath::Abs(phi_si - nPhi_si ) > tolerance_si);
+					phi_si = nPhi_si;
+
+					// Check f'(phi) > 0
+					double Df_si = H_si * TMath::Cos(phi_si) - G_si / TMath::Power( TMath::Cos(phi_si),2);
+					if( Df_si > 0 && TMath::Abs(phi_si) < TMath::PiOver2()  ){
+						// Found correct value of phi - now calculate everything else
+						double K_si = H_si * TMath::Sin(phi_si);
+						double x_si = TMath::ACos( mass_si / ( y_si * gamm_si - K_si));
+						double momt_si = mass_si * TMath::Tan( x_si ); // momentum of particle b or B in CM frame
+						double EB_si = TMath::Sqrt(mass_si*mass_si + Et_si*Et_si - 2*Et_si*TMath::Sqrt(momt_si * momt_si + mass_si * mass_si));
+						fin.Ex_si[index] = EB_si - massB_si;
+						//fin.Ex_corrected[index] = excitation_energy_corr_pars[OFF_POSITION - 1][j][0]*(450.0/9.0)*( fin.Ex[index] + 1.0 ) + excitation_energy_corr_pars[OFF_POSITION - 1][j][1];
+
+						double hahaha1_si = gamm_si* TMath::Sqrt(mass_si * mass_si + momt_si * momt_si) - y_si;
+						double hahaha2_si = gamm_si* beta_si * momt_si;
+						//fin.thetaCM[index] = TMath::ACos(hahaha1/hahaha2) * TMath::RadToDeg();
+
+					}
+					else{
+						fin.Ex_si[index] = TMath::QuietNaN();
+						//fin.Ex_corrected[index] = TMath::QuietNaN();
+						//fin.thetaCM[index] = TMath::QuietNaN();
+					}
+				}
+				else{
+					fin.Ex_si[index] = TMath::QuietNaN();
+					//fin.Ex_corrected[index] = TMath::QuietNaN();
+					//fin.thetaCM[index] = TMath::QuietNaN();
+				}
+
+				// </> SI CALIBRATION
+
+
 				// Calculate the EBIS time - the array time and populate a histogram
 				fin.td_e_ebis[index] = 10000;
 				if ( ebis_t != 0 && e_t[index] != 0 ){
 					fin.td_e_ebis[index] = (int)(e_t[index] - ebis_t);
 				}
 				TD_EBIS->Fill( fin.td_e_ebis[index] );
-				
+
 
 				// Calculate the recoil time stuff, by first populating arrays with junk
 				for ( Int_t ii = 0; ii < 4; ii++ ){
@@ -516,7 +702,7 @@ Bool_t PTMonitors::Process(Long64_t entry){
 					for( int k = 0 ; k < numCut; k++ ){
 						fin.cut[k] = (TCutG *)cutList->At(k) ;
 						if( fin.cut[k]->IsInside(rdt[k+4], rdt[k]) ) { //CRH
-							for (Int_t kk = 0; kk < 4; kk++) { 
+							for (Int_t kk = 0; kk < 4; kk++) {
 								if(-30 < fin.td_rdt_e[index][kk] && fin.td_rdt_e[index][kk] < 30) {
 									EVZ->Fill( fin.z[index], fin.ecrr[index] );
 									EXE->Fill(fin.Ex[index] );
@@ -532,7 +718,7 @@ Bool_t PTMonitors::Process(Long64_t entry){
 
 	// FILL THE NEW TTree BASED ON CALCULATIONS
 	fin_tree->Fill();
-	
+
 	} // Processed entries
 	return kTRUE;
 }
@@ -557,7 +743,7 @@ void PTMonitors::Terminate()
 
 	// Close the file
 	if ( outFile != NULL ){ outFile->Close(); }
-	
+
 	// Print out some stuff
 	if (ProcessedEntries>=NUMSORT){
 		printf("Sorted only %llu\n",NUMSORT);

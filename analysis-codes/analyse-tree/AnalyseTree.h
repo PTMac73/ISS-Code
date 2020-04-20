@@ -16,15 +16,6 @@
 #include <TTreeReaderValue.h>
 #include <TTreeReaderArray.h>
 
-Bool_t det_array[6][4] = {
-	{ 1, 1, 1, 1 },
-	{ 1, 0, 0, 1 },
-	{ 0, 1, 1, 1 },
-	{ 1, 1, 0, 1 },
-	{ 1, 1, 1, 1 },
-	{ 1, 1, 0, 1 }
-};
-
 // Headers needed by this particular selector
 
 

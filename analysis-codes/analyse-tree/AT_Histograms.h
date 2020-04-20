@@ -10,13 +10,15 @@
 #define AT_HISTOGRAMS_H_
 
 
-#include "histograms/ATH_ex_compare.h"
-#include "histograms/ATH_rdt_cuts.h"
-#include "histograms/ATH_evz_compare.h"
 #include "histograms/ATH_evz.h"
+#include "histograms/ATH_evz_compare.h"
 #include "histograms/ATH_evz_si.h"
+#include "histograms/ATH_ex.h"
+#include "histograms/ATH_ex_compare.h"
 #include "histograms/ATH_ex_si.h"
-
+#include "histograms/ATH_rdt_cuts.h"
+#include "histograms/ATH_xcal.h"
+#include "histograms/ATH_xnxf.h"
 
 
 #endif

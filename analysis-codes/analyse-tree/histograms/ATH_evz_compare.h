@@ -58,7 +58,7 @@ void HDrawEVZCompare(){
 	
 	// Print spectra if desired
 	if ( SW_EVZ_COMPARE[1] == 1 ){
-		TString base = "%s/evz_comp%s_th_%3.2f-%3.2f_posXXX";
+		TString base = "%s/posXXX_evz_comp%s_th_%3.2f-%3.2f";
 		TString root_name = Form( base.Data(), print_dir.Data(), "", THETA_LB, THETA_UB );
 		TString spec_name_sing = Form( base.Data(), print_dir.Data(), "_sing", THETA_LB, THETA_UB );
 		PrintAll( c_evz_compare_sing, spec_name_sing );

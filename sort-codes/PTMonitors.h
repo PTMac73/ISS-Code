@@ -19,7 +19,7 @@
 
 // CUT ARRAYS
 // Time difference between recoil detectors and array detectors
-Int_t td_rdt_e_cuts[24][2] = {
+/*Int_t td_rdt_e_cuts[24][2] = {
 	{-9, 6},
 	{-11, 4},
 	{-9, 3},
@@ -44,6 +44,33 @@ Int_t td_rdt_e_cuts[24][2] = {
 	{-18, 5},
 	{-22, 6},
 	{-21, 6} 
+};*/
+
+Int_t td_rdt_e_cuts[24][2] = {
+	{  -7,  4 },
+	{ -11,  4 },
+	{  -9,  3 },
+	{ -14,  3 },
+	{ -16,  4 },
+	{ -20,  3 },
+	{  -5,  6 },
+	{ -10,  3 },
+	{  -8,  4 },
+	{ -13,  4 },
+	{ -19,  4 },
+	{-200,200 },
+	{ -12,  5 },
+	{  -7,  7 },
+	{  -9,  7 },
+	{  -8,  5 },
+	{ -20,  5 },
+	{ -20,  6 },
+	{ -11,  6 },
+	{ -15,  6 },
+	{ -11,  8 },
+	{ -18,  5 },
+	{ -22,  6 },
+	{ -21,  6 } 
 };
 
 // Cuts on xcal for each of the detectors in the array for both positions

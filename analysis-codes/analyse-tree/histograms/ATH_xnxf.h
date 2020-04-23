@@ -31,7 +31,7 @@
 
 // Switch for this is SW_XNXF
 // DEFINE HISTOGRAMS/PROFILES
-const Int_t NUM_DIFF_HISTS = 10;
+const Int_t NUM_DIFF_HISTS = 11;
 const Int_t NUM_DETS = 24;
 const Double_t XNXF_FRAC = 0.1;
 TH2F* h_xnxf[NUM_DETS];					// (0) XN-XF hist monochrome
@@ -40,27 +40,29 @@ TH2F* h_xnxfE[NUM_DETS];				// (2) XNXF-E hist monochrome
 TProfile* p_xnxfE[NUM_DETS];			// (3) XNXF-E profile
 TH2F* h_xnE[NUM_DETS];					// (4) XN-E hist monochrome
 TH2F* h_xfE[NUM_DETS];					// (5) XF-E hist monochrome
-TH2F* h_xnxf_colour[NUM_DETS][4];		// (6) XN-XF hist coloured
-TH2F* h_xnE_colour[NUM_DETS][2];		// (7) XN-E hist coloured
-TH2F* h_xfE_colour[NUM_DETS][2];		// (8) XF-E hist coloured
-TH2F* h_xnxfE_colour[NUM_DETS][3];		// (9) XNXF-E hist coloured
+TH2F* h_xnxf_colour[NUM_DETS][5];		// (6) XN-XF hist coloured
+TH2F* h_xnE_colour[NUM_DETS][5];		// (7) XN-E hist coloured
+TH2F* h_xfE_colour[NUM_DETS][5];		// (8) XF-E hist coloured
+TH2F* h_xnxfE_colour[NUM_DETS][4];		// (9) XNXF-E hist coloured
+TH1F* h_ecalibration[NUM_DETS];			//(10) E Calibration hist
 
 // Define which ones to print
 Bool_t xnxf_print_opt[NUM_DIFF_HISTS] = {
 	0,	// (0) XN-XF hist monochrome
-	1,	// (1) XN-XF profile
-	1,	// (2) XNXF-E hist monochrome
-	1,	// (3) XNXF-E profile
+	0,	// (1) XN-XF profile
+	0,	// (2) XNXF-E hist monochrome
+	0,	// (3) XNXF-E profile
 	0,	// (4) XN-E hist monochrome
 	0,	// (5) XF-E hist monochrome
-	1,	// (6) XN-XF hist coloured
-	1,	// (7) XN-E hist coloured
-	1,	// (8) XF-E hist coloured
-	1	// (9) XNXF-E hist coloured
+	0,	// (6) XN-XF hist coloured
+	0,	// (7) XN-E hist coloured
+	0,	// (8) XF-E hist coloured
+	0,	// (9) XNXF-E hist coloured
+	1	//(10) E Calibration hist
 };
 
-// -------------------------------- { 00, 01, 02, 03, 04, 05, 06, 07, 08, 09 };
-TString spec_name[NUM_DIFF_HISTS] = { "", "", "", "", "", "", "", "", "", "" };
+// -------------------------------- { 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10 };
+TString spec_name[NUM_DIFF_HISTS] = { "", "", "", "", "", "", "", "", "", "", "" };
 
 // Additional variables
 TString xnxfcut_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/Mg-Analysis/SPE-Files/xnxf-calibration/pos1_xnxf_cuts.root";
@@ -69,7 +71,7 @@ TCutG* xnxf_cut;
 // Store the correction parameters
 Double_t xn_corr[NUM_DETS];
 Double_t xfxne_corr[NUM_DETS][2];
-
+Double_t e_corr[NUM_DETS][2];
 
 
 // FUNCTIONS ----------------------------------------------------------------------------------- //
@@ -145,6 +147,8 @@ void CreateProfile( TProfile* p, TString x_label, TString y_label ){
 	p->SetTitle("");
 	p->GetXaxis()->SetTitle( x_label.Data() );
 	p->GetYaxis()->SetTitle( y_label.Data() );
+	p->SetMarkerColor(kRed);
+	p->SetLineColor(kRed);
 	GlobSetHistFonts( p );
 	return;
 }
@@ -152,16 +156,17 @@ void CreateProfile( TProfile* p, TString x_label, TString y_label ){
 
 // Populate TString array of names
 void MakeSpecName( Int_t i ){
-	spec_name[0] = Form( "%s/posXXX_xnxf_%i", print_dir.Data(), i );		// (0) XN-XF hist monochrome
-	spec_name[1] = Form( "%s/posXXX_xnxf_p_%i", print_dir.Data(), i );		// (1) XN-XF profile
-	spec_name[2] = Form( "%s/posXXX_xnxfE_%i", print_dir.Data(), i );		// (2) XNXF-E hist monochrome
-	spec_name[3] = Form( "%s/posXXX_xnxfE_p_%i", print_dir.Data(), i );		// (3) XNXF-E profile
-	spec_name[4] = Form( "%s/posXXX_xnE_%i", print_dir.Data(), i );			// (4) XN-E hist monochrome
-	spec_name[5] = Form( "%s/posXXX_xfE_%i", print_dir.Data(), i );			// (5) XF-E hist monochrome
-	spec_name[6] = Form( "%s/posXXX_xnxf_col_%i", print_dir.Data(), i );	// (6) XN-XF hist coloured
-	spec_name[7] = Form( "%s/posXXX_xnE_col_%i", print_dir.Data(), i );		// (7) XN-E hist coloured
-	spec_name[8] = Form( "%s/posXXX_xfE_col_%i", print_dir.Data(), i );		// (8) XF-E hist coloured
-	spec_name[9] = Form( "%s/posXXX_xnxfE_col_%i", print_dir.Data(), i );	// (9) XNXF-E hist coloured
+	spec_name[0]  = Form( "%s/posXXX_xnxf_%i", print_dir.Data(), i );		// (0) XN-XF hist monochrome
+	spec_name[1]  = Form( "%s/posXXX_xnxf_p_%i", print_dir.Data(), i );		// (1) XN-XF profile
+	spec_name[2]  = Form( "%s/posXXX_xnxfE_%i", print_dir.Data(), i );		// (2) XNXF-E hist monochrome
+	spec_name[3]  = Form( "%s/posXXX_xnxfE_p_%i", print_dir.Data(), i );	// (3) XNXF-E profile
+	spec_name[4]  = Form( "%s/posXXX_xnE_%i", print_dir.Data(), i );		// (4) XN-E hist monochrome
+	spec_name[5]  = Form( "%s/posXXX_xfE_%i", print_dir.Data(), i );		// (5) XF-E hist monochrome
+	spec_name[6]  = Form( "%s/posXXX_xnxf_col_%i", print_dir.Data(), i );	// (6) XN-XF hist coloured
+	spec_name[7]  = Form( "%s/posXXX_xnE_col_%i", print_dir.Data(), i );	// (7) XN-E hist coloured
+	spec_name[8]  = Form( "%s/posXXX_xfE_col_%i", print_dir.Data(), i );	// (8) XF-E hist coloured
+	spec_name[9]  = Form( "%s/posXXX_xnxfE_col_%i", print_dir.Data(), i );	// (9) XNXF-E hist coloured
+	spec_name[10] = Form( "%s/posXXX_ecalibration_%i", print_dir.Data(), i );	//(10) E Calibration hist
 }
 
 // MAIN FUNCTIONS ------------------------------------------------------------------------------ //
@@ -177,10 +182,11 @@ void HCreateXNXF(){
 		p_xnxfE[i] = NULL;		// (3) XNXF-E profile
 		h_xnE[i] = NULL;		// (4) XN-E hist monochrome
 		h_xfE[i] = NULL;		// (5) XF-E hist monochrome
-		for ( Int_t j = 0; j < 4; j++ ){ h_xnxf_colour[i][j] = NULL; }	// (6) XN-XF hist coloured
-		for ( Int_t j = 0; j < 2; j++ ){ h_xnE_colour[i][j] = NULL; } 	// (7) XN-E hist coloured
-		for ( Int_t j = 0; j < 2; j++ ){ h_xfE_colour[i][j] = NULL; }	// (8) XF-E hist coloured
-		for ( Int_t j = 0; j < 3; j++ ){ h_xnxfE_colour[i][j] = NULL; }	// (9) XNXF-E hist coloured
+		for ( Int_t j = 0; j < 5; j++ ){ h_xnxf_colour[i][j] = NULL; }	// (6) XN-XF hist coloured
+		for ( Int_t j = 0; j < 5; j++ ){ h_xnE_colour[i][j] = NULL; } 	// (7) XN-E hist coloured
+		for ( Int_t j = 0; j < 5; j++ ){ h_xfE_colour[i][j] = NULL; }	// (8) XF-E hist coloured
+		for ( Int_t j = 0; j < 4; j++ ){ h_xnxfE_colour[i][j] = NULL; }	// (9) XNXF-E hist coloured
+		h_ecalibration[i] = NULL;	//(10) E Calibration hist
 		
 		// Detector by detector
 		if ( i == DET_NUMBER || ( DET_NUMBER == -1 ) ){
@@ -210,7 +216,7 @@ void HCreateXNXF(){
 			Create2DHists( h_xfE[i], "XF", "E" );
 			
 			// (6) *HIST* XN-XF hist coloured
-			for ( Int_t j = 0; j < 4; j++ ){
+			for ( Int_t j = 0; j < 5; j++ ){
 				h_xnxf_colour[i][j] = new TH2F( Form( "h_xnxf_%i_%i", i, j ), Form( "XN-XF COLOUR SPECTRUM | Det %i | Case %i", i, j ), 200, 0, 2000, 200, 0, 2000 );
 				Create2DHists( h_xnxf_colour[i][j], "XF", "XN" );
 			}
@@ -218,36 +224,55 @@ void HCreateXNXF(){
 			h_xnxf_colour[i][1]->SetMarkerColor( kBlack );
 			h_xnxf_colour[i][2]->SetMarkerColor( kRed );
 			h_xnxf_colour[i][3]->SetMarkerColor( kGreen );
+			h_xnxf_colour[i][4]->SetMarkerColor( kMagenta+2 );
 			
 			// (7) *HIST*  XN-E hist coloured
-			for ( Int_t j = 0; j < 2; j++ ){
-				h_xnE_colour[i][j] = new TH2F( Form( "h_xnE_%i_%i", i, j ), Form( "XN-E COLOUR SPECTRUM | Det %i | XN %s E", i, ( j == 0 ? "<" : ">" ) ), 200, 0, 2000, 200, 0, 2000 );
+			for ( Int_t j = 0; j < 5; j++ ){
+				h_xnE_colour[i][j] = new TH2F( Form( "h_xnE_%i_%i", i, j ), Form( "XN-E COLOUR SPECTRUM | Det %i | CASE %i", i, j ), 200, 0, 2000, 200, 0, 2000 );
 				Create2DHists( h_xnE_colour[i][j], "XN", "E" );
 			}
 			h_xnE_colour[i][0]->SetMarkerColor( kBlue );
-			h_xnE_colour[i][1]->SetMarkerColor( kGreen );
+			h_xnE_colour[i][1]->SetMarkerColor( kBlack );
+			h_xnE_colour[i][2]->SetMarkerColor( kRed );
+			h_xnE_colour[i][3]->SetMarkerColor( kGreen );
+			h_xnE_colour[i][4]->SetMarkerColor( kMagenta+2 );
 			
 			// (8) *HIST* XF-E hist coloured
-			for ( Int_t j = 0; j < 2; j++ ){
-				h_xfE_colour[i][j] = new TH2F( Form( "h_xfE_%i_%i", i, j ), Form( "XF-E COLOUR SPECTRUM | Det %i | XF %s E", i, ( j == 0 ? "<" : ">" ) ), 200, 0, 2000, 200, 0, 2000 );
+			for ( Int_t j = 0; j < 5; j++ ){
+				h_xfE_colour[i][j] = new TH2F( Form( "h_xfE_%i_%i", i, j ), Form( "XF-E COLOUR SPECTRUM | Det %i | CASE %i", i, j ), 200, 0, 2000, 200, 0, 2000 );
 				Create2DHists( h_xfE_colour[i][j], "XF", "E" );
 			}
-			h_xfE_colour[i][0]->SetMarkerColor( kGreen );
-			h_xfE_colour[i][1]->SetMarkerColor( kBlue );
+			h_xfE_colour[i][0]->SetMarkerColor( kBlue );
+			h_xfE_colour[i][1]->SetMarkerColor( kBlack );
+			h_xfE_colour[i][2]->SetMarkerColor( kRed );
+			h_xfE_colour[i][3]->SetMarkerColor( kGreen );
+			h_xfE_colour[i][4]->SetMarkerColor( kMagenta+2 );
 			
 			// (9) XNXF-E hist coloured
-			for ( Int_t j = 0; j < 3; j++ ){
+			for ( Int_t j = 0; j < 4; j++ ){
 				h_xnxfE_colour[i][j] = new TH2F( Form( "h_xnxfE_%i_%i", i, j ), Form( "XNXF-E COLOUR SPECTRUM | Det %i | CASE %i", i, j ), 200, 0, 2000, 200, 0, 2000 );
 				Create2DHists( h_xnxfE_colour[i][j], "XNXF", "E" );
 			}
-			h_xnxfE_colour[i][0]->SetMarkerColor( kRed );
+			h_xnxfE_colour[i][0]->SetMarkerColor( kBlue );
 			h_xnxfE_colour[i][1]->SetMarkerColor( kGreen );
-			h_xnxfE_colour[i][2]->SetMarkerColor( kBlue );
+			h_xnxfE_colour[i][2]->SetMarkerColor( kRed );
+			h_xnxfE_colour[i][3]->SetMarkerColor( kMagenta+2 );
+			
+			//(10) *HIST* E Calibration
+			h_ecalibration[i] = new TH1F( Form( "h_ecalibration_%i", i ), Form( "E CALIBRATION SPECTRUM | DET %i", i ), 2000, 0, 2000 );
+			h_ecalibration[i]->SetLineColor( kRed );
+			h_ecalibration[i]->SetTitle("");
+			h_ecalibration[i]->GetXaxis()->SetTitle( "Raw E" );
+			h_ecalibration[i]->GetYaxis()->SetTitle( "Counts" );
+			GlobSetHistFonts( h_ecalibration[i] );
+			
 
 			// Correction parameters		
 			xn_corr[i] = 0.0;
 			xfxne_corr[i][0] = 0.0;
 			xfxne_corr[i][1] = 0.0;
+			e_corr[i][0] = 0.0;
+			e_corr[i][1] = 0.0;
 		}
 	}
 	
@@ -287,6 +312,10 @@ void HDrawXNXF(){
 	TCanvas* c_xnxfE_colour[24];	// (9) XNXF-E hist coloured
 	TCanvas* c_xnxfE_colour_comb;
 	
+	TCanvas* c_ecalibration[24];	// (10) E calibration
+	TCanvas* c_ecalibration_comb;
+	
+	
 	// DEFINE COMBINED CANVASES
 	if ( CANVAS_COMBINE == 1 ){
 		c_xnxf_comb = new TCanvas( "c_xnxf_comb", "XNXF PLOTS", C_WIDTH, C_HEIGHT );
@@ -295,7 +324,6 @@ void HDrawXNXF(){
 		// *TODO* Finish this
 	}
 	
-	
 	// Define boundary lines
 	TLine* bline_xnxf[24][4];
 	TLine* bline_xnxfE[24][4];
@@ -303,11 +331,19 @@ void HDrawXNXF(){
 	// Define fit lines for the different plots
 	TF1* fitline_xnxf = new TF1( "fitline_xnxf", "[0] + [1]*x", 0, 100 );
 	fitline_xnxf->SetLineWidth(2);
-	fitline_xnxf->SetLineColor(kRed);
+	fitline_xnxf->SetLineColorAlpha(kBlack,0.5);
+	fitline_xnxf->SetParameters( 0, 0 );
+	fitline_xnxf->SetRange( 200, 1800 );
 	
 	TF1* fitline_xnxfE = new TF1( "fitline_xnxfE", "[0] + [1]*x", 0, 100 );
 	fitline_xnxfE->SetLineWidth(2);
-	fitline_xnxfE->SetLineColor(kRed);
+	fitline_xnxfE->SetLineColorAlpha(kBlack,0.5);
+	fitline_xnxfE->SetParameters( 0, 0 );
+	fitline_xnxfE->SetRange( 200, 1800 );
+	
+	// Define peak markers and fitting functions
+	TLine* peak_mark[4];
+	TF1* fitline_ecalibration_gaus_fit[2];
 	
 	
 	// Create names and files
@@ -318,7 +354,6 @@ void HDrawXNXF(){
 	if ( SW_XNXF[1] == 1 && PRINT_ROOT == 1 ){
 		f = new TFile( ( root_name + ".root" ).Data(), "RECREATE" );
 	}
-	
 	
 	// *LOOP* over detectors (i)
 	for ( Int_t i = 0; i < 24; i++ ){
@@ -345,22 +380,73 @@ void HDrawXNXF(){
 					( j == 0 ? xnxfE_lims[i][2] : xnxfE_lims[i][3] )
 				);
 			}
+			for ( Int_t j = 0; j < 4; j++ ){
+				peak_mark[j] = new TLine( rawE_pos[i][j], 0.0, rawE_pos[i][j],1000.0 );
+			}
 			
 			// TPROFILE FIT LINES
 			// Fit some lines to the XN:XF TProfile plots
 			TFitResultPtr fit_ptr = p_xnxf[i]->Fit("pol1", "SQ0", "", xnxf_lims[i][0], xnxf_lims[i][1] );
-			fitline_xnxf->SetRange( xnxf_lims[i][0], xnxf_lims[i][1] );
-			fitline_xnxf->SetParameters( fit_ptr->Parameter(0), fit_ptr->Parameter(1) );
-			xn_corr[i] = -1.0/fit_ptr->Parameter(1);
-			//PrintXNXFFitPars( fit_ptr );
+			if ( fit_ptr.Get() != NULL ){
+				fitline_xnxf->SetRange( xnxf_lims[i][0], xnxf_lims[i][1] );
+				fitline_xnxf->SetParameters( fit_ptr->Parameter(0), fit_ptr->Parameter(1) );
+				xn_corr[i] = -1.0/fit_ptr->Parameter(1);
+				//PrintXNXFFitPars( fit_ptr );
+			}
 			
 			// Fit some lines to the XNXF:E TProfile plots
 			TFitResultPtr fit_ptrE = p_xnxfE[i]->Fit("pol1", "SQ0", "", xnxfE_lims[i][0], xnxfE_lims[i][1] );
-			fitline_xnxfE->SetRange( xnxfE_lims[i][0], xnxfE_lims[i][1] );
-			fitline_xnxfE->SetParameters( fit_ptrE->Parameter(0), fit_ptrE->Parameter(1) );
-			xfxne_corr[i][0] = 0.5*fit_ptrE->Parameter(0); 	// Intercept
-			xfxne_corr[i][1] = fit_ptrE->Parameter(1); 		// Gradient
-			//PrintXNXFEFitPars( fit_ptrE );
+			if ( fit_ptrE.Get() != NULL ){
+				fitline_xnxfE->SetRange( xnxfE_lims[i][0], xnxfE_lims[i][1] );
+				fitline_xnxfE->SetParameters( fit_ptrE->Parameter(0), fit_ptrE->Parameter(1) );
+				xfxne_corr[i][0] = 0.5*fit_ptrE->Parameter(0); 	// Intercept
+				xfxne_corr[i][1] = fit_ptrE->Parameter(1); 		// Gradient
+				//PrintXNXFEFitPars( fit_ptrE );
+			}
+			// PEAK FITTING FOR ENERGY CALIBRATION
+			fitline_ecalibration_gaus_fit[0] = new TF1( "fitline_ecalibration_0", "[0] + [1]*x + [2]*exp(-0.5*((x-[3])/[4])^2)", rawE_pos[i][0] - e_calibration_range, rawE_pos[i][0] + e_calibration_range );
+			fitline_ecalibration_gaus_fit[1] = new TF1( "fitline_ecalibration_1", "[0] + [1]*x + [2]*exp(-0.5*((x-[3])/[4])^2) + [5]*exp(-0.5*((x-[6])/[7])^2) + [8]*exp(-0.5*((x-[9])/[10])^2)", rawE_pos[i][1] - e_calibration_range, rawE_pos[i][3] + e_calibration_range );
+			
+			fitline_ecalibration_gaus_fit[0]->SetParLimits( 0, 0, 100 );		// Constant BG
+			fitline_ecalibration_gaus_fit[0]->SetParLimits( 1, -100, 100 );		// Gradient BG
+			fitline_ecalibration_gaus_fit[0]->SetParLimits( 2, 0, 2000 );		// Amplitude
+			fitline_ecalibration_gaus_fit[0]->SetParLimits( 3, rawE_pos[i][0] - e_calibration_range, rawE_pos[i][0] + e_calibration_range );		// Mu
+			fitline_ecalibration_gaus_fit[0]->SetParLimits( 4, 0, 100 );		// Sigma
+			
+			fitline_ecalibration_gaus_fit[1]->SetParLimits( 0, 0, 100 );		// Constant BG
+			fitline_ecalibration_gaus_fit[1]->SetParLimits( 1, -100, 100 );		// Gradient BG
+			fitline_ecalibration_gaus_fit[1]->SetParLimits( 2, 0, 2000 );		// Amplitude
+			fitline_ecalibration_gaus_fit[1]->SetParLimits( 3, rawE_pos[i][1] - e_calibration_range, rawE_pos[i][1] + e_calibration_range );		// Mu
+			fitline_ecalibration_gaus_fit[1]->SetParLimits( 4, 0, 50 );		// Sigma
+			fitline_ecalibration_gaus_fit[1]->SetParLimits( 5, 0, 2000 );		// Amplitude
+			fitline_ecalibration_gaus_fit[1]->SetParLimits( 6, rawE_pos[i][2] - e_calibration_range, rawE_pos[i][2] + e_calibration_range );		// Mu
+			fitline_ecalibration_gaus_fit[1]->SetParLimits( 7, 0, 50 );		// Sigma
+			fitline_ecalibration_gaus_fit[1]->SetParLimits( 8, 0, 2000 );		// Amplitude
+			fitline_ecalibration_gaus_fit[1]->SetParLimits( 9, rawE_pos[i][3] - e_calibration_range, rawE_pos[i][3] + e_calibration_range );		// Mu
+			fitline_ecalibration_gaus_fit[1]->SetParLimits( 10, 0, 50 );		// Sigma
+			
+			fitline_ecalibration_gaus_fit[0]->SetLineWidth(2);
+			fitline_ecalibration_gaus_fit[0]->SetLineColorAlpha(kBlack,0.5);
+			fitline_ecalibration_gaus_fit[1]->SetLineWidth(2);
+			fitline_ecalibration_gaus_fit[1]->SetLineColorAlpha(kBlack,0.5);
+			
+			fitline_ecalibration_gaus_fit[0]->SetParameters( 0.1, 0.01, 300, rawE_pos[i][0], 20 );
+			fitline_ecalibration_gaus_fit[1]->SetParameter( 0, 0.1 );					// Const. BG
+			fitline_ecalibration_gaus_fit[1]->SetParameter( 1, 0.01 );					// Gradient BG
+			fitline_ecalibration_gaus_fit[1]->SetParameter( 2, 300 );					// Amp 1
+			fitline_ecalibration_gaus_fit[1]->SetParameter( 3, rawE_pos[i][1] );		// Mu 1
+			fitline_ecalibration_gaus_fit[1]->SetParameter( 4, 40 );					// Sigma 1
+			fitline_ecalibration_gaus_fit[1]->SetParameter( 5, 300 );					// Amp 2
+			fitline_ecalibration_gaus_fit[1]->SetParameter( 6, rawE_pos[i][2] );		// Mu 2
+			fitline_ecalibration_gaus_fit[1]->SetParameter( 7, 40 );					// Sigma 2
+			fitline_ecalibration_gaus_fit[1]->SetParameter( 8, 300 );					// Amp 3
+			fitline_ecalibration_gaus_fit[1]->SetParameter( 9, rawE_pos[i][3] );		// Mu 3
+			fitline_ecalibration_gaus_fit[1]->SetParameter( 10, 40 );					// Sigma 3
+			fitline_ecalibration_gaus_fit[0]->SetRange( rawE_pos[i][0] - 3*e_calibration_range, rawE_pos[i][0] + 3*e_calibration_range );
+			fitline_ecalibration_gaus_fit[1]->SetRange( rawE_pos[i][1] - 3*e_calibration_range, rawE_pos[i][3] + 3*e_calibration_range );
+			
+			h_ecalibration[i]->Fit( "fitline_ecalibration_0", "0" );
+			h_ecalibration[i]->Fit( "fitline_ecalibration_1", "0" );
 			
 			// Get the XNXF cut
 			if ( cut_list_xnxf != NULL ){ xnxf_cut = (TCutG*)cut_list_xnxf->At(i); }
@@ -381,7 +467,7 @@ void HDrawXNXF(){
 				// (1) *CANVAS* XN-XF profile
 				c_xnxf_p[i] = new TCanvas( Form( "c_xnxf_p_%i", i ), Form( "XN-XF Profile | Det %i", i ), C_WIDTH, C_HEIGHT );
 				GlobSetCanvasMargins( c_xnxf_p[i] );
-				p_xnxf[i]->Draw();
+				p_xnxf[i]->Draw("E1");
 				fitline_xnxf->Draw("SAME");
 				
 				
@@ -389,15 +475,15 @@ void HDrawXNXF(){
 				c_xnxfE[i] = new TCanvas( Form( "c_xnxfE_%i", i ), Form( "XNXF-E | Det %i", i ), C_WIDTH, C_HEIGHT );
 				GlobSetCanvasMargins( c_xnxfE[i] );
 				h_xnxfE[i]->Draw();
-				for ( Int_t j = 0; j < 4; j++ ){
+				/*for ( Int_t j = 0; j < 4; j++ ){
 					bline_xnxfE[i][j]->Draw();
-				}
-				
+				}*/
+				fitline_xnxfE->Draw("SAME");
 				
 				// (3) *CANVAS* XNXF-E profile
 				c_xnxfE_p[i] = new TCanvas( Form( "c_xnxf_pE_%i", i ), Form( "XNXF-E Profile | Det %i", i ), C_WIDTH, C_HEIGHT );
 				GlobSetCanvasMargins( c_xnxfE_p[i] );
-				p_xnxfE[i]->Draw();
+				p_xnxfE[i]->Draw("E1");
 				fitline_xnxfE->Draw("SAME");
 				
 				
@@ -420,6 +506,7 @@ void HDrawXNXF(){
 				h_xnxf_colour[i][1]->Draw("SAME");
 				h_xnxf_colour[i][2]->Draw("SAME");
 				h_xnxf_colour[i][3]->Draw("SAME");
+				h_xnxf_colour[i][4]->Draw("SAME");
 				
 				for ( Int_t j = 0; j < 4; j++ ){
 					bline_xnxf[i][j]->Draw();
@@ -431,32 +518,51 @@ void HDrawXNXF(){
 				GlobSetCanvasMargins( c_xnE_colour[i] );
 				h_xnE_colour[i][0]->Draw();
 				h_xnE_colour[i][1]->Draw("SAME");
+				h_xnE_colour[i][2]->Draw("SAME");
+				h_xnE_colour[i][3]->Draw("SAME");
+				h_xnE_colour[i][4]->Draw("SAME");
 				
 				// (8) *CANVAS* XF-E hist coloured
 				c_xfE_colour[i] = new TCanvas( Form( "c_xfE_col_%i", i ), Form( "XF-E Colour Plot | Det %i", i ), C_WIDTH, C_HEIGHT );
 				GlobSetCanvasMargins( c_xfE_colour[i] );
 				h_xfE_colour[i][0]->Draw();
 				h_xfE_colour[i][1]->Draw("SAME");
+				h_xfE_colour[i][2]->Draw("SAME");
+				h_xfE_colour[i][3]->Draw("SAME");
+				h_xfE_colour[i][4]->Draw("SAME");
 				
 				// (9) XNXF-E hist coloured
 				c_xnxfE_colour[i] = new TCanvas( Form( "c_xnxfE_col_%i", i ), Form( "XNXF-E Colour Plot | Det %i", i ), C_WIDTH, C_HEIGHT );
 				GlobSetCanvasMargins( c_xnxfE_colour[i] );
-				h_xnxfE_colour[i][0]->Draw();
+				h_xnxfE_colour[i][3]->Draw();
+				h_xnxfE_colour[i][0]->Draw("SAME");
 				h_xnxfE_colour[i][1]->Draw("SAME");
 				h_xnxfE_colour[i][2]->Draw("SAME");
 				
+				fitline_xnxfE->Draw("SAME");
+				
+				// (10) E Calibration
+				c_ecalibration[i] = new TCanvas( Form( "c_ecalibration_%i", i ), Form( "Energy Calibration | Det %i", i ), C_WIDTH, C_HEIGHT );
+				h_ecalibration[i]->Draw();
+				fitline_ecalibration_gaus_fit[0]->Draw("SAME");
+				fitline_ecalibration_gaus_fit[1]->Draw("SAME");
+				for ( Int_t j = 0; j < 4; j++ ){
+					peak_mark[j]->Draw("SAME");
+				}
+				
 				// PRINT SPECTRA
 				if ( SW_XNXF[1] == 1 ){
-					if( xnxf_print_opt[0] == 1 )PrintAll( c_xnxf[i],         spec_name[0] );		// (0) XN-XF hist monochrome
-					if( xnxf_print_opt[1] == 1 )PrintAll( c_xnxf_p[i],       spec_name[1] );		// (1) XN-XF profile
-					if( xnxf_print_opt[2] == 1 )PrintAll( c_xnxfE[i],        spec_name[2] );		// (2) XNXF-E hist monochrome
-					if( xnxf_print_opt[3] == 1 )PrintAll( c_xnxfE_p[i],      spec_name[3] );		// (3) XNXF-E profile
-					if( xnxf_print_opt[4] == 1 )PrintAll( c_xnE[i],          spec_name[4] );		// (4) XN-E hist monochrome
-					if( xnxf_print_opt[5] == 1 )PrintAll( c_xfE[i],          spec_name[5] );		// (5) XF-E hist monochrome
-					if( xnxf_print_opt[6] == 1 )PrintAll( c_xnxf_colour[i],  spec_name[6] );		// (6) XN-XF hist coloured
-					if( xnxf_print_opt[7] == 1 )PrintAll( c_xnE_colour[i],   spec_name[7] );		// (7) XN-E hist coloured
-					if( xnxf_print_opt[8] == 1 )PrintAll( c_xfE_colour[i],   spec_name[8] );		// (8) XF-E hist coloured
-					if( xnxf_print_opt[9] == 1 )PrintAll( c_xnxfE_colour[i], spec_name[9] );		// (9) XNXF-E hist coloured
+					if( xnxf_print_opt[0] ==  1 )PrintAll( c_xnxf[i],         spec_name[0]  );		// (0) XN-XF hist monochrome
+					if( xnxf_print_opt[1] ==  1 )PrintAll( c_xnxf_p[i],       spec_name[1]  );		// (1) XN-XF profile
+					if( xnxf_print_opt[2] ==  1 )PrintAll( c_xnxfE[i],        spec_name[2]  );		// (2) XNXF-E hist monochrome
+					if( xnxf_print_opt[3] ==  1 )PrintAll( c_xnxfE_p[i],      spec_name[3]  );		// (3) XNXF-E profile
+					if( xnxf_print_opt[4] ==  1 )PrintAll( c_xnE[i],          spec_name[4]  );		// (4) XN-E hist monochrome
+					if( xnxf_print_opt[5] ==  1 )PrintAll( c_xfE[i],          spec_name[5]  );		// (5) XF-E hist monochrome
+					if( xnxf_print_opt[6] ==  1 )PrintAll( c_xnxf_colour[i],  spec_name[6]  );		// (6) XN-XF hist coloured
+					if( xnxf_print_opt[7] ==  1 )PrintAll( c_xnE_colour[i],   spec_name[7]  );		// (7) XN-E hist coloured
+					if( xnxf_print_opt[8] ==  1 )PrintAll( c_xfE_colour[i],   spec_name[8]  );		// (8) XF-E hist coloured
+					if( xnxf_print_opt[9] ==  1 )PrintAll( c_xnxfE_colour[i], spec_name[9]  );		// (9) XNXF-E hist coloured
+					if( xnxf_print_opt[10] == 1 )PrintAll( c_ecalibration[i], spec_name[10] );		//(10) E Calibration
 				}
 				
 			}

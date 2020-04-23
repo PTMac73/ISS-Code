@@ -67,6 +67,7 @@ void PrintSummaryOfOptions(){
 	PrintColumn( "Ex_compare" , BoolToStr( SW_EX_COMPARE[0]  ) , BoolToStr( SW_EX_COMPARE[1]  ), BoolToStr( SW_EX_COMPARE[2]  ) );
 	PrintColumn( "Ex_Si"      , BoolToStr( SW_EX_SI[0]       ) , BoolToStr( SW_EX_SI[1]       ), BoolToStr( SW_EX_SI[2]       ) );
 	PrintColumn( "RDT_cuts"   , BoolToStr( SW_RDT_CUTS[0]    ) , BoolToStr( SW_RDT_CUTS[1]    ), BoolToStr( SW_RDT_CUTS[2]    ) );
+	PrintColumn( "TD"         , BoolToStr( SW_TD[0]          ) , BoolToStr( SW_TD[1]          ), BoolToStr( SW_TD[2]          ) );
 	PrintColumn( "XCAL"       , BoolToStr( SW_XCAL[0]        ) , BoolToStr( SW_XCAL[1]        ), BoolToStr( SW_XCAL[2]        ) );
 	PrintColumn( "XN:XF"      , BoolToStr( SW_XNXF[0]        ) , BoolToStr( SW_XNXF[1]        ), BoolToStr( SW_XNXF[2]        ) );
 	

@@ -12,6 +12,7 @@
 #include <TFile.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <TMath.h>
 #include <TString.h>
 #include <TStyle.h>
 
@@ -27,31 +28,32 @@
 #define ATH_XCAL_H_
 
 // Switch for this is SW_XCAL
-// Number of histograms = 24 (DBD) + 6 (RBR) + 1 (Full)
-TH1F* h_xcal[24];		// Full spectrum
-TH1F* h_xcal_cut[24];	// Cut spectrum
+TH1F* h_xcal[24][2];		// Full spectrum
 
 
 void HCreateXCAL(){
 	// *LOOP* over detectors
 	for ( Int_t i = 0; i < 24; i++ ){
-		h_xcal[i] = new TH1F( Form( "h_xcal_%i", i ), "", 200, -0.5, 1.5 );
-		h_xcal[i]->SetTitle("");
-		h_xcal[i]->GetXaxis()->SetTitle("xcal");
-		h_xcal[i]->GetYaxis()->SetTitle("Counts");	
-		h_xcal[i]->SetFillColor(kRed);	
-		h_xcal[i]->SetLineWidth(1);
-		h_xcal[i]->SetLineColor(kBlack);
-		GlobSetHistFonts( h_xcal[i] );
-		
-		h_xcal_cut[i] = new TH1F( Form( "h_xcal_cut_%i", i ), "", 200, -0.5, 1.5 );
-		h_xcal_cut[i]->SetTitle("");
-		h_xcal_cut[i]->GetXaxis()->SetTitle("");
-		h_xcal_cut[i]->GetYaxis()->SetTitle("");	
-		h_xcal_cut[i]->SetFillColor(kYellow);
-		h_xcal_cut[i]->SetLineWidth(1);
-		h_xcal_cut[i]->SetLineColor(kBlack);
-		GlobSetHistFonts( h_xcal_cut[i] );
+		// Detector by detector
+		if ( ( i == DET_NUMBER || ( DET_NUMBER == -1 ) ) && det_array[i % 6][(Int_t)TMath::Floor(i/6)] != 0 ){
+			h_xcal[i][0] = new TH1F( Form( "h_xcal_%i", i ), "", 200, -0.5, 1.5 );
+			h_xcal[i][0]->SetTitle("");
+			h_xcal[i][0]->GetXaxis()->SetTitle("xcal");
+			h_xcal[i][0]->GetYaxis()->SetTitle("Counts");	
+			h_xcal[i][0]->SetFillColor(kRed);	
+			h_xcal[i][0]->SetLineWidth(1);
+			h_xcal[i][0]->SetLineColor(kBlack);
+			GlobSetHistFonts( h_xcal[i][0] );
+			
+			h_xcal[i][1] = new TH1F( Form( "h_xcal_cut_%i", i ), "", 200, -0.5, 1.5 );
+			h_xcal[i][1]->SetTitle("");
+			h_xcal[i][1]->GetXaxis()->SetTitle("");
+			h_xcal[i][1]->GetYaxis()->SetTitle("");	
+			h_xcal[i][1]->SetFillColor(kYellow);
+			h_xcal[i][1]->SetLineWidth(1);
+			h_xcal[i][1]->SetLineColor(kBlack);
+			GlobSetHistFonts( h_xcal[i][1] );
+		}
 	}
 	
 	return;
@@ -82,15 +84,15 @@ void HDrawXCAL(){
 	for ( Int_t i = 0; i < 24; i++ ){
 
 		// Detector by detector
-		if ( i == DET_NUMBER || DET_NUMBER == -1 ){
+		if ( ( i == DET_NUMBER || DET_NUMBER == -1 ) && det_array[i % 6][(Int_t)TMath::Floor(i/6)] != 0 ){
 			spec_name = Form( "%s/posXXX_xcal_%i", print_dir.Data(), i );
 			
 			if ( CANVAS_COMBINE == 0 ){
 				// Plot spectrum
 				c_xcal[i] = new TCanvas( Form( "c_xcal_%i", i ), Form( "xcal | Det %i", i ), C_WIDTH, C_HEIGHT );
 				GlobSetCanvasMargins( c_xcal[i] );
-				h_xcal[i]->Draw();
-				h_xcal_cut[i]->Draw("SAME");
+				h_xcal[i][0]->Draw();
+				h_xcal[i][1]->Draw("SAME");
 				gStyle->SetTitleFont(62);
 				
 				// Print spectrum if desired
@@ -101,9 +103,9 @@ void HDrawXCAL(){
 			}
 			else{
 				c_xcal_comb->cd(i+1);
-				h_xcal[i]->SetTitle( Form( "Det #%i", i ) );
-				h_xcal[i]->Draw();
-				h_xcal_cut[i]->Draw("SAME");
+				h_xcal[i][0]->SetTitle( Form( "Det #%i", i ) );
+				h_xcal[i][0]->Draw();
+				h_xcal[i][1]->Draw("SAME");
 				//TPad* pad = (TPad*)c_xcal_comb->GetPad(i+1);
 				//SetCanvasTitleFont( pad );
 				
@@ -116,7 +118,7 @@ void HDrawXCAL(){
 			}
 			
 			// Write ROOT file if desired
-			if ( PRINT_ROOT == 1 && SW_XCAL[1] == 1 ){ f->cd(); h_xcal[i]->Write(); h_xcal_cut[i]->Write(); }
+			if ( PRINT_ROOT == 1 && SW_XCAL[1] == 1 ){ f->cd(); h_xcal[i][0]->Write(); h_xcal[i][1]->Write(); }
 			
 			// Write SPE file if desired
 			if ( SW_XCAL[2] == 1 ){ ErrorSPE( "XCAL spectra" ); }

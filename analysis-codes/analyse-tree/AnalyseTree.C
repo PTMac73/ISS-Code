@@ -71,6 +71,7 @@ void AnalyseTree::Begin(TTree* t)
 	if ( SW_EX[0] == 1 ){ HCreateEx(); }
 	if ( SW_XNXF[0] == 1 ){ HCreateXNXF(); }
 	if ( SW_XCAL[0] == 1 ){ HCreateXCAL(); }
+	if ( SW_TD[0] == 1 ){ HCreateTD(); }
 	
 	// Get the number of entries
 	num_entries = t->GetEntries();
@@ -107,9 +108,6 @@ void AnalyseTree::Begin(TTree* t)
 	else{
 		std::cout << "NO XNXF CUTS FOUND. Will carry on without them." << "\n";
 	}
-
-	// Open the root file for writing
-	if ( PRINT_ROOT == 1 ){ out_root_file = new TFile( Form( "%s/posXXX.root", print_dir.Data() ), "RECREATE" ); }
 
 	// Start timing
 	stopwatch.Start();
@@ -227,43 +225,73 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			h_xnxf[i]->Fill( xf[i], xn[i] );
 			
 			if ( !TMath::IsNaN( xf[i] ) && !TMath::IsNaN( xn[i] ) ){
-				if ( XNCAL <  0.5*e[i] && XFCAL >= 0.5*e[i] ){ h_xnxf_colour[i][0]->Fill( xf[i], xn[i] ); }
-				if ( XNCAL >= 0.5*e[i] && XFCAL >= 0.5*e[i] ){ h_xnxf_colour[i][1]->Fill( xf[i], xn[i] ); }
-				if ( XNCAL <  0.5*e[i] && XFCAL <  0.5*e[i] ){ h_xnxf_colour[i][2]->Fill( xf[i], xn[i] ); }
-				if ( XNCAL >= 0.5*e[i] && XFCAL <  0.5*e[i] ){ h_xnxf_colour[i][3]->Fill( xf[i], xn[i] ); }
+				if      ( XNcal < 0 || XFcal < 0 ){ h_xnxf_colour[i][4]->Fill( xf[i], xn[i] ); }
+				else if ( XNCAL <  0.5*e[i] && XFCAL >= 0.5*e[i] ){ h_xnxf_colour[i][0]->Fill( xf[i], xn[i] ); }
+				else if ( XNCAL >= 0.5*e[i] && XFCAL >= 0.5*e[i] ){ h_xnxf_colour[i][1]->Fill( xf[i], xn[i] ); }
+				else if ( XNCAL <  0.5*e[i] && XFCAL <  0.5*e[i] ){ h_xnxf_colour[i][2]->Fill( xf[i], xn[i] ); }
+				else if ( XNCAL >= 0.5*e[i] && XFCAL <  0.5*e[i] ){ h_xnxf_colour[i][3]->Fill( xf[i], xn[i] ); }
 			}
 			if ( is_in_xnxf_cut ){ p_xnxf[i]->Fill( xf[i], xn[i] ); }
 			
 			h_xnE[i]->Fill( xn[i], e[i] );
 			h_xfE[i]->Fill( xf[i], e[i] );
 			
-			if ( XNCAL <  0.5*e[i] ){ h_xnE_colour[i][0]->Fill( xn[i], e[i] ); }
-			if ( XNCAL >= 0.5*e[i] ){ h_xnE_colour[i][1]->Fill( xn[i], e[i] ); }
+			if      ( XNCAL <  0.5*e[i] && XFCAL >= 0.5*e[i] ){ h_xnE_colour[i][0]->Fill( xn[i], e[i] ); }
+			else if ( XNCAL >= 0.5*e[i] && XFCAL >= 0.5*e[i] ){ h_xnE_colour[i][1]->Fill( xn[i], e[i] ); }
+			else if ( XNCAL <  0.5*e[i] && XFCAL <  0.5*e[i] ){ h_xnE_colour[i][2]->Fill( xn[i], e[i] ); }
+			else if ( XNCAL >= 0.5*e[i] && XFCAL <  0.5*e[i] ){ h_xnE_colour[i][3]->Fill( xn[i], e[i] ); }
+			else if ( !TMath::IsNaN( XNCAL ) && TMath::IsNaN( XFCAL ) ){ h_xnE_colour[i][4]->Fill( xn[i], e[i] ); }
 			
-			if ( XFCAL <  0.5*e[i] ){ h_xfE_colour[i][0]->Fill( xf[i], e[i] ); }
-			if ( XFCAL >= 0.5*e[i] ){ h_xfE_colour[i][1]->Fill( xf[i], e[i] ); }
+			if      ( XNCAL <  0.5*e[i] && XFCAL >= 0.5*e[i] ){ h_xfE_colour[i][0]->Fill( xf[i], e[i] ); }
+			else if ( XNCAL >= 0.5*e[i] && XFCAL >= 0.5*e[i] ){ h_xfE_colour[i][1]->Fill( xf[i], e[i] ); }
+			else if ( XNCAL <  0.5*e[i] && XFCAL <  0.5*e[i] ){ h_xfE_colour[i][2]->Fill( xf[i], e[i] ); }
+			else if ( XNCAL >= 0.5*e[i] && XFCAL <  0.5*e[i] ){ h_xfE_colour[i][3]->Fill( xf[i], e[i] ); }
+			else if ( TMath::IsNaN( XNCAL ) && !TMath::IsNaN( XFCAL ) ){ h_xfE_colour[i][4]->Fill( xf[i], e[i] ); }
 
 			if ( !TMath::IsNaN( xf[i] ) && !TMath::IsNaN( xn[i] ) && !TMath::IsNaN( e[i] ) ){
-				if ( XNcal != 0.0 && XNcal/XFcal <= XNXF_FRAC ){ h_xnxfE_colour[i][0]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] ); }
-				else if ( XFcal != 0.0 && XNcal/XFcal >= ( 1 - XNXF_FRAC ) ){ h_xnxfE_colour[i][1]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] ); }
+				Double_t fracfrac = 0.0; // This allows weaker detectors to have more spurious counts to define the line
+				if ( XNcal < 0 || XFcal < 0 ){ h_xnxfE_colour[i][3]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] ); }
+				else if ( XNcal > 0.0 && XNcal/XFcal <= fracfrac*XNXF_FRAC ){ h_xnxfE_colour[i][0]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] ); }
+				else if ( XFcal > 0.0 && XFcal/XNcal <= ( fracfrac*XNXF_FRAC ) ){ h_xnxfE_colour[i][1]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] ); }
 				else{ 
 					h_xnxfE_colour[i][2]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] );
-					h_xnxfE[i]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] );
-					p_xnxfE[i]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] );
 				}
+				h_xnxfE[i]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] );
+				p_xnxfE[i]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] );
 			}
-
 			
+			h_ecalibration[i]->Fill( e[i] );
 		}
+
+		// *HIST* td with no td cuts
+		if ( is_in_used_det && is_in_rdt && is_in_theta_min ){
+			if ( SW_TD[0] == 1 ){
+				h_td[i][0]->Fill( td_rdt_e[i][0] );
+				h_td[i][0]->Fill( td_rdt_e[i][1] );
+				h_td[i][0]->Fill( td_rdt_e[i][2] );
+				h_td[i][0]->Fill( td_rdt_e[i][3] );
+			}
+		}
+		
+		// *HIST* td with td cuts
+		if ( is_in_used_det && is_in_rdt && is_in_td && is_in_theta_min ){
+			if ( SW_TD[0] == 1 ){
+				h_td[i][1]->Fill( td_rdt_e[i][0] );
+				h_td[i][1]->Fill( td_rdt_e[i][1] );
+				h_td[i][1]->Fill( td_rdt_e[i][2] );
+				h_td[i][1]->Fill( td_rdt_e[i][3] );
+			}
+		}
+
 
 		// *HIST* xcal no cuts
 		if ( is_in_used_det && is_in_rdt && is_in_td && is_in_theta_min ){
-			if ( SW_XCAL[0] == 1 ){ h_xcal[i]->Fill( xcal[i] ); }
+			if ( SW_XCAL[0] == 1 ){ h_xcal[i][0]->Fill( xcal[i] ); }
 		}
 			
 		// *HIST* xcal with cuts
 		if ( is_in_used_det && is_in_rdt && is_in_td && is_in_theta_min && is_in_xcal ){ 
-			if ( SW_XCAL[0] == 1 ){ h_xcal_cut[i]->Fill( xcal[i] );  }
+			if ( SW_XCAL[0] == 1 ){ h_xcal[i][1]->Fill( xcal[i] );  }
 		}
 		
 		// Do singles cuts
@@ -364,8 +392,7 @@ void AnalyseTree::Terminate()
 	if ( SW_EX[0] == 1 ){ HDrawEx(); }
 	if ( SW_XNXF[0] == 1 ){ HDrawXNXF(); }
 	if ( SW_XCAL[0] == 1 ){ HDrawXCAL(); }
-	
-	if ( PRINT_ROOT == 1 ){ if ( out_root_file->IsOpen() ){ out_root_file->Close(); } }
+	if ( SW_TD[0] == 1 ){ HDrawTD(); }
 	
 	stopwatch.Start(kFALSE);
 }

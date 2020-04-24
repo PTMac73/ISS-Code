@@ -26,39 +26,56 @@
 
 // Switch for this is SW_EVZ
 TH2F* h_evz;
+TH2F* h_evz_evolution[5];
 
 
 void HCreateEVZ(){
-	h_evz = new TH2F( "h_evz", "", 400, -50, -10, 900, 0, 9 );
-	h_evz->SetMarkerStyle(20);
-	h_evz->SetMarkerSize(0.5);
-	h_evz->SetMarkerColor( kRed );
-	h_evz->GetYaxis()->SetTitle( "Energy (MeV)" );
-	h_evz->GetXaxis()->SetTitle( "z (cm)" );
-	GlobSetHistFonts( h_evz );
+	CreateEVZSpectrum( h_evz, "h_evz" );
+	for ( Int_t i = 0; i < 5; i++ ){
+		CreateEVZSpectrum( h_evz_evolution[i], Form( "h_evz_evolution_%i", i ) );
+	}
+	
 }
 
-
 void HDrawEVZ(){
-	TCanvas *c_evz = new TCanvas( "c_evz", "EVZ", C_WIDTH, C_HEIGHT );
+	TCanvas* c_evz;
+	TCanvas* c_evz_evolution[5];
+	
+	c_evz = new TCanvas( "c_evz", "EVZ", C_WIDTH, C_HEIGHT );
 	GlobSetCanvasMargins( c_evz );
 	h_evz->Draw();
 	
+	TString root_name = Form( "%s/posXXX_evz", print_dir.Data() );
+	TFile* f;
+	
+	// Open root file if desired
+	if ( SW_EVZ[1] == 1 && PRINT_ROOT == 1 ){
+		f = new TFile( ( root_name + ".root" ).Data(), "RECREATE" );
+	}
+	
+	for ( Int_t i = 0; i < 5; i++ ){
+		c_evz_evolution[i] = new TCanvas( Form( "c_evz_evolution_%i", i ), Form( "EVOLUTION OF EVZ | Case %i", i ), C_WIDTH, C_HEIGHT );
+		GlobSetCanvasMargins( c_evz_evolution[i] );
+		h_evz_evolution[i]->Draw();
+	}
+	
 	// Print spectrum if desired
 	if ( SW_EVZ[1] == 1 ){
-		TString spec_name = Form( "%s/evz_posXXX", print_dir.Data() );
-		PrintAll( c_evz, spec_name );
-		
-		if ( PRINT_ROOT == 1 ){
-			out_root_file->cd();
-			h_evz->Write();
+		PrintAll( c_evz, Form( "%s/evz_posXXX", print_dir.Data() ) );
+		for ( Int_t i = 0; i < 5; i++ ){
+			PrintAll( c_evz_evolution[i], Form( "%s/evz_posXXX_evolution_%i", print_dir.Data(), i ) );
 		}
-		
+	}
+	
+	// Write ROOT file if desired
+	if ( PRINT_ROOT == 1 && SW_EVZ[1] == 1 ){ 
+		f->cd(); h_evz->Write();
+		for ( Int_t i = 0; i < 5; i++ ){ h_evz_evolution[i]->Write(); } 
 	}
 	
 	// Write SPE file if desired
 	if ( SW_EVZ[2] == 1 ){
-		ErrorSPE( "c_evz" );
+		ErrorSPE( "EVZ Spectra" );
 	}
 	
 	return;

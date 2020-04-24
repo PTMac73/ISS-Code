@@ -72,6 +72,7 @@ void AnalyseTree::Begin(TTree* t)
 	if ( SW_XNXF[0] == 1 ){ HCreateXNXF(); }
 	if ( SW_XCAL[0] == 1 ){ HCreateXCAL(); }
 	if ( SW_TD[0] == 1 ){ HCreateTD(); }
+	if ( SW_SIGTIME[0] == 1 ){ HCreateSIGTIME(); }
 	
 	// Get the number of entries
 	num_entries = t->GetEntries();
@@ -151,7 +152,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 	// Get branches
 	/*
 	b_TAC->GetEntry(entry);               b_ELUM->GetEntry(entry);
-	b_EZERO->GetEntry(entry);             b_EnergyTimestamp->GetEntry(entry);
+	b_EZERO->GetEntry(entry);             
 	b_RDTTimestamp->GetEntry(entry);      b_TACTimestamp->GetEntry(entry);
 	b_ELUMTimestamp->GetEntry(entry);     b_EZEROTimestamp->GetEntry(entry);
 	b_X->GetEntry(entry);                 
@@ -160,7 +161,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 	b_ECAL->GetEntry(entry);
 	*/
 	//std::cout << "Get branches" << "\n";
-	b_Energy->GetEntry(entry);
+	b_Energy->GetEntry(entry);            b_EnergyTimestamp->GetEntry(entry);
 	b_XF->GetEntry(entry);                b_XN->GetEntry(entry);
 	b_XFCAL->GetEntry(entry);             b_XNCAL->GetEntry(entry);
 	//std::cout << "Get more branches" << "\n";
@@ -221,12 +222,11 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		XFcal = xf[i];
 
 		// *HIST* XN-XF
-		if ( SW_XNXF[0] == 1 && ( DET_NUMBER == i || DET_NUMBER == -1 ) ){ 
+		if ( SW_XNXF[0] == 1 && ( DET_NUMBER == i || DET_NUMBER == -1 ) && is_in_used_det ){ 
 			h_xnxf[i]->Fill( xf[i], xn[i] );
 			
 			if ( !TMath::IsNaN( xf[i] ) && !TMath::IsNaN( xn[i] ) ){
-				if      ( XNcal < 0 || XFcal < 0 ){ h_xnxf_colour[i][4]->Fill( xf[i], xn[i] ); }
-				else if ( XNCAL <  0.5*e[i] && XFCAL >= 0.5*e[i] ){ h_xnxf_colour[i][0]->Fill( xf[i], xn[i] ); }
+				if ( XNCAL <  0.5*e[i] && XFCAL >= 0.5*e[i] ){ h_xnxf_colour[i][0]->Fill( xf[i], xn[i] ); }
 				else if ( XNCAL >= 0.5*e[i] && XFCAL >= 0.5*e[i] ){ h_xnxf_colour[i][1]->Fill( xf[i], xn[i] ); }
 				else if ( XNCAL <  0.5*e[i] && XFCAL <  0.5*e[i] ){ h_xnxf_colour[i][2]->Fill( xf[i], xn[i] ); }
 				else if ( XNCAL >= 0.5*e[i] && XFCAL <  0.5*e[i] ){ h_xnxf_colour[i][3]->Fill( xf[i], xn[i] ); }
@@ -249,18 +249,22 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			else if ( TMath::IsNaN( XNCAL ) && !TMath::IsNaN( XFCAL ) ){ h_xfE_colour[i][4]->Fill( xf[i], e[i] ); }
 
 			if ( !TMath::IsNaN( xf[i] ) && !TMath::IsNaN( xn[i] ) && !TMath::IsNaN( e[i] ) ){
-				Double_t fracfrac = 0.0; // This allows weaker detectors to have more spurious counts to define the line
-				if ( XNcal < 0 || XFcal < 0 ){ h_xnxfE_colour[i][3]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] ); }
-				else if ( XNcal > 0.0 && XNcal/XFcal <= fracfrac*XNXF_FRAC ){ h_xnxfE_colour[i][0]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] ); }
-				else if ( XFcal > 0.0 && XFcal/XNcal <= ( fracfrac*XNXF_FRAC ) ){ h_xnxfE_colour[i][1]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] ); }
+				if ( XNcal > 0.0 && TMath::Abs( XNcal/XFcal ) <= XNXF_FRAC ){ h_xnxfE_colour[i][0]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] ); }
+				else if ( XFcal > 0.0 && TMath::Abs( XFcal/XNcal ) <= XNXF_FRAC ){ h_xnxfE_colour[i][1]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] ); }
 				else{ 
 					h_xnxfE_colour[i][2]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] );
+					h_xnxfE[i]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] );
+					p_xnxfE[i]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] );
 				}
-				h_xnxfE[i]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] );
-				p_xnxfE[i]->Fill( xnCorr[i]*xn[i] + xf[i], e[i] );
 			}
 			
-			h_ecalibration[i]->Fill( e[i] );
+			h_ecalibration[i][0]->Fill( e[i] );
+			if ( is_in_theta_min && is_in_xcal ){ h_ecalibration[i][1]->Fill( e[i] ); }
+		}
+
+		// *HIST* SIGTIME
+		if ( i != 11 && SW_SIGTIME[0] == 1 ){
+			h_sigtime_e[i]->Fill( e_t[i], e[i] );
 		}
 
 		// *HIST* td with no td cuts
@@ -285,14 +289,14 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 
 
 		// *HIST* xcal no cuts
-		if ( is_in_used_det && is_in_rdt && is_in_td && is_in_theta_min ){
+		if ( is_in_used_det ){
 			if ( SW_XCAL[0] == 1 ){ h_xcal[i][0]->Fill( xcal[i] ); }
 		}
 			
 		// *HIST* xcal with cuts
-		if ( is_in_used_det && is_in_rdt && is_in_td && is_in_theta_min && is_in_xcal ){ 
+		/*if ( is_in_used_det && is_in_xcal ){ 
 			if ( SW_XCAL[0] == 1 ){ h_xcal[i][1]->Fill( xcal[i] );  }
-		}
+		}*/
 		
 		// Do singles cuts
 		if ( is_in_used_det && is_in_theta_min && is_in_xcal && is_in_xcal_mid ){
@@ -311,7 +315,36 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 				if ( SW_EX_COMPARE[0] == 1 ){ h_ex_compare1[i % 6]->Fill( Ex[i] ); }
 			}
 		}
-			
+		
+		// EVOLUTION OF CUTS
+		// Raw spectra
+		if ( is_in_used_det ){
+			if ( SW_EVZ[0] == 1 ){ h_evz_evolution[0]->Fill( z[i], ecrr[i] ); }
+		}
+		
+		// RDT cuts
+		if ( is_in_used_det && is_in_rdt ){
+			if ( SW_EVZ[0] == 1 ){ h_evz_evolution[1]->Fill( z[i], ecrr[i] ); }
+		}
+		
+		// RDT + thetaCM cuts
+		if ( is_in_used_det && is_in_rdt && is_in_theta_min ){
+			if ( SW_EVZ[0] == 1 ){ h_evz_evolution[2]->Fill( z[i], ecrr[i] ); }
+		}
+		
+		// RDT + thetaCM cuts + timing
+		if ( is_in_used_det && is_in_rdt && is_in_theta_min && is_in_td ){
+			if ( SW_EVZ[0] == 1 ){ h_evz_evolution[3]->Fill( z[i], ecrr[i] ); }
+		}
+		
+		// RDT + thetaCM cuts + timing + xcal
+		if ( is_in_used_det && is_in_rdt && is_in_theta_min && is_in_td && is_in_xcal ){
+			if ( SW_EVZ[0] == 1 ){ h_evz_evolution[4]->Fill( z[i], ecrr[i] ); }
+		}
+		
+		
+		
+		
 		// Do full cuts (Mg)
 		if ( is_in_used_det && is_in_rdt && is_in_td && is_in_theta_min && is_in_xcal && is_in_xcal_mid ){
 			
@@ -393,6 +426,7 @@ void AnalyseTree::Terminate()
 	if ( SW_XNXF[0] == 1 ){ HDrawXNXF(); }
 	if ( SW_XCAL[0] == 1 ){ HDrawXCAL(); }
 	if ( SW_TD[0] == 1 ){ HDrawTD(); }
+	if ( SW_SIGTIME[0] == 1 ){ HDrawSIGTIME(); }
 	
 	stopwatch.Start(kFALSE);
 }

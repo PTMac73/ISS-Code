@@ -28,9 +28,10 @@
 
 // Switch for this is SW_EX
 // Number of histograms = 24 (DBD) + 6 (RBR) + 1 (Full)
-TH1F* h_ex_full = NULL;		// Full spectrum
-TH1F* h_ex_rbr[6];		// Full spectrum
-TH1F* h_ex_dbd[24];		// Full spectrum
+TH1F* h_ex_full = NULL;			// Full spectrum
+TH1F* h_ex_rbr[6];				// RBR spectrum
+TH1F* h_ex_dbd[24];				// DBD spectrum
+TH1F* h_ex_full_evolution[5];	// Full spectrum evolution
 
 
 void HCreateEx(){

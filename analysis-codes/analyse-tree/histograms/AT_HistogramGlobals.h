@@ -13,6 +13,7 @@
 #include <TH1.h>
 #include <TH2.h>
 #include <TPaveText.h>
+#include <TProfile.h>
 #include <TString.h>
 #include <iostream>
 
@@ -34,8 +35,10 @@ void GlobSetCanvasMargins( TCanvas *c, Double_t l = 0.1, Double_t r = 0.02, Doub
 void GlobSetHistFonts( TH1* h ){
 	h->GetXaxis()->SetTitleFont(62);
 	h->GetXaxis()->SetLabelFont(62);
+	h->GetXaxis()->CenterTitle();
 	h->GetYaxis()->SetTitleFont(62);
 	h->GetYaxis()->SetLabelFont(62);
+	h->GetYaxis()->CenterTitle();
 	h->SetTitleFont(62);
 	return;
 }
@@ -99,7 +102,7 @@ void SetCanvasTitleFont( TPad* pad ){
 
 // Create cherished spectra
 void CreateExSpectrum( TH1F*& h, TString name ){
-	h = new TH1F( name.Data(), "", 450, -1, 8 );
+	h = new TH1F( name.Data(), name.Data(), 450, -1, 8 );
 	h->SetTitle("");
 	h->GetXaxis()->SetTitle("Excitation Energy (MeV)");
 	h->GetYaxis()->SetTitle("Counts per 20 keV");	
@@ -108,12 +111,36 @@ void CreateExSpectrum( TH1F*& h, TString name ){
 	return;
 }
 
-void CreateEVZSpectrum(){
-	/*TODO*/
+// Format generic 2D histograms
+void GlobCreate2DHists( TH2F* h, TString x_label, TString y_label ){
+	h->SetTitle("");
+	h->GetXaxis()->SetTitle( x_label.Data() );
+	h->GetYaxis()->SetTitle( y_label.Data() );
+	h->SetMarkerStyle(20);
+	h->SetMarkerSize(0.5);
+	h->SetMarkerColor(kRed);	
+	GlobSetHistFonts( h );
+	return;
+}
+
+void CreateEVZSpectrum( TH2F*& h, TString name ){
+	h = new TH2F( name.Data(), name.Data() , 400, -50, -10, 900, 0, 9 );
+	GlobCreate2DHists( h, "z (cm)", "Energy (MeV)" );
 	return;
 }
 
 
+
+// Format generic profile plots
+void GlobCreateProfile( TProfile* p, TString x_label, TString y_label ){
+	p->SetTitle("");
+	p->GetXaxis()->SetTitle( x_label.Data() );
+	p->GetYaxis()->SetTitle( y_label.Data() );
+	p->SetMarkerColor(kRed);
+	p->SetLineColor(kRed);
+	GlobSetHistFonts( p );
+	return;
+}
 
 
 

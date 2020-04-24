@@ -19,6 +19,7 @@
 #include "histograms/ATH_rdt_cuts.h"
 #include "histograms/ATH_xcal.h"
 #include "histograms/ATH_xnxf.h"
+#include "histograms/ATH_signal_timing.h"
 #include "histograms/ATH_td.h"
 
 

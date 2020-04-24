@@ -44,21 +44,21 @@ TH2F* h_xnxf_colour[NUM_DETS][5];		// (6) XN-XF hist coloured
 TH2F* h_xnE_colour[NUM_DETS][5];		// (7) XN-E hist coloured
 TH2F* h_xfE_colour[NUM_DETS][5];		// (8) XF-E hist coloured
 TH2F* h_xnxfE_colour[NUM_DETS][4];		// (9) XNXF-E hist coloured
-TH1F* h_ecalibration[NUM_DETS];			//(10) E Calibration hist
+TH1F* h_ecalibration[NUM_DETS][2];			//(10) E Calibration hist
 
 // Define which ones to print
 Bool_t xnxf_print_opt[NUM_DIFF_HISTS] = {
-	0,	// (0) XN-XF hist monochrome
-	0,	// (1) XN-XF profile
-	0,	// (2) XNXF-E hist monochrome
-	0,	// (3) XNXF-E profile
-	0,	// (4) XN-E hist monochrome
-	0,	// (5) XF-E hist monochrome
-	0,	// (6) XN-XF hist coloured
-	0,	// (7) XN-E hist coloured
-	0,	// (8) XF-E hist coloured
-	0,	// (9) XNXF-E hist coloured
-	1	//(10) E Calibration hist
+	0,	// (0) XN-XF hist monochrome (OBSOLETE)
+	1,	// (1) XN-XF profile
+	1,	// (2) XNXF-E hist monochrome
+	1,	// (3) XNXF-E profile
+	0,	// (4) XN-E hist monochrome (OBSOLETE)
+	0,	// (5) XF-E hist monochrome (OBSOLETE)
+	1,	// (6) XN-XF hist coloured
+	1,	// (7) XN-E hist coloured
+	1,	// (8) XF-E hist coloured
+	1,	// (9) XNXF-E hist coloured
+	0	//(10) E Calibration hist
 };
 
 // -------------------------------- { 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10 };
@@ -130,29 +130,6 @@ void PrintXNXFECorr(){
 	return;
 }
 
-// Format 2D histograms
-void Create2DHists( TH2F* h, TString x_label, TString y_label ){
-	h->SetTitle("");
-	h->GetXaxis()->SetTitle( x_label.Data() );
-	h->GetYaxis()->SetTitle( y_label.Data() );
-	h->SetMarkerStyle(20);
-	h->SetMarkerSize(0.5);
-	h->SetMarkerColor(kRed);	
-	GlobSetHistFonts( h );
-	return;
-}
-
-// Format profiles
-void CreateProfile( TProfile* p, TString x_label, TString y_label ){
-	p->SetTitle("");
-	p->GetXaxis()->SetTitle( x_label.Data() );
-	p->GetYaxis()->SetTitle( y_label.Data() );
-	p->SetMarkerColor(kRed);
-	p->SetLineColor(kRed);
-	GlobSetHistFonts( p );
-	return;
-}
-
 
 // Populate TString array of names
 void MakeSpecName( Int_t i ){
@@ -186,39 +163,39 @@ void HCreateXNXF(){
 		for ( Int_t j = 0; j < 5; j++ ){ h_xnE_colour[i][j] = NULL; } 	// (7) XN-E hist coloured
 		for ( Int_t j = 0; j < 5; j++ ){ h_xfE_colour[i][j] = NULL; }	// (8) XF-E hist coloured
 		for ( Int_t j = 0; j < 4; j++ ){ h_xnxfE_colour[i][j] = NULL; }	// (9) XNXF-E hist coloured
-		h_ecalibration[i] = NULL;	//(10) E Calibration hist
+		for ( Int_t j = 0; j < 2; j++ ){ h_ecalibration[i][j] = NULL; }	//(10) E Calibration hist
 		
 		// Detector by detector
 		if ( i == DET_NUMBER || ( DET_NUMBER == -1 ) ){
 		
 			// (0) *HIST* XN-XF hist monochrome
 			h_xnxf[i] = new TH2F( Form( "h_xnxf_%i", i ), Form( "XN-XF SPECTRUM %i", i ), 200, 0, 2000, 200, 0, 2000 );
-			Create2DHists( h_xnxf[i], "XF", "XN" );
+			GlobCreate2DHists( h_xnxf[i], "XF", "XN" );
 			
 			// (1) *HIST* XN-XF profile
 			p_xnxf[i] = new TProfile( Form( "p_xnxf_%i", i ), Form( "XN-XF SPECTRUM %i", i ), 200, xnxf_lims[i][0], xnxf_lims[i][1], xnxf_lims[i][2], xnxf_lims[i][3] );
-			CreateProfile( p_xnxf[i], "XF", "XN" );
+			GlobCreateProfile( p_xnxf[i], "XF", "XN" );
 			
 			// (2) *HIST* XNXF-E hist monochrome
 			h_xnxfE[i] = new TH2F( Form( "h_xnxfE_%i", i ), Form( "XNXF-E SPECTRUM %i", i ), 200, 0, 2000, 200, 0, 2000 );
-			Create2DHists( h_xnxfE[i], "XNXF", "E" );
+			GlobCreate2DHists( h_xnxfE[i], "XNXF", "E" );
 			
 			// (3) *HIST* XNXF-E profile
 			p_xnxfE[i] = new TProfile( Form( "p_xnxfE_%i", i ), Form( "XNXF-E SPECTRUM %i", i ), 200, xnxfE_lims[i][0], xnxfE_lims[i][1], xnxfE_lims[i][2], xnxfE_lims[i][3] );
-			CreateProfile( p_xnxfE[i], "XNXF", "E" );
+			GlobCreateProfile( p_xnxfE[i], "XNXF", "E" );
 			
 			// (4) *HIST* XN-E hist monochrome
 			h_xnE[i] = new TH2F( Form( "h_xnE_%i", i ), Form( "XN-E SPECTRUM %i", i ), 200, 0, 2000, 200, 0, 2000 );
-			Create2DHists( h_xnE[i], "XN", "E" );
+			GlobCreate2DHists( h_xnE[i], "XN", "E" );
 			
 			// (5) *HIST* XF-E hist monochrome
 			h_xfE[i] = new TH2F( Form( "h_xfE_%i", i ), Form( "XF-E SPECTRUM %i", i ), 200, 0, 2000, 200, 0, 2000 );
-			Create2DHists( h_xfE[i], "XF", "E" );
+			GlobCreate2DHists( h_xfE[i], "XF", "E" );
 			
 			// (6) *HIST* XN-XF hist coloured
 			for ( Int_t j = 0; j < 5; j++ ){
 				h_xnxf_colour[i][j] = new TH2F( Form( "h_xnxf_%i_%i", i, j ), Form( "XN-XF COLOUR SPECTRUM | Det %i | Case %i", i, j ), 200, 0, 2000, 200, 0, 2000 );
-				Create2DHists( h_xnxf_colour[i][j], "XF", "XN" );
+				GlobCreate2DHists( h_xnxf_colour[i][j], "XF", "XN" );
 			}
 			h_xnxf_colour[i][0]->SetMarkerColor( kBlue );
 			h_xnxf_colour[i][1]->SetMarkerColor( kBlack );
@@ -229,7 +206,7 @@ void HCreateXNXF(){
 			// (7) *HIST*  XN-E hist coloured
 			for ( Int_t j = 0; j < 5; j++ ){
 				h_xnE_colour[i][j] = new TH2F( Form( "h_xnE_%i_%i", i, j ), Form( "XN-E COLOUR SPECTRUM | Det %i | CASE %i", i, j ), 200, 0, 2000, 200, 0, 2000 );
-				Create2DHists( h_xnE_colour[i][j], "XN", "E" );
+				GlobCreate2DHists( h_xnE_colour[i][j], "XN", "E" );
 			}
 			h_xnE_colour[i][0]->SetMarkerColor( kBlue );
 			h_xnE_colour[i][1]->SetMarkerColor( kBlack );
@@ -240,7 +217,7 @@ void HCreateXNXF(){
 			// (8) *HIST* XF-E hist coloured
 			for ( Int_t j = 0; j < 5; j++ ){
 				h_xfE_colour[i][j] = new TH2F( Form( "h_xfE_%i_%i", i, j ), Form( "XF-E COLOUR SPECTRUM | Det %i | CASE %i", i, j ), 200, 0, 2000, 200, 0, 2000 );
-				Create2DHists( h_xfE_colour[i][j], "XF", "E" );
+				GlobCreate2DHists( h_xfE_colour[i][j], "XF", "E" );
 			}
 			h_xfE_colour[i][0]->SetMarkerColor( kBlue );
 			h_xfE_colour[i][1]->SetMarkerColor( kBlack );
@@ -251,7 +228,7 @@ void HCreateXNXF(){
 			// (9) XNXF-E hist coloured
 			for ( Int_t j = 0; j < 4; j++ ){
 				h_xnxfE_colour[i][j] = new TH2F( Form( "h_xnxfE_%i_%i", i, j ), Form( "XNXF-E COLOUR SPECTRUM | Det %i | CASE %i", i, j ), 200, 0, 2000, 200, 0, 2000 );
-				Create2DHists( h_xnxfE_colour[i][j], "XNXF", "E" );
+				GlobCreate2DHists( h_xnxfE_colour[i][j], "XNXF", "E" );
 			}
 			h_xnxfE_colour[i][0]->SetMarkerColor( kBlue );
 			h_xnxfE_colour[i][1]->SetMarkerColor( kGreen );
@@ -259,12 +236,20 @@ void HCreateXNXF(){
 			h_xnxfE_colour[i][3]->SetMarkerColor( kMagenta+2 );
 			
 			//(10) *HIST* E Calibration
-			h_ecalibration[i] = new TH1F( Form( "h_ecalibration_%i", i ), Form( "E CALIBRATION SPECTRUM | DET %i", i ), 2000, 0, 2000 );
-			h_ecalibration[i]->SetLineColor( kRed );
-			h_ecalibration[i]->SetTitle("");
-			h_ecalibration[i]->GetXaxis()->SetTitle( "Raw E" );
-			h_ecalibration[i]->GetYaxis()->SetTitle( "Counts" );
-			GlobSetHistFonts( h_ecalibration[i] );
+			h_ecalibration[i][0] = new TH1F( Form( "h_ecalibration_%i", i ), Form( "E CALIBRATION SPECTRUM | DET %i", i ), 2000, 0, 2000 );
+			h_ecalibration[i][1] = new TH1F( Form( "h_ecalibration_cuts%i", i ), Form( "E CALIBRATION SPECTRUM CUTS | DET %i", i ), 2000, 0, 2000 );
+			
+			h_ecalibration[i][0]->SetLineColorAlpha( kBlue, 0.5 );
+			h_ecalibration[i][0]->SetTitle("");
+			h_ecalibration[i][0]->GetXaxis()->SetTitle( "Raw E" );
+			h_ecalibration[i][0]->GetYaxis()->SetTitle( "Counts" );
+			GlobSetHistFonts( h_ecalibration[i][0] );
+			
+			h_ecalibration[i][1]->SetLineColor( kRed );
+			h_ecalibration[i][1]->SetTitle("");
+			h_ecalibration[i][1]->GetXaxis()->SetTitle( "" );
+			h_ecalibration[i][1]->GetYaxis()->SetTitle( "" );
+			GlobSetHistFonts( h_ecalibration[i][1] );
 			
 
 			// Correction parameters		
@@ -382,6 +367,7 @@ void HDrawXNXF(){
 			}
 			for ( Int_t j = 0; j < 4; j++ ){
 				peak_mark[j] = new TLine( rawE_pos[i][j], 0.0, rawE_pos[i][j],1000.0 );
+				peak_mark[j]->SetLineColorAlpha( kBlue, 0.5 );
 			}
 			
 			// TPROFILE FIT LINES
@@ -445,8 +431,8 @@ void HDrawXNXF(){
 			fitline_ecalibration_gaus_fit[0]->SetRange( rawE_pos[i][0] - 3*e_calibration_range, rawE_pos[i][0] + 3*e_calibration_range );
 			fitline_ecalibration_gaus_fit[1]->SetRange( rawE_pos[i][1] - 3*e_calibration_range, rawE_pos[i][3] + 3*e_calibration_range );
 			
-			h_ecalibration[i]->Fit( "fitline_ecalibration_0", "0" );
-			h_ecalibration[i]->Fit( "fitline_ecalibration_1", "0" );
+			h_ecalibration[i][1]->Fit( "fitline_ecalibration_0", "0" );
+			h_ecalibration[i][1]->Fit( "fitline_ecalibration_1", "0" );
 			
 			// Get the XNXF cut
 			if ( cut_list_xnxf != NULL ){ xnxf_cut = (TCutG*)cut_list_xnxf->At(i); }
@@ -543,7 +529,8 @@ void HDrawXNXF(){
 				
 				// (10) E Calibration
 				c_ecalibration[i] = new TCanvas( Form( "c_ecalibration_%i", i ), Form( "Energy Calibration | Det %i", i ), C_WIDTH, C_HEIGHT );
-				h_ecalibration[i]->Draw();
+				h_ecalibration[i][0]->Draw();
+				h_ecalibration[i][1]->Draw("SAME");
 				fitline_ecalibration_gaus_fit[0]->Draw("SAME");
 				fitline_ecalibration_gaus_fit[1]->Draw("SAME");
 				for ( Int_t j = 0; j < 4; j++ ){

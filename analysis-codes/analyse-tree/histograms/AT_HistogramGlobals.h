@@ -46,8 +46,10 @@ void GlobSetHistFonts( TH1* h ){
 void GlobSetHistFonts( TH2* h ){
 	h->GetXaxis()->SetTitleFont(62);
 	h->GetXaxis()->SetLabelFont(62);
+	h->GetXaxis()->CenterTitle();
 	h->GetYaxis()->SetTitleFont(62);
 	h->GetYaxis()->SetLabelFont(62);
+	h->GetYaxis()->CenterTitle();
 	h->SetTitleFont(62);
 	return;
 }

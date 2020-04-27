@@ -49,16 +49,16 @@ TH1F* h_ecalibration[NUM_DETS][2];			//(10) E Calibration hist
 // Define which ones to print
 Bool_t xnxf_print_opt[NUM_DIFF_HISTS] = {
 	0,	// (0) XN-XF hist monochrome (OBSOLETE)
-	1,	// (1) XN-XF profile
-	1,	// (2) XNXF-E hist monochrome
-	1,	// (3) XNXF-E profile
+	0,	// (1) XN-XF profile
+	0,	// (2) XNXF-E hist monochrome
+	0,	// (3) XNXF-E profile
 	0,	// (4) XN-E hist monochrome (OBSOLETE)
 	0,	// (5) XF-E hist monochrome (OBSOLETE)
-	1,	// (6) XN-XF hist coloured
-	1,	// (7) XN-E hist coloured
-	1,	// (8) XF-E hist coloured
-	1,	// (9) XNXF-E hist coloured
-	0	//(10) E Calibration hist
+	0,	// (6) XN-XF hist coloured
+	0,	// (7) XN-E hist coloured
+	0,	// (8) XF-E hist coloured
+	0,	// (9) XNXF-E hist coloured
+	1	//(10) E Calibration hist
 };
 
 // -------------------------------- { 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10 };
@@ -328,7 +328,7 @@ void HDrawXNXF(){
 	
 	// Define peak markers and fitting functions
 	TLine* peak_mark[4];
-	TF1* fitline_ecalibration_gaus_fit[2];
+	TF1* fitline_ecalibration_gaus_fit[5];
 	
 	
 	// Create names and files
@@ -389,50 +389,63 @@ void HDrawXNXF(){
 				xfxne_corr[i][1] = fit_ptrE->Parameter(1); 		// Gradient
 				//PrintXNXFEFitPars( fit_ptrE );
 			}
-			// PEAK FITTING FOR ENERGY CALIBRATION
+			// PEAK FITTING FOR ENERGY CALIBRATION (0-3 holds peak info, 4 is the combined triplet)
 			fitline_ecalibration_gaus_fit[0] = new TF1( "fitline_ecalibration_0", "[0] + [1]*x + [2]*exp(-0.5*((x-[3])/[4])^2)", rawE_pos[i][0] - e_calibration_range, rawE_pos[i][0] + e_calibration_range );
-			fitline_ecalibration_gaus_fit[1] = new TF1( "fitline_ecalibration_1", "[0] + [1]*x + [2]*exp(-0.5*((x-[3])/[4])^2) + [5]*exp(-0.5*((x-[6])/[7])^2) + [8]*exp(-0.5*((x-[9])/[10])^2)", rawE_pos[i][1] - e_calibration_range, rawE_pos[i][3] + e_calibration_range );
+			fitline_ecalibration_gaus_fit[1] = new TF1( "fitline_ecalibration_1", "[0] + [1]*x + [2]*exp(-0.5*((x-[3])/[4])^2)", rawE_pos[i][1] - e_calibration_range, rawE_pos[i][1] + e_calibration_range );
+			fitline_ecalibration_gaus_fit[2] = new TF1( "fitline_ecalibration_2", "[0] + [1]*x + [2]*exp(-0.5*((x-[3])/[4])^2)", rawE_pos[i][2] - e_calibration_range, rawEpos[i][2] + e_calibration_range );
+			fitline_ecalibration_gaus_fit[3] = new TF1( "fitline_ecalibration_3", "[0] + [1]*x + [2]*exp(-0.5*((x-[3])/[4])^2)", rawE_pos[i][3] - e_calibration_range, rawE_pos[i][3] + e_calibration_range );
+			fitline_ecalibration_gaus_fit[4] = new TF1( "fitline_ecalibration_1", "[0] + [1]*x + [2]*exp(-0.5*((x-[3])/[4])^2) + [5]*exp(-0.5*((x-[6])/[7])^2) + [8]*exp(-0.5*((x-[9])/[10])^2)", rawE_pos[i][1] - e_calibration_range, rawE_pos[i][3] + e_calibration_range );
 			
+			
+			// Set parameter limits
 			fitline_ecalibration_gaus_fit[0]->SetParLimits( 0, 0, 100 );		// Constant BG
 			fitline_ecalibration_gaus_fit[0]->SetParLimits( 1, -100, 100 );		// Gradient BG
 			fitline_ecalibration_gaus_fit[0]->SetParLimits( 2, 0, 2000 );		// Amplitude
 			fitline_ecalibration_gaus_fit[0]->SetParLimits( 3, rawE_pos[i][0] - e_calibration_range, rawE_pos[i][0] + e_calibration_range );		// Mu
 			fitline_ecalibration_gaus_fit[0]->SetParLimits( 4, 0, 100 );		// Sigma
 			
-			fitline_ecalibration_gaus_fit[1]->SetParLimits( 0, 0, 100 );		// Constant BG
-			fitline_ecalibration_gaus_fit[1]->SetParLimits( 1, -100, 100 );		// Gradient BG
-			fitline_ecalibration_gaus_fit[1]->SetParLimits( 2, 0, 2000 );		// Amplitude
-			fitline_ecalibration_gaus_fit[1]->SetParLimits( 3, rawE_pos[i][1] - e_calibration_range, rawE_pos[i][1] + e_calibration_range );		// Mu
-			fitline_ecalibration_gaus_fit[1]->SetParLimits( 4, 0, 50 );		// Sigma
-			fitline_ecalibration_gaus_fit[1]->SetParLimits( 5, 0, 2000 );		// Amplitude
-			fitline_ecalibration_gaus_fit[1]->SetParLimits( 6, rawE_pos[i][2] - e_calibration_range, rawE_pos[i][2] + e_calibration_range );		// Mu
-			fitline_ecalibration_gaus_fit[1]->SetParLimits( 7, 0, 50 );		// Sigma
-			fitline_ecalibration_gaus_fit[1]->SetParLimits( 8, 0, 2000 );		// Amplitude
-			fitline_ecalibration_gaus_fit[1]->SetParLimits( 9, rawE_pos[i][3] - e_calibration_range, rawE_pos[i][3] + e_calibration_range );		// Mu
-			fitline_ecalibration_gaus_fit[1]->SetParLimits( 10, 0, 50 );		// Sigma
+			fitline_ecalibration_gaus_fit[4]->SetParLimits( 0, 0, 100 );		// Constant BG
+			fitline_ecalibration_gaus_fit[4]->SetParLimits( 1, -100, 100 );		// Gradient BG
+			fitline_ecalibration_gaus_fit[4]->SetParLimits( 2, 0, 2000 );		// Amplitude
+			fitline_ecalibration_gaus_fit[4]->SetParLimits( 3, rawE_pos[i][1] - e_calibration_range, rawE_pos[i][1] + e_calibration_range );		// Mu
+			fitline_ecalibration_gaus_fit[4]->SetParLimits( 4, 0, 50 );		// Sigma
+			fitline_ecalibration_gaus_fit[4]->SetParLimits( 5, 0, 2000 );		// Amplitude
+			fitline_ecalibration_gaus_fit[4]->SetParLimits( 6, rawE_pos[i][2] - e_calibration_range, rawE_pos[i][2] + e_calibration_range );		// Mu
+			fitline_ecalibration_gaus_fit[4]->SetParLimits( 7, 0, 50 );		// Sigma
+			fitline_ecalibration_gaus_fit[4]->SetParLimits( 8, 0, 2000 );		// Amplitude
+			fitline_ecalibration_gaus_fit[4]->SetParLimits( 9, rawE_pos[i][3] - e_calibration_range, rawE_pos[i][3] + e_calibration_range );		// Mu
+			fitline_ecalibration_gaus_fit[4]->SetParLimits( 10, 0, 50 );		// Sigma
 			
-			fitline_ecalibration_gaus_fit[0]->SetLineWidth(2);
-			fitline_ecalibration_gaus_fit[0]->SetLineColorAlpha(kBlack,0.5);
-			fitline_ecalibration_gaus_fit[1]->SetLineWidth(2);
-			fitline_ecalibration_gaus_fit[1]->SetLineColorAlpha(kBlack,0.5);
 			
+			// Set formatting
+			for ( Int_t j = 0; j < 4; j++ ){
+				fitline_ecalibration_gaus_fit[i]->SetLineWidth( ( j == 0 || j == 3 ? 2 : 1 ) );
+				fitline_ecalibration_gaus_fit[i]->SetLineColorAlpha(kBlack,0.8);
+			}
+			
+			// Set initial values
 			fitline_ecalibration_gaus_fit[0]->SetParameters( 0.1, 0.01, 300, rawE_pos[i][0], 20 );
-			fitline_ecalibration_gaus_fit[1]->SetParameter( 0, 0.1 );					// Const. BG
-			fitline_ecalibration_gaus_fit[1]->SetParameter( 1, 0.01 );					// Gradient BG
-			fitline_ecalibration_gaus_fit[1]->SetParameter( 2, 300 );					// Amp 1
-			fitline_ecalibration_gaus_fit[1]->SetParameter( 3, rawE_pos[i][1] );		// Mu 1
-			fitline_ecalibration_gaus_fit[1]->SetParameter( 4, 40 );					// Sigma 1
-			fitline_ecalibration_gaus_fit[1]->SetParameter( 5, 300 );					// Amp 2
-			fitline_ecalibration_gaus_fit[1]->SetParameter( 6, rawE_pos[i][2] );		// Mu 2
-			fitline_ecalibration_gaus_fit[1]->SetParameter( 7, 40 );					// Sigma 2
-			fitline_ecalibration_gaus_fit[1]->SetParameter( 8, 300 );					// Amp 3
-			fitline_ecalibration_gaus_fit[1]->SetParameter( 9, rawE_pos[i][3] );		// Mu 3
-			fitline_ecalibration_gaus_fit[1]->SetParameter( 10, 40 );					// Sigma 3
+			fitline_ecalibration_gaus_fit[4]->SetParameter( 0, 0.1 );					// Const. BG
+			fitline_ecalibration_gaus_fit[4]->SetParameter( 1, 0.01 );					// Gradient BG
+			fitline_ecalibration_gaus_fit[4]->SetParameter( 2, 300 );					// Amp 1
+			fitline_ecalibration_gaus_fit[4]->SetParameter( 3, rawE_pos[i][1] );		// Mu 1
+			fitline_ecalibration_gaus_fit[4]->SetParameter( 4, 40 );					// Sigma 1
+			fitline_ecalibration_gaus_fit[4]->SetParameter( 5, 300 );					// Amp 2
+			fitline_ecalibration_gaus_fit[4]->SetParameter( 6, rawE_pos[i][2] );		// Mu 2
+			fitline_ecalibration_gaus_fit[4]->SetParameter( 7, 40 );					// Sigma 2
+			fitline_ecalibration_gaus_fit[4]->SetParameter( 8, 300 );					// Amp 3
+			fitline_ecalibration_gaus_fit[4]->SetParameter( 9, rawE_pos[i][3] );		// Mu 3
+			fitline_ecalibration_gaus_fit[4]->SetParameter( 10, 40 );					// Sigma 3
+			
+			// Set ranges
 			fitline_ecalibration_gaus_fit[0]->SetRange( rawE_pos[i][0] - 3*e_calibration_range, rawE_pos[i][0] + 3*e_calibration_range );
-			fitline_ecalibration_gaus_fit[1]->SetRange( rawE_pos[i][1] - 3*e_calibration_range, rawE_pos[i][3] + 3*e_calibration_range );
+			fitline_ecalibration_gaus_fit[4]->SetRange( rawE_pos[i][1] - 3*e_calibration_range, rawE_pos[i][3] + 3*e_calibration_range );
+			// TODO SET THE RANGES
 			
 			h_ecalibration[i][1]->Fit( "fitline_ecalibration_0", "0" );
 			h_ecalibration[i][1]->Fit( "fitline_ecalibration_1", "0" );
+			
+			// Set the fit parameters for peaks 1--3 here TODO
 			
 			// Get the XNXF cut
 			if ( cut_list_xnxf != NULL ){ xnxf_cut = (TCutG*)cut_list_xnxf->At(i); }
@@ -533,6 +546,7 @@ void HDrawXNXF(){
 				h_ecalibration[i][1]->Draw("SAME");
 				fitline_ecalibration_gaus_fit[0]->Draw("SAME");
 				fitline_ecalibration_gaus_fit[1]->Draw("SAME");
+				// TODO Draw fit lines here
 				for ( Int_t j = 0; j < 4; j++ ){
 					peak_mark[j]->Draw("SAME");
 				}

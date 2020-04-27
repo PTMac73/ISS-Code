@@ -61,9 +61,9 @@ void HDrawEVZ(){
 	
 	// Print spectrum if desired
 	if ( SW_EVZ[1] == 1 ){
-		PrintAll( c_evz, Form( "%s/evz_posXXX", print_dir.Data() ) );
+		PrintAll( c_evz, Form( "%s/posXXX_evz", print_dir.Data() ) );
 		for ( Int_t i = 0; i < 5; i++ ){
-			PrintAll( c_evz_evolution[i], Form( "%s/evz_posXXX_evolution_%i", print_dir.Data(), i ) );
+			PrintAll( c_evz_evolution[i], Form( "%s/posXXX_evz_evolution_%i", print_dir.Data(), i ) );
 		}
 	}
 	

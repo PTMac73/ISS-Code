@@ -34,8 +34,8 @@ TString cut_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/working/ALL-MgC
 TString cut_dir_si = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-codes/analyse-tree/cuttlefish.root";
 
 // Decide how to plot excitation spectra
-const Bool_t ALL_ROWS = 0;
-const Bool_t ROW_BY_ROW = 1;
+const Bool_t ALL_ROWS = 1;
+const Bool_t ROW_BY_ROW = 0;
 const Bool_t DET_BY_DET = 0;
 
 // Select row/det number to look at (-1 means do them all)
@@ -71,11 +71,11 @@ TFile* out_root_file;
 const Bool_t  SW_EX_COMPARE[3] = { 0, 1, 1 };
 const Bool_t    SW_RDT_CUTS[3] = { 0, 0, 0 };
 const Bool_t      SW_EVZ_SI[3] = { 0, 0, 0 };
-const Bool_t          SW_EX[3] = { 0, 1, 1 };
+const Bool_t          SW_EX[3] = { 0, 1, 0 };
 const Bool_t       SW_EX_SI[3] = { 0, 0, 0 };
 const Bool_t SW_EVZ_COMPARE[3] = { 0, 1, 0 };
-const Bool_t         SW_EVZ[3] = { 1, 1, 0 };
-const Bool_t        SW_XNXF[3] = { 0, 1, 0 };
+const Bool_t         SW_EVZ[3] = { 0, 1, 0 };
+const Bool_t        SW_XNXF[3] = { 1, 1, 0 };
 const Bool_t        SW_XCAL[3] = { 0, 1, 0 };
 const Bool_t          SW_TD[3] = { 0, 1, 0 };
 const Bool_t     SW_SIGTIME[3] = { 0, 1, 0 };
@@ -93,6 +93,7 @@ Bool_t is_in_rdt_si = 0;
 Bool_t is_in_td = 0;
 Bool_t is_in_xcal = 0;
 Bool_t is_in_xcal_mid = 0;
+Bool_t is_in_XCAL = 0;
 Bool_t is_in_theta_min = 0;
 Bool_t is_in_theta_range = 0;
 Bool_t is_in_row = 0;
@@ -288,5 +289,34 @@ Double_t rawE_pos[24][4] = {
 	{ 0760.0,  1240.0, 1310.0, 1390.0 }  // 23
 	
 };
+
+Float_t XCAL_cuts[24][2] = {
+	{ 0.00, 0.96 }, // 00
+	{ 0.00, 0.96 }, // 01
+	{ 0.04, 0.98 }, // 02
+	{ 0.02, 0.97 }, // 03
+	{ 0.03, 1.00 }, // 04
+	{ 0.05, 1.00 }, // 05
+	{ 0.00, 1.00 }, // 06
+	{ 0.00, 1.00 }, // 07
+	{ 0.00, 1.00 }, // 08
+	{ 0.01, 0.99 }, // 09
+	{ 0.03, 1.00 }, // 10
+	{ 0.00, 1.00 }, // 11
+	{ 0.00, 1.00 }, // 12
+	{ 0.00, 1.00 }, // 13
+	{ 0.00, 1.00 }, // 14
+	{ 0.00, 1.00 }, // 15
+	{ 0.02, 0.96 }, // 16
+	{ 0.02, 1.00 }, // 17
+	{ 0.02, 1.00 }, // 18
+	{ 0.00, 1.00 }, // 19
+	{ 0.03, 1.00 }, // 20
+	{ 0.03, 1.00 }, // 21
+	{ 0.00, 0.99 }, // 22
+	{ 0.00, 1.00 }  // 23
+}; 
+
+
 
 #endif

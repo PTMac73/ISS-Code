@@ -41,6 +41,7 @@ void HCreateEx(){
 		// Full spectrum
 		if ( i == 0 && ALL_ROWS == 1 ){
 			CreateExSpectrum( h_ex_full, "h_ex_full" );
+			for ( Int_t j = 0; j < 5; j++ ){ CreateExSpectrum( h_ex_full_evolution[j], Form( "h_ex_full_evolution_%i", j ) ); }
 		}
 		
 		// Row by row
@@ -51,6 +52,7 @@ void HCreateEx(){
 		// Detector by detector
 		if ( ( i == DET_NUMBER || ( DET_NUMBER == -1 ) ) && DET_BY_DET == 1 ){
 			CreateExSpectrum( h_ex_dbd[i], Form( "h_ex_dbd_%i", i ) );
+			 
 		}
 	}
 	
@@ -64,6 +66,8 @@ void HDrawEx(){
 	TCanvas* c_ex_rbr[6];
 	TCanvas* c_ex_dbd[24];
 	TCanvas* c_ex_dbd_comb;
+	TCanvas* c_ex_evolution[5];
+	
 	if ( CANVAS_COMBINE == 1 ){
 		c_ex_dbd_comb = new TCanvas( "c_ex_dbd_comb", "DBD Ex Spectrum", C_WIDTH, C_HEIGHT );
 		c_ex_dbd_comb->Divide(6,4);
@@ -82,7 +86,6 @@ void HDrawEx(){
 	// *LOOP* over detectors (i)
 	for ( Int_t i = 0; i < 24; i++ ){
 	
-	
 		// Full spectrum
 		if ( i == 0 && ALL_ROWS == 1 ){
 			// Plot spectrum
@@ -91,10 +94,23 @@ void HDrawEx(){
 			h_ex_full->Draw();
 			spec_name = Form( "%s/posXXX_ex_full", print_dir.Data() );
 			
+			// Plot evolution spectrum
+			for ( Int_t j = 0; j < 5; j++ ){
+				c_ex_evolution[j] = new TCanvas( Form( "c_ex_evolution_%i", j ), Form( "EXCITATION SPECTRUM EVOLUTION | Case %i", j ), C_WIDTH, C_HEIGHT );
+				GlobSetCanvasMargins( c_ex_evolution[j] );
+				h_ex_full_evolution[j]->Draw();
+			}
+			
+			
 			// Print spectrum if desired
 			if ( SW_EX[1] == 1 ){
 				PrintAll( c_ex_full, spec_name );
 				if ( PRINT_ROOT == 1 ){ f->cd(); h_ex_full->Write(); }
+				
+				for ( Int_t j = 0; j < 5; j++ ){
+					PrintAll( c_ex_evolution[j], Form( "%s/posXXX_ex_evolution_%i", print_dir.Data(), j ) );
+					if ( PRINT_ROOT == 1 ){ f->cd(); h_ex_full_evolution[j]->Write(); }
+				}
 			}
 			
 			// Write SPE file if desired

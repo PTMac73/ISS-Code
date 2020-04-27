@@ -204,6 +204,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		is_in_theta_range = ( thetaCM[i] >= THETA_LB && thetaCM[i] <= THETA_UB );
 		is_in_xcal = ( xcal[i] >= xcal_cuts[i][0] && xcal[i] <= xcal_cuts[i][1] );
 		is_in_xcal_mid = ( xcal[i] <= xcal_cuts[i][2] || xcal[i] >= xcal_cuts[i][3] );
+		is_in_XCAL = ( xcal[i] >= XCAL_cuts[i][0] && xcal[i] <= XCAL_cuts[i][1] );
 		
 		// XNXF cut boolean
 		TCutG* cut_xnxf = (TCutG*)cut_list_xnxf->At(i);
@@ -289,14 +290,14 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 
 
 		// *HIST* xcal no cuts
-		if ( is_in_used_det ){
+		if ( is_in_used_det && is_in_rdt && is_in_theta_min ){
 			if ( SW_XCAL[0] == 1 ){ h_xcal[i][0]->Fill( xcal[i] ); }
 		}
 			
 		// *HIST* xcal with cuts
-		/*if ( is_in_used_det && is_in_xcal ){ 
+		if ( is_in_used_det && is_in_rdt && is_in_theta_min && is_in_XCAL ){ 
 			if ( SW_XCAL[0] == 1 ){ h_xcal[i][1]->Fill( xcal[i] );  }
-		}*/
+		}
 		
 		// Do singles cuts
 		if ( is_in_used_det && is_in_theta_min && is_in_xcal && is_in_xcal_mid ){
@@ -320,26 +321,31 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		// Raw spectra
 		if ( is_in_used_det ){
 			if ( SW_EVZ[0] == 1 ){ h_evz_evolution[0]->Fill( z[i], ecrr[i] ); }
+			if ( SW_EX[0] == 1 ){ h_ex_full_evolution[0]->Fill( Ex[i] ); }
 		}
 		
 		// RDT cuts
 		if ( is_in_used_det && is_in_rdt ){
 			if ( SW_EVZ[0] == 1 ){ h_evz_evolution[1]->Fill( z[i], ecrr[i] ); }
+			if ( SW_EX[0] == 1 ){ h_ex_full_evolution[1]->Fill( Ex[i] ); }
 		}
 		
 		// RDT + thetaCM cuts
 		if ( is_in_used_det && is_in_rdt && is_in_theta_min ){
 			if ( SW_EVZ[0] == 1 ){ h_evz_evolution[2]->Fill( z[i], ecrr[i] ); }
+			if ( SW_EX[0] == 1 ){ h_ex_full_evolution[2]->Fill( Ex[i] ); }
 		}
 		
 		// RDT + thetaCM cuts + timing
 		if ( is_in_used_det && is_in_rdt && is_in_theta_min && is_in_td ){
 			if ( SW_EVZ[0] == 1 ){ h_evz_evolution[3]->Fill( z[i], ecrr[i] ); }
+			if ( SW_EX[0] == 1 ){ h_ex_full_evolution[3]->Fill( Ex[i] ); }
 		}
 		
 		// RDT + thetaCM cuts + timing + xcal
 		if ( is_in_used_det && is_in_rdt && is_in_theta_min && is_in_td && is_in_xcal ){
 			if ( SW_EVZ[0] == 1 ){ h_evz_evolution[4]->Fill( z[i], ecrr[i] ); }
+			if ( SW_EX[0] == 1 ){ h_ex_full_evolution[4]->Fill( Ex[i] ); }
 		}
 		
 		

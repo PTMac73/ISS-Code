@@ -49,7 +49,7 @@ Float_t z_array_pos[6] = {35.868,29.987,24.111,18.248,12.412,6.676};//in cm
 Int_t OFF_POSITION = 2;
 Bool_t ALPHA_RUN = 0;
 Float_t z_off;
-Float_t xcal_cuts[24][4];
+//Float_t xcal_cuts[24][4];
 Float_t thetaCM_lims[9];
 
 // RYAN'S CORRECTION PARAMETERS
@@ -290,13 +290,13 @@ void PTMonitors::Begin(TTree *tree){
 	}
 	else if ( OFF_POSITION == 1 ){
 		z_off = 9.498;
-		std::copy( &xcal_cuts1[0][0], &xcal_cuts1[0][0] + 24*4, &xcal_cuts[0][0] );
-		std::copy( &thetaCM_limsBOTH[0][0], &thetaCM_limsBOTH[0][9], &thetaCM_lims[9] );
+		//std::copy( &xcal_cuts1[0][0], &xcal_cuts1[0][0] + 24*4, &xcal_cuts[0][0] );
+		//std::copy( &thetaCM_limsBOTH[0][0], &thetaCM_limsBOTH[0][9], &thetaCM_lims[9] );
 	}
 	else if ( OFF_POSITION == 2 ){
 		z_off = 6.50;
-		std::copy( &xcal_cuts2[0][0], &xcal_cuts2[0][0] + 24*4, &xcal_cuts[0][0] );
-		std::copy( &thetaCM_limsBOTH[1][0], &thetaCM_limsBOTH[1][9], &thetaCM_lims[9] );
+		//std::copy( &xcal_cuts2[0][0], &xcal_cuts2[0][0] + 24*4, &xcal_cuts[0][0] );
+		//std::copy( &thetaCM_limsBOTH[1][0], &thetaCM_limsBOTH[1][9], &thetaCM_lims[9] );
 	}
 	Printf( "Z OFFSET = %f;\t ARRAY POSITION = %i", z_off, OFF_POSITION );
 
@@ -439,7 +439,8 @@ void PTMonitors::Begin(TTree *tree){
 	fin_tree->Branch("thetaCM",fin.thetaCM,"thetaCM[24]/F");
 	fin_tree->Branch("detID",fin.detID,"detID[24]/I");
 	fin_tree->Branch("td_rdt_e_cuts",td_rdt_e_cuts,"td_rdt_e_cuts[24][2]/I");
-	fin_tree->Branch("xcal_cuts",xcal_cuts,"xcal_cuts[24][4]/F");
+	//fin_tree->Branch("xcal_cuts",xcal_cuts,"xcal_cuts[24][4]/F");
+	fin_tree->Branch("xcal_cuts",xcal_cuts,"xcal_cuts[24][2]/F");
 	fin_tree->Branch("xold",fin.xold,"xold[24]/F");
 	fin_tree->Branch("thetaCM_lims", thetaCM_lims, "thetaCM_lims[9]/F");
 	fin_tree->Branch("ex_lims", ex_lims, "ex_lims[10]/F");

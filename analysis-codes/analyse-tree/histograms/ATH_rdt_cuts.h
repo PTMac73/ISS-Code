@@ -35,15 +35,10 @@ TObjArray* arr_rdt = new TObjArray();
 
 void HCreateRDTCuts(){
 	for ( Int_t i = 0; i < 4; i++ ){
-		h_rdt_cuts[i] = new TH2F( Form( "h_rdt_cuts_%i", i ), "", 900, 0, 9000, 1000, 0, 8500 );
-		h_rdt_cuts[i]->SetMarkerStyle(20);
-		h_rdt_cuts[i]->SetMarkerSize(0.5);
-		h_rdt_cuts[i]->SetMarkerColor(kBlack);
-		h_rdt_cuts[i]->GetYaxis()->SetTitle( Form( "rdt[%i]", i ) );
-		h_rdt_cuts[i]->GetXaxis()->SetTitle( Form( "rdt[%i]", i + 4 ) );
-		
-		GlobSetHistFonts( h_rdt_cuts[i] );
-	
+		h_rdt_cuts[i] = new TH2F( Form( "h_rdt_cuts_%i", i ), "", 900, 0, 9000, 1000, 0, 6000 );
+		GlobCreate2DHists( h_rdt_cuts[i], Form( "rdt[%i]", i + 4 ), Form( "rdt[%i]", i ) );
+		h_rdt_cuts[i]->SetMarkerSize( 0.2 );
+	/*
 		h_rdt_ex_mg[i] = new TH1F( Form( "h_rdt_ex_mg_%i", i ), "", 450, -1, 8 );
 		h_rdt_ex_mg[i]->SetFillColorAlpha(kBlack, 0.3);
 		h_rdt_ex_mg[i]->SetLineColor(kWhite);
@@ -63,6 +58,7 @@ void HCreateRDTCuts(){
 		
 		GlobSetHistFonts( h_rdt_ex_mg[i] );
 		GlobSetHistFonts( h_rdt_evz_mg[i] );
+		*/
 	}
 	
 	return;
@@ -74,6 +70,15 @@ void HDrawRDTCuts( TTree* t ){
 	TCanvas* c_rdt_cuts[4];
 	cuttlefish = new TObjArray();
 	TCutG* cuttle;
+	
+	TString root_name = Form( "%s/posXXX_rdt", print_dir.Data() );
+	TFile* f;
+	TString spec_name;
+	
+	// Open root file if desired
+	if ( SW_RDT_CUTS[1] == 1 && PRINT_ROOT == 1 ){
+		f = new TFile( ( root_name + ".root" ).Data(), "RECREATE" );
+	}
 
 	// If combining canvases, then divide up
 	if ( CANVAS_COMBINE == 1 && DRAW_NEW_CUTS == 0 ){
@@ -131,8 +136,8 @@ void HDrawRDTCuts( TTree* t ){
 		
 		// Root file options
 		if ( PRINT_ROOT == 1 ){
+			f->cd();
 			for ( Int_t i = 0; i < 4; i++ ){
-				out_root_file->cd();
 				h_rdt_cuts[i]->Write();
 			}
 		}

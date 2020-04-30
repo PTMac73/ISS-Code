@@ -128,6 +128,7 @@ void GlobCreate2DHists( TH2F* h, TString x_label, TString y_label ){
 void CreateEVZSpectrum( TH2F*& h, TString name ){
 	h = new TH2F( name.Data(), name.Data() , 400, -50, -10, 900, 0, 9 );
 	GlobCreate2DHists( h, "z (cm)", "Energy (MeV)" );
+	h->SetMarkerSize(0.2);
 	return;
 }
 
@@ -143,6 +144,60 @@ void GlobCreateProfile( TProfile* p, TString x_label, TString y_label ){
 	GlobSetHistFonts( p );
 	return;
 }
+
+
+Double_t GetMeanBinPosition( TH1F* h, Int_t lb, Int_t ub ){
+	Double_t sum1 = 0;
+	Double_t sum2 = 0;
+	
+	Int_t num_bins = ub - lb;
+	
+	for ( Int_t i = 0; i < num_bins; i++ ){
+		sum1 += h->GetBinContent( i + lb )*h->GetBinCenter( i + lb );
+		sum2 += h->GetBinContent( i + lb );
+	}
+	
+	return sum1/sum2;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -30,13 +30,9 @@ TH2F* h_evz_compare[4];
 
 void HCreateEVZCompare(){
 	for ( Int_t i = 0; i < 4; i++ ){
-		h_evz_compare[i] = new TH2F( Form( "h_evz_compare_%i", i ), "", 450, -50, -10, 900, 0, 9 );
-		h_evz_compare[i]->SetMarkerStyle(20);
-		h_evz_compare[i]->SetMarkerSize(0.5);
-		h_evz_compare[i]->SetMarkerColor( i % 2 == 0 ? kRed : kBlack );
-		h_evz_compare[i]->GetYaxis()->SetTitle( "Energy (MeV)" );
-		h_evz_compare[i]->GetXaxis()->SetTitle( "z (cm)" );
-		GlobSetHistFonts( h_evz_compare[i] );
+		CreateEVZSpectrum( h_evz_compare[i], Form( "h_evz_compare_%i", i ) );
+		if ( i == 1 || i == 3 ){ h_evz_compare[i]->SetMarkerColor( kRed ); }
+		if ( i == 0 || i == 2 ){ h_evz_compare[i]->SetMarkerColor( kBlack ); }
 	}
 	
 	return;

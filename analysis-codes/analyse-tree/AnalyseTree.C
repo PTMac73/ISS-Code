@@ -300,7 +300,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		}
 		
 		// Do singles cuts
-		if ( is_in_used_det && is_in_theta_min && is_in_xcal && is_in_xcal_mid ){
+		if ( is_in_used_det && is_in_theta_min && is_in_xcal ){
 			// *HIST* E v.s. z plot - singles
 			if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[0]->Fill( z[i], ecrr[i] ); }
 			if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[0]->Fill( z[i], ecrr[i] ); }
@@ -352,13 +352,13 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		
 		
 		// Do full cuts (Mg)
-		if ( is_in_used_det && is_in_rdt && is_in_td && is_in_theta_min && is_in_xcal && is_in_xcal_mid ){
+		if ( is_in_used_det && is_in_rdt && is_in_td && is_in_theta_min && is_in_xcal ){
 			
 			// *HIST* Full E v.s. z (Mg)
 			if ( SW_EVZ[0] == 1 ){ h_evz->Fill( z[i], ecrr[i] ); }
 			if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[1]->Fill( z[i], ecrr[i] ); }
 			if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[2]->Fill( z[i], ecrr[i] ); }
-			if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_evz_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( z[i], ecrr[i] ); }
+			//if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_evz_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( z[i], ecrr[i] ); }
 			
 			// Add additional angle cut
 			if ( is_in_theta_range ){
@@ -367,7 +367,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			
 			
 			// *HIST* Full excitation plot (Mg)
-			if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_ex_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( Ex[i] ); }
+			//if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_ex_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( Ex[i] ); }
 			if ( SW_EX_SI[0] == 1 ){ h_ex_si[0]->Fill( Ex[i] ); }
 			if ( SW_EX[0] == 1 ){
 				if ( ALL_ROWS == 1 ){ h_ex_full->Fill( Ex[i] ); }
@@ -384,7 +384,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 
 
 		// Do full cuts (Si)
-		if ( is_in_used_det && found_si_cuts && is_in_rdt_si && is_in_td && is_in_theta_min && is_in_xcal && is_in_xcal_mid ){
+		if ( is_in_used_det && found_si_cuts && is_in_rdt_si && is_in_td && is_in_theta_min && is_in_xcal ){
 			// *HIST* Full E v.s. z (Si)
 			if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[2]->Fill( z[i], ecrr[i] ); }
 			

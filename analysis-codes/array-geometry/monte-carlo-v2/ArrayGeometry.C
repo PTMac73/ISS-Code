@@ -653,10 +653,13 @@ void ArrayGeometryEX( Double_t ex = EX ){
 	fr_recoil_theta_frac->GetYaxis()->SetTitle( "% hits on RDT" );
 
 	g_recoil_theta_frac = new TGraph( NUM_THETA, theta_cm, theta_frac_proton_recoil );
-	
 	g_recoil_theta_frac->SetMarkerStyle(20);
 	g_recoil_theta_frac->SetMarkerSize(0.5);
+	g_recoil_theta_frac->GetXaxis()->CenterTitle();
+	g_recoil_theta_frac->GetYaxis()->CenterTitle();
+	g_recoil_theta_frac->SetMarkerColor( kRed );
 	g_recoil_theta_frac->Draw("P");
+	
 
 	// PRINT THE CANVASES AND FREE MEMORY------------------------------------------------------- //
 	c_traj_ejectile_side->Print( Form( "output-data/EX_%s-POS_%i-traj_ejectile_side.svg", DecimalDotToUnderscore( ex ).Data(), POSITION ) );
@@ -737,14 +740,16 @@ void ArrayGeometryEX( Double_t ex = EX ){
 	
 
 	// TH's
+	
 	if ( h_beam_width->IsOnHeap() ){ h_beam_width->Delete(); }
 	if ( h_phi_dist->IsOnHeap() ){ h_phi_dist->Delete(); }
-	if ( frame->IsOnHeap() ){ frame->Delete(); }
+	/*if ( frame->IsOnHeap() ){ frame->Delete(); }
 	if ( frame1->IsOnHeap() ){ frame1->Delete(); }
 	if ( frame2->IsOnHeap() ){ frame2->Delete(); }
 	if ( frame_rec_side->IsOnHeap() ){ frame_rec_side->Delete(); }
 	if ( frame_rec_head->IsOnHeap() ){ frame_rec_head->Delete(); }
-	if ( fr_recoil_theta_frac->IsOnHeap() ){ fr_recoil_theta_frac->Delete(); }
+	if ( fr_recoil_theta_frac->IsOnHeap() ){ fr_recoil_theta_frac->Delete(); }*/
+
 
 	// TLines
 	if ( l_solid_angle->IsOnHeap() ){ l_solid_angle->Delete(); }
@@ -757,9 +762,9 @@ void ArrayGeometryEX( Double_t ex = EX ){
 		if ( beam_start[i] != NULL ){ if ( beam_start[i]->IsOnHeap() ){ beam_start[i]->Delete(); } }
 	}
 
-	// TPads
-	if ( pad->IsOnHeap() ){ pad->Delete(); }
 
+	// TPads
+	//if ( pad->IsOnHeap() ){ pad->Delete(); }
 }
 
 
@@ -779,7 +784,8 @@ void ArrayGeometry(){
 		3.17944,
 		3.85680,
 		3.96590,
-		4.28395
+		//4.28395
+		4.30000
 	};
 
 	if ( ALL == 1 ){

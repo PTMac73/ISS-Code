@@ -12,7 +12,7 @@
 #include <TF1.h>
 #include <TFile.h>
 #include <TFitResult.h>
-#include <TGraph.h>
+#include <TGraphErrors.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <TLine.h>
@@ -46,7 +46,7 @@ TH2F* h_xnE_colour[NUM_DETS][5];		// (7) XN-E hist coloured
 TH2F* h_xfE_colour[NUM_DETS][5];		// (8) XF-E hist coloured
 TH2F* h_xnxfE_colour[NUM_DETS][4];		// (9) XNXF-E hist coloured
 TH1F* h_ecalibration[NUM_DETS][2];		//(10) E Calibration hist
-TGraph* g_ecalibration[NUM_DETS];		//(11) E Calibration graph
+TGraphErrors* g_ecalibration[NUM_DETS];		//(11) E Calibration graph
 
 // Define which ones to print
 Bool_t xnxf_print_opt[NUM_DIFF_HISTS] = {
@@ -75,8 +75,10 @@ TCutG* xnxf_cut;
 Double_t xn_corr[NUM_DETS];
 Double_t xfxne_corr[NUM_DETS][2];
 Double_t centroid_positions[NUM_DETS][4];
+Double_t centroid_errors[NUM_DETS][4];
 Double_t e_corr[NUM_DETS][2];
-Double_t alpha_energy[4] = { 3.18269, 5.15659, 5.48556, 5.80477 };
+Double_t alpha_energy[4] = { 3.182690, 5.15659, 5.48556, 5.80477 };
+Double_t alpha_errors[4] = { 0.000024, 0.00014, 0.00012, 0.00005 };
 
 
 
@@ -139,7 +141,7 @@ void PrintXNXFECorr(){
 void PrintECorr(){
 	std::cout << "Double_t eCorr[24][2] = {" << "\n";
 	for ( Int_t i = 0; i < NUM_DETS; i++ ){
-		std::cout << "\t{ " << std::right << std::fixed << std::setw(10) << std::setprecision(6) << xfxne_corr[i][0] << ", " << std::fixed << std::setw(8) << std::setprecision(6) << xfxne_corr[i][1] << " },\t// " << Form("%02d", i ) << "\n";
+		std::cout << "\t{ " << std::right << std::fixed << std::setw(10) << std::setprecision(6) << e_corr[i][0] << ", " << std::fixed << std::setw(8) << std::setprecision(6) << e_corr[i][1] << " },\t// " << Form("%02d", i ) << "\n";
 	}	
 	std::cout << "};" << "\n";
 	return;
@@ -293,6 +295,7 @@ void HCreateXNXF(){
 			e_corr[i][1] = 0.0;
 			for ( Int_t j = 0; j < 4; j++ ){
 				centroid_positions[i][j] = 0.0;
+				centroid_errors[i][j] = 0.0;
 			}
 		}
 	}
@@ -373,6 +376,7 @@ void HDrawXNXF(){
 	
 	// Define peak markers and fitting functions
 	TLine* peak_mark[4];
+	TLine* peak_mark_true[4];
 	TBox* peak_box[4];
 	
 	
@@ -411,14 +415,16 @@ void HDrawXNXF(){
 				);
 			}
 			for ( Int_t j = 0; j < 4; j++ ){
-				peak_mark[j] = new TLine( rawE_pos[i][j], 0.0, rawE_pos[i][j],1000.0 );
+				peak_mark[j] = new TLine( rawE_pos[i][j], 0.0, rawE_pos[i][j],1.05*h_ecalibration[i][0]->GetMaximum() );
 				peak_mark[j]->SetLineColorAlpha( kBlue, 0.5 );
+				peak_mark[j]->SetLineStyle(2);
+				peak_mark[j]->SetLineWidth(1);
 				
 				peak_box[j] = new TBox(
 					rawE_pos[i][j] - e_calibration_range,	// X1
 					0.0,									// Y1
 					rawE_pos[i][j] + e_calibration_range,	// X2
-					1000.0									// Y2
+					1.05*h_ecalibration[i][0]->GetMaximum()	// Y2
 				);
 				peak_box[j]->SetFillColorAlpha( kBlack, 0.1 );
 			}
@@ -444,22 +450,42 @@ void HDrawXNXF(){
 			}
 			
 			// GET THE MEAN PEAK VALUES!
+			
 			for ( Int_t j = 0; j < 4; j++ ){	
 				if ( h_ecalibration[i][1]->GetEntries() != 0 ){
-					centroid_positions[i][j] = GetMeanBinPosition( h_ecalibration[i][1], rawE_pos[i][j] - e_calibration_range, rawE_pos[i][j] + e_calibration_range );
+					centroid_positions[i][j] = GetMeanBinPosition( h_ecalibration[i][1], rawE_pos[i][j] - e_calibration_range, rawE_pos[i][j] + e_calibration_range, centroid_errors[i][j] );
+					if ( i == 4 ){ std::cout << i << ", " << j << "\t" << "Used hist with cuts\n"; }
 				}
 				else if ( h_ecalibration[i][0]->GetEntries() != 0 ){
-					centroid_positions[i][j] = GetMeanBinPosition( h_ecalibration[i][0], rawE_pos[i][j] - e_calibration_range, rawE_pos[i][j] + e_calibration_range );
+					centroid_positions[i][j] = GetMeanBinPosition( h_ecalibration[i][0], rawE_pos[i][j] - e_calibration_range, rawE_pos[i][j] + e_calibration_range, centroid_errors[i][j] );
+					if ( i == 4 ){ std::cout << i << ", " << j << "\t" << "Used hist with no cuts\n"; }
 				}
 				else{
 					centroid_positions[i][j] = -1.0;
+					centroid_errors[i][j] = -1.0;
+					if ( i == 4 ){ std::cout << i << ", " << j << "\t" << "FAIL\n"; }
 				}
+				
+				// Mark the found position in green
+				peak_mark_true[j] = new TLine(
+					centroid_positions[i][j],
+					0.0,
+					centroid_positions[i][j],
+					1.05*h_ecalibration[i][0]->GetMaximum()
+				);
+				peak_mark_true[j]->SetLineWidth(1);
+				peak_mark_true[j]->SetLineColor(kGreen);
+				
 			}
 			
+			
+			
+			
 			// Format the TGraph
-			g_ecalibration[i] = new TGraph( 4, alpha_energy, centroid_positions[i] );
+			g_ecalibration[i] = new TGraphErrors( 4, alpha_energy, centroid_positions[i], alpha_errors, centroid_errors[i] );
+			GlobSetHistFonts( g_ecalibration[i] );
 			g_ecalibration[i]->SetMarkerStyle(20);
-			g_ecalibration[i]->SetMarkerSize(1);
+			g_ecalibration[i]->SetMarkerSize(0);
 			g_ecalibration[i]->SetMarkerColor(kRed);
 			g_ecalibration[i]->SetTitle("");
 			
@@ -578,6 +604,7 @@ void HDrawXNXF(){
 				for ( Int_t j = 0; j < 4; j++ ){
 					peak_box[j]->Draw("SAME");
 					peak_mark[j]->Draw("SAME");
+					peak_mark_true[j]->Draw("SAME");
 				}
 				
 				// (11) E Calibration graph
@@ -649,8 +676,8 @@ void HDrawXNXF(){
 	
 	
 	}
-	//PrintXNCorr();
-	//PrintXNXFECorr();
+	PrintXNCorr();
+	PrintXNXFECorr();
 	PrintAlphaCentroids();
 	PrintECorr();
 	// Close the root file

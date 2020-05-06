@@ -28,7 +28,10 @@ void ArrayGeometryEX( Double_t ex = EX ){
 	// Batch mode
 	if ( BATCH_MODE ){ gROOT->SetBatch(kTRUE); }
 
-
+	// Check the plotting conditions
+	if ( THETA_HEAD < theta_lb || THETA_HEAD > theta_ub ){
+		std::cout << "Trajectories will not plot as " << THETA_HEAD << " is not within sampled angles!" << "\n";
+	}
 
 
 	// SETUP ----------------------------------------------------------------------------------- //
@@ -125,7 +128,7 @@ void ArrayGeometryEX( Double_t ex = EX ){
 	for ( Int_t i = 0; i < NUM_THETA; i++ ){
 		// Calculate angle-dependent kinematic terms
 		theta_cm[i] = ( i*theta_spacing + theta_lb );
-		theta_var = 180 - theta_cm[i];									// The true CM angl
+		theta_var = 180 - theta_cm[i];									// The easier CM angle
 		T_lab_3 = T_cm_3 + 0.5*mass[2]*V_cm*V_cm + mass[2]*v3*V_cm*TMath::Cos( theta_var*TMath::DegToRad() );		// [MeV]
 		v3_para = v3*TMath::Cos( theta_var*TMath::DegToRad() ) + V_cm;												// LAB [c]
 		v3_perp = v3*TMath::Sin( theta_var*TMath::DegToRad() );														// LAB [c]
@@ -302,6 +305,7 @@ void ArrayGeometryEX( Double_t ex = EX ){
 
 		// Print to file
 		if ( i == 0 ){
+			log_file << theta_lb << "\u00b0 <= \u03b8 <= " << theta_ub << "\u00b0; \u03b8-SPACING = " << theta_spacing << "\u00b0; NUM EVENTS PER THETA = " << NUM_EVENTS_PER_THETA << "; z-SPACING = " << z_spacing << " cm\n";
 			log_file << 
 				"     THETA_CM(\u00b0)" << 
 				"    THETA_LAB(\u00b0)" << 
@@ -323,7 +327,7 @@ void ArrayGeometryEX( Double_t ex = EX ){
 								  std::setw(log_width) << std::setprecision(log_prec) << d_phi[i][0] << 
 								  std::setw(log_width) << std::setprecision(log_prec) << d_phi[i][1] << 
 								  std::setw(log_width) << std::setprecision(log_prec) << d_phi[i][2] << 
-								  std::setw(log_width) << std::setprecision(log_prec) << 100.0*theta_frac_proton_recoil[i]/NUM_EVENTS_PER_THETA << "\n";
+								  std::setw(log_width) << std::setprecision(log_prec) << theta_frac_proton_recoil[i] << "\n";
 
 		// Output percentage in terminal
 		prog = 100.0*(Double_t)i/(Double_t)NUM_THETA;
@@ -654,7 +658,7 @@ void ArrayGeometryEX( Double_t ex = EX ){
 
 	g_recoil_theta_frac = new TGraph( NUM_THETA, theta_cm, theta_frac_proton_recoil );
 	g_recoil_theta_frac->SetMarkerStyle(20);
-	g_recoil_theta_frac->SetMarkerSize(0.5);
+	g_recoil_theta_frac->SetMarkerSize(0.2);
 	g_recoil_theta_frac->GetXaxis()->CenterTitle();
 	g_recoil_theta_frac->GetYaxis()->CenterTitle();
 	g_recoil_theta_frac->SetMarkerColor( kRed );

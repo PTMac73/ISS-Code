@@ -54,6 +54,16 @@ void GlobSetHistFonts( TH2* h ){
 	return;
 }
 
+void GlobSetHistFonts( TGraph* g ){
+	g->GetXaxis()->SetTitleFont(62);
+	g->GetXaxis()->SetLabelFont(62);
+	g->GetXaxis()->CenterTitle();
+	g->GetYaxis()->SetTitleFont(62);
+	g->GetYaxis()->SetLabelFont(62);
+	g->GetYaxis()->CenterTitle();
+	return;
+}
+
 
 // Write error message about spe files
 void ErrorSPE( TString str = "This mode" ){
@@ -146,16 +156,32 @@ void GlobCreateProfile( TProfile* p, TString x_label, TString y_label ){
 }
 
 
-Double_t GetMeanBinPosition( TH1F* h, Int_t lb, Int_t ub ){
-	Double_t sum1 = 0;
-	Double_t sum2 = 0;
+Double_t GetMeanBinPosition( TH1F* h, Double_t lb, Double_t ub, Double_t &err ){
+	Double_t sum1 = 0;	// Weighted mean numerator
+	Double_t sum2 = 0;	// Weighted mean denominator
 	
-	Int_t num_bins = ub - lb;
+	Double_t sumXXN = 0;	// X = bin position, N = number of counts
+	Double_t sumXN = 0;
+	Double_t sumN = 0;
+	
+	Int_t bub = h->FindBin(ub);
+	Int_t blb = h->FindBin(lb);
+	
+	Int_t num_bins = bub - blb;
+	Double_t w = h->GetBinWidth( blb );
 	
 	for ( Int_t i = 0; i < num_bins; i++ ){
-		sum1 += h->GetBinContent( i + lb )*h->GetBinCenter( i + lb );
-		sum2 += h->GetBinContent( i + lb );
+		sum1 += h->GetBinContent( i + blb )*h->GetBinCenter( i + blb );
+		sum2 += h->GetBinContent( i + blb );
+		
+		sumN += h->GetBinContent( i + blb );
+		sumXN += h->GetBinContent( i + blb )*h->GetBinCenter( i + blb );
+		sumXXN += h->GetBinContent( i + blb )*h->GetBinCenter( i + blb )*h->GetBinCenter( i + blb );
 	}
+	
+	err = sumXXN/( sumN*sumN ) - sumXN*sumXN/( sumN*sumN*sumN ) + w*w/4.0;
+	
+	std::cout << sum1 << "\t" << sum2 << "\t" << sumN << "\t" << sumXN << "\t" << sumXXN << "\t" << w << "\t" << num_bins << "\t" << err << "\n";
 	
 	return sum1/sum2;
 }

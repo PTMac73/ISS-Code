@@ -12,6 +12,7 @@
 #include <TFile.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <TLine.h>
 #include <TMath.h>
 #include <TString.h>
 #include <TStyle.h>
@@ -80,12 +81,29 @@ void HDrawTD(){
 	}
 	
 	
+	
 	// *LOOP* over detectors (i)
 	for ( Int_t i = 0; i < 24; i++ ){
-
+	
 		// Detector by detector
 		if ( ( i == DET_NUMBER || DET_NUMBER == -1 ) && det_array[i % 6][(Int_t)TMath::Floor(i/6)] != 0 ){
 			spec_name = Form( "%s/posXXX_td_%i", print_dir.Data(), i );
+			
+			// Define cut lines
+			TLine* cut_line[2];
+			for ( Int_t j = 0; j < 2; j++ ){
+				cut_line[j] = new TLine(
+					TD_rdt_e_cuts[i][j],			// X1
+					0.0,							// Y1
+					TD_rdt_e_cuts[i][j],			// X2
+					1.05*h_td[i][1]->GetMaximum()	// Y2
+				);
+				cut_line[j]->SetLineWidth(1);
+				cut_line[j]->SetLineStyle(2);
+				cut_line[j]->SetLineColor(kBlack);
+			}
+			
+			
 			
 			if ( CANVAS_COMBINE == 0 ){
 				// Plot spectrum
@@ -93,6 +111,8 @@ void HDrawTD(){
 				GlobSetCanvasMargins( c_td[i] );
 				h_td[i][0]->Draw();
 				h_td[i][1]->Draw("SAME");
+				cut_line[0]->Draw("SAME");
+				cut_line[1]->Draw("SAME");
 				gStyle->SetTitleFont(62);
 				
 				// Print spectrum if desired
@@ -106,6 +126,7 @@ void HDrawTD(){
 				h_td[i][0]->SetTitle( Form( "Det #%i", i ) );
 				h_td[i][0]->Draw();
 				h_td[i][1]->Draw("SAME");
+				
 				//TPad* pad = (TPad*)c_td_comb->GetPad(i+1);
 				//SetCanvasTitleFont( pad );
 				

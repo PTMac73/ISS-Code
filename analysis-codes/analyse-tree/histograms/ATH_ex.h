@@ -41,6 +41,10 @@ void HCreateEx(){
 		// Full spectrum
 		if ( i == 0 && ALL_ROWS == 1 ){
 			CreateExSpectrum( h_ex_full, "h_ex_full" );
+		}
+		
+		// Evolution
+		if ( i == 0 ){
 			for ( Int_t j = 0; j < 5; j++ ){ CreateExSpectrum( h_ex_full_evolution[j], Form( "h_ex_full_evolution_%i", j ) ); }
 		}
 		

@@ -35,7 +35,7 @@ TString cut_dir_si = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-cod
 
 // Decide how to plot excitation spectra
 const Bool_t ALL_ROWS = 1;
-const Bool_t ROW_BY_ROW = 0;
+const Bool_t ROW_BY_ROW = 1;
 const Bool_t DET_BY_DET = 0;
 
 // Select row/det number to look at (-1 means do them all)
@@ -44,7 +44,7 @@ const Int_t ROW_NUMBER = -1;
 
 
 // Select angle cuts
-const Double_t THETA_MIN = 11.0; //16.6278;
+const Double_t THETA_MIN = 19.21; //16.6278;
 const Double_t THETA_LB = 11.0;
 const Double_t THETA_UB = 14.5;
 
@@ -71,12 +71,12 @@ TFile* out_root_file;
 const Bool_t  SW_EX_COMPARE[3] = { 0, 1, 1 };
 const Bool_t    SW_RDT_CUTS[3] = { 0, 1, 0 };
 const Bool_t      SW_EVZ_SI[3] = { 0, 0, 0 };
-const Bool_t          SW_EX[3] = { 0, 1, 0 };
+const Bool_t          SW_EX[3] = { 0, 1, 1 };
 const Bool_t       SW_EX_SI[3] = { 0, 0, 0 };
 const Bool_t SW_EVZ_COMPARE[3] = { 0, 1, 0 };
 const Bool_t         SW_EVZ[3] = { 0, 1, 0 };
-const Bool_t        SW_XNXF[3] = { 1, 1, 0 };
-const Bool_t        SW_XCAL[3] = { 0, 1, 0 };
+const Bool_t        SW_XNXF[3] = { 0, 1, 0 };
+const Bool_t        SW_XCAL[3] = { 1, 1, 0 };
 const Bool_t          SW_TD[3] = { 0, 1, 0 };
 const Bool_t     SW_SIGTIME[3] = { 0, 1, 0 };
 
@@ -88,12 +88,31 @@ TObjArray* cuttlefish;		// Cuts to be read out
 
 // Cut booleans
 Bool_t is_in_used_det = 0;
-Bool_t is_in_rdt = 0;
-Bool_t is_in_rdt_si = 0;
-Bool_t is_in_td = 0;
+
+Bool_t is_in_rdt[4] = { 0, 0, 0, 0 };
+Bool_t is_in_rdt_total = 0;
+
+Bool_t is_in_rdt_si[4] = { 0, 0, 0, 0 };
+Bool_t is_in_rdt_si_total = 0;
+
+Bool_t is_in_td[4] = { 0, 0, 0, 0 };
+Bool_t is_in_td_total = 0;
+
+Bool_t is_in_TD[4] = { 0, 0, 0, 0 };			// Local version of time difference cuts
+Bool_t is_in_TD_total = 0;
+
+Bool_t is_in_rdt_and_td[4] = { 0, 0, 0, 0 };
+Bool_t is_in_rdt_and_td_total = 0;
+
+Bool_t is_in_rdt_si_and_td[4] = { 0, 0, 0, 0 };
+Bool_t is_in_rdt_si_and_td_total = 0;
+
+Bool_t is_in_rdt_and_TD[4] = { 0, 0, 0, 0 };
+Bool_t is_in_rdt_and_TD_total = 0;
+
 Bool_t is_in_xcal = 0;
 Bool_t is_in_xcal_mid = 0;
-Bool_t is_in_XCAL = 0;
+Bool_t is_in_XCAL = 0;			// Local version of xcal cuts
 Bool_t is_in_theta_min = 0;
 Bool_t is_in_theta_range = 0;
 Bool_t is_in_row = 0;
@@ -260,7 +279,7 @@ Double_t xnxfE_lims[24][4] = {
 	{ 0200.0, 1900.0, 0200.0, 1900.0 }  // 23
 };
 
-Double_t e_calibration_range = 40;
+Double_t e_calibration_range = 32;
 
 Double_t rawE_pos[24][4] = {
 	{ 0815.0,  1325.0, 1400.0, 1480.0 }, // 00
@@ -269,8 +288,8 @@ Double_t rawE_pos[24][4] = {
 	{ 0850.0,  1375.0, 1475.0, 1560.0 }, // 03
 	{ 0800.0,  1290.0, 1375.0, 1450.0 }, // 04
 	{ 0775.0,  1275.0, 1355.0, 1430.0 }, // 05
-	{ 0835.0,  1350.0, 1425.0, 1525.0 }, // 06
-	{ 0800.0,  1300.0, 1390.0, 1475.0 }, // 07
+	{ 0835.0,  1350.0, 1440.0, 1525.0 }, // 06
+	{ 0800.0,  1300.0, 1390.0, 1465.0 }, // 07
 	{ 0830.0,  1355.0, 1420.0, 1520.0 }, // 08
 	{ 0810.0,  1315.0, 1400.0, 1480.0 }, // 09
 	{ 0760.0,  1240.0, 1310.0, 1390.0 }, // 10
@@ -291,32 +310,58 @@ Double_t rawE_pos[24][4] = {
 };
 
 Float_t XCAL_cuts[24][2] = {
-	{ 0.00, 0.96 }, // 00
+	{ 0.01, 0.96 }, // 00
 	{ 0.00, 0.96 }, // 01
-	{ 0.04, 0.98 }, // 02
-	{ 0.02, 0.97 }, // 03
+	{ 0.04, 1.00 }, // 02
+	{ 0.03, 0.97 }, // 03
 	{ 0.03, 1.00 }, // 04
 	{ 0.05, 1.00 }, // 05
-	{ 0.00, 1.00 }, // 06
-	{ 0.00, 1.00 }, // 07
-	{ 0.00, 1.00 }, // 08
+	{ 0.13, 0.87 }, // 06
+	{ 0.06, 0.89 }, // 07
+	{ 0.00, 0.87 }, // 08
 	{ 0.01, 0.99 }, // 09
-	{ 0.03, 1.00 }, // 10
+	{ 0.05, 0.94 }, // 10
 	{ 0.00, 1.00 }, // 11
 	{ 0.00, 1.00 }, // 12
-	{ 0.00, 1.00 }, // 13
-	{ 0.00, 1.00 }, // 14
-	{ 0.00, 1.00 }, // 15
-	{ 0.02, 0.96 }, // 16
+	{ 0.00, 0.85 }, // 13
+	{ 0.08, 0.88 }, // 14
+	{ 0.04, 0.89 }, // 15
+	{ 0.00, 0.96 }, // 16
 	{ 0.02, 1.00 }, // 17
-	{ 0.02, 1.00 }, // 18
-	{ 0.00, 1.00 }, // 19
-	{ 0.03, 1.00 }, // 20
-	{ 0.03, 1.00 }, // 21
-	{ 0.00, 0.99 }, // 22
-	{ 0.00, 1.00 }  // 23
-}; 
+	{ 0.05, 1.00 }, // 18
+	{ 0.00, 0.96 }, // 19
+	{ 0.04, 1.00 }, // 20
+	{ 0.06, 1.00 }, // 21
+	{ 0.06, 0.99 }, // 22
+	{ 0.00, 0.95 }  // 23
+};
 
+Int_t TD_rdt_e_cuts[24][2] = {
+	{  -7,  4 },	// 00
+	{ -11,  4 },	// 01
+	{  -9,  4 },	// 02
+	{ -14,  3 },	// 03
+	{ -16,  4 },	// 04
+	{ -20,  3 },	// 05
+	{  -5,  6 },	// 06
+	{ -10,  3 },	// 07
+	{  -10,  5 },	// 08
+	{ -13,  4 },	// 09
+	{ -19,  4 },	// 10
+	{-200,200 },	// 11
+	{ -12,  5 },	// 12
+	{  -7,  7 },	// 13
+	{  -9,  7 },	// 14
+	{  -8,  5 },	// 15
+	{ -20,  5 },	// 16
+	{ -20,  6 },	// 17
+	{ -11,  6 },	// 18
+	{ -15,  6 },	// 19
+	{ -11,  8 },	// 20
+	{ -18,  5 },	// 21
+	{ -22,  6 },	// 22
+	{ -16,  6 } 	// 23
+};
 
 
 #endif

@@ -44,6 +44,8 @@ ULong64_t processed_entries = 0;
 ULong64_t num_entries;
 Double_t entry_frac = 0.1;
 
+Int_t random_counter = 0;
+
 
 
 // BEGIN ANALYSIS
@@ -174,19 +176,18 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 	b_TD_RDT_E_CUTS->GetEntry(entry);     b_XCAL_CUTS->GetEntry(entry);
 
 	// Work out if it is inside the cut(s)
-	is_in_rdt = 0; is_in_rdt_si = 0;
+	is_in_rdt_total = 0; is_in_rdt_si_total = 0;
 	for ( Int_t i = 0; i < 4; i++ ){
-		if ( is_in_rdt == 0 ){
-			TCutG* cut = (TCutG*)cut_list->At(i);
-			is_in_rdt += cut->IsInside( rdt[i+4], rdt[i] );
-		}
+		TCutG* cut = (TCutG*)cut_list->At(i);
+		is_in_rdt[i] = cut->IsInside( rdt[i+4], rdt[i] );
+		is_in_rdt_total = ( is_in_rdt_total || is_in_rdt[i] ); 
 		
-		if ( found_si_cuts && is_in_rdt_si == 0 ){
+		if ( found_si_cuts ){
 			TCutG* cut_si = (TCutG*)cut_list_si->At(i);
-			is_in_rdt_si += cut_si->IsInside( rdt[i+4], rdt[i] );
+			is_in_rdt_si[i] = cut_si->IsInside( rdt[i+4], rdt[i] );
+			is_in_rdt_si_total = ( is_in_rdt_si_total || is_in_rdt_si[i] );
 		}
 	}
-	
 	// Create some doubles for use in the loop
 	Double_t XNCAL, XFCAL, XNcal, XFcal;
 	
@@ -196,15 +197,33 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		// Calculate cut booleans
 		is_in_used_det = ( det_array[ i % 6 ][ (Int_t)TMath::Floor( i/6 ) ] == 1 );
 		// is_in_rdt goes here
-		is_in_td = ( ( td_rdt_e[i][0] > td_rdt_e_cuts[i][0] && td_rdt_e[i][0] < td_rdt_e_cuts[i][1] ) || \
-		             ( td_rdt_e[i][1] > td_rdt_e_cuts[i][0] && td_rdt_e[i][1] < td_rdt_e_cuts[i][1] ) || \
-		             ( td_rdt_e[i][2] > td_rdt_e_cuts[i][0] && td_rdt_e[i][2] < td_rdt_e_cuts[i][1] ) || \
-		             ( td_rdt_e[i][3] > td_rdt_e_cuts[i][0] && td_rdt_e[i][3] < td_rdt_e_cuts[i][1] ) );
+		// Monitors timing and recoil-timing  
+		is_in_td_total = 0;
+		is_in_rdt_and_td_total = 0;
+		is_in_rdt_si_and_td_total = 0;
+		for ( Int_t j = 0; j < 4; j++ ){
+			is_in_td[j] = ( td_rdt_e[i][j] >= td_rdt_e_cuts[i][0] && td_rdt_e[i][j] < td_rdt_e_cuts[i][1] );
+			is_in_td_total = ( is_in_td_total || is_in_td[j] );
+			is_in_rdt_and_td[j] = ( is_in_td[j] && is_in_rdt[j] );
+			is_in_rdt_and_td_total = ( is_in_rdt_and_td_total || is_in_rdt_and_td[j] );
+			is_in_rdt_si_and_td[j] = ( is_in_td[j] && is_in_rdt_si[j] );
+			is_in_rdt_si_and_td_total = ( is_in_rdt_si_and_td_total || is_in_rdt_si_and_td[j] );
+		}
+		// Local timing and recoil-timing       
+		is_in_TD_total = 0;
+		is_in_rdt_and_TD_total = 0;
+		for ( Int_t j = 0; j < 4; j++ ){
+			is_in_TD[j] = ( td_rdt_e[i][j] >= TD_rdt_e_cuts[i][0] && td_rdt_e[i][j] < TD_rdt_e_cuts[i][1] );
+			is_in_TD_total = ( is_in_TD_total || is_in_TD[j] );
+			is_in_rdt_and_TD[j] = ( is_in_TD[j] && is_in_rdt[j] );
+			is_in_rdt_and_TD_total = ( is_in_rdt_and_TD_total || is_in_rdt_and_TD[j] );
+		}
+		// Other
 		is_in_theta_min = ( thetaCM[i] >= THETA_MIN );
 		is_in_theta_range = ( thetaCM[i] >= THETA_LB && thetaCM[i] <= THETA_UB );
-		is_in_xcal = ( xcal[i] >= xcal_cuts[i][0] && xcal[i] <= xcal_cuts[i][1] );
+		is_in_xcal = ( xcal[i] >= xcal_cuts[i][0] && xcal[i] < xcal_cuts[i][1] );
 		is_in_xcal_mid = ( xcal[i] <= xcal_cuts[i][2] || xcal[i] >= xcal_cuts[i][3] );
-		is_in_XCAL = ( xcal[i] >= XCAL_cuts[i][0] && xcal[i] <= XCAL_cuts[i][1] );
+		is_in_XCAL = ( xcal[i] >= XCAL_cuts[i][0] && xcal[i] < XCAL_cuts[i][1] );
 		
 		// XNXF cut boolean
 		TCutG* cut_xnxf = (TCutG*)cut_list_xnxf->At(i);
@@ -268,35 +287,40 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			h_sigtime_e[i]->Fill( e_t[i], e[i] );
 		}
 
-		// *HIST* td with no td cuts
-		if ( is_in_used_det && is_in_rdt && is_in_theta_min ){
-			if ( SW_TD[0] == 1 ){
-				h_td[i][0]->Fill( td_rdt_e[i][0] );
-				h_td[i][0]->Fill( td_rdt_e[i][1] );
-				h_td[i][0]->Fill( td_rdt_e[i][2] );
-				h_td[i][0]->Fill( td_rdt_e[i][3] );
-			}
-		}
 		
-		// *HIST* td with td cuts
-		if ( is_in_used_det && is_in_rdt && is_in_td && is_in_theta_min ){
+		// *HIST* TD histograms
+		if ( is_in_used_det && is_in_theta_min ){
 			if ( SW_TD[0] == 1 ){
-				h_td[i][1]->Fill( td_rdt_e[i][0] );
-				h_td[i][1]->Fill( td_rdt_e[i][1] );
-				h_td[i][1]->Fill( td_rdt_e[i][2] );
-				h_td[i][1]->Fill( td_rdt_e[i][3] );
+				for ( Int_t j = 0; j < 4; j++ ){
+					// *HIST* td with no td cuts
+					if ( is_in_rdt[j] ){
+						h_td[i][0]->Fill( td_rdt_e[i][j] );
+					}
+					
+					// *HIST* td with td cuts TOD
+					if ( is_in_rdt_and_td[j] ){
+						h_td[i][1]->Fill( td_rdt_e[i][j] );
+					}
+					
+				}
 			}
 		}
 
 
 		// *HIST* xcal no cuts
-		if ( is_in_used_det && is_in_rdt && is_in_theta_min ){
-			if ( SW_XCAL[0] == 1 ){ h_xcal[i][0]->Fill( xcal[i] ); }
+		if ( is_in_used_det && is_in_rdt_and_td_total && is_in_theta_min ){
+			if ( SW_XCAL[0] == 1 ){
+				h_xcal[i][0]->Fill( xcal[i] );
+				h_xcal_e[i][0]->Fill( xcal[i], ecrr[i] );
+			}
 		}
 			
 		// *HIST* xcal with cuts
-		if ( is_in_used_det && is_in_rdt && is_in_theta_min && is_in_XCAL ){ 
-			if ( SW_XCAL[0] == 1 ){ h_xcal[i][1]->Fill( xcal[i] );  }
+		if ( is_in_used_det && is_in_rdt_and_td_total && is_in_theta_min && is_in_XCAL ){ 
+			if ( SW_XCAL[0] == 1 ){
+				h_xcal[i][1]->Fill( xcal[i] );
+				h_xcal_e[i][1]->Fill( xcal[i], ecrr[i] );
+			}
 		}
 		
 		// Do singles cuts
@@ -325,25 +349,25 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		}
 		
 		// RDT cuts
-		if ( is_in_used_det && is_in_rdt ){
+		if ( is_in_used_det && is_in_rdt_total ){
 			if ( SW_EVZ[0] == 1 ){ h_evz_evolution[1]->Fill( z[i], ecrr[i] ); }
 			if ( SW_EX[0] == 1 ){ h_ex_full_evolution[1]->Fill( Ex[i] ); }
 		}
 		
 		// RDT + thetaCM cuts
-		if ( is_in_used_det && is_in_rdt && is_in_theta_min ){
+		if ( is_in_used_det && is_in_rdt_total && is_in_theta_min ){
 			if ( SW_EVZ[0] == 1 ){ h_evz_evolution[2]->Fill( z[i], ecrr[i] ); }
 			if ( SW_EX[0] == 1 ){ h_ex_full_evolution[2]->Fill( Ex[i] ); }
 		}
 		
 		// RDT + thetaCM cuts + timing
-		if ( is_in_used_det && is_in_rdt && is_in_theta_min && is_in_td ){
+		if ( is_in_used_det && is_in_rdt_and_td_total && is_in_theta_min ){
 			if ( SW_EVZ[0] == 1 ){ h_evz_evolution[3]->Fill( z[i], ecrr[i] ); }
 			if ( SW_EX[0] == 1 ){ h_ex_full_evolution[3]->Fill( Ex[i] ); }
 		}
 		
 		// RDT + thetaCM cuts + timing + xcal
-		if ( is_in_used_det && is_in_rdt && is_in_theta_min && is_in_td && is_in_xcal ){
+		if ( is_in_used_det && is_in_rdt_and_td_total && is_in_theta_min && is_in_xcal ){
 			if ( SW_EVZ[0] == 1 ){ h_evz_evolution[4]->Fill( z[i], ecrr[i] ); }
 			if ( SW_EX[0] == 1 ){ h_ex_full_evolution[4]->Fill( Ex[i] ); }
 		}
@@ -352,7 +376,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		
 		
 		// Do full cuts (Mg)
-		if ( is_in_used_det && is_in_rdt && is_in_td && is_in_theta_min && is_in_xcal ){
+		if ( is_in_used_det && is_in_rdt_and_td_total && is_in_theta_min && is_in_xcal ){
 			
 			// *HIST* Full E v.s. z (Mg)
 			if ( SW_EVZ[0] == 1 ){ h_evz->Fill( z[i], ecrr[i] ); }
@@ -384,7 +408,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 
 
 		// Do full cuts (Si)
-		if ( is_in_used_det && found_si_cuts && is_in_rdt_si && is_in_td && is_in_theta_min && is_in_xcal ){
+		if ( is_in_used_det && found_si_cuts && is_in_rdt_si_and_td_total && is_in_theta_min && is_in_xcal ){
 			// *HIST* Full E v.s. z (Si)
 			if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[2]->Fill( z[i], ecrr[i] ); }
 			

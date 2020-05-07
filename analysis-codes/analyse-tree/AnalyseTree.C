@@ -80,6 +80,15 @@ void AnalyseTree::Begin(TTree* t)
 	num_entries = t->GetEntries();
 	TString option = GetOption();
 	
+	// Check array position is correct
+	if ( ARR_POSITION != 1 && ARR_POSITION != 2 ){
+		std::cout << "Array position is set to " << ARR_POSITION << ". Please set to 1 or 2." << "\n";
+		std::exit(1);
+	}
+	else{
+		std::cout << "Array position = " << ARR_POSITION << "\n\n";
+	}
+	
 	// Get the cuts
 	TFile *f = new TFile( cut_dir.Data() );
 	if ( f->IsOpen() ){
@@ -217,13 +226,22 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			is_in_TD_total = ( is_in_TD_total || is_in_TD[j] );
 			is_in_rdt_and_TD[j] = ( is_in_TD[j] && is_in_rdt[j] );
 			is_in_rdt_and_TD_total = ( is_in_rdt_and_TD_total || is_in_rdt_and_TD[j] );
+			
+			if ( is_in_td[j] != is_in_TD[j] ){
+				std::cout << j << ": td = " << td_rdt_e[i][j] << "; td_rdt_e_cuts = " << td_rdt_e_cuts[i][0] << ", " << xcal_cuts[i][1] << "; TD_rdt_e_cuts = " << TD_rdt_e_cuts[i][0] << ", " << TD_rdt_e_cuts[i][1] << "\n";
+			}
+			
+			
+			
 		}
 		// Other
 		is_in_theta_min = ( thetaCM[i] >= THETA_MIN );
+		is_in_theta_custom = ( thetaCM[i] >= thetaCM_cuts[i % 6][ARR_POSITION-1] );
 		is_in_theta_range = ( thetaCM[i] >= THETA_LB && thetaCM[i] <= THETA_UB );
-		is_in_xcal = ( xcal[i] >= xcal_cuts[i][0] && xcal[i] < xcal_cuts[i][1] );
-		is_in_xcal_mid = ( xcal[i] <= xcal_cuts[i][2] || xcal[i] >= xcal_cuts[i][3] );
-		is_in_XCAL = ( xcal[i] >= XCAL_cuts[i][0] && xcal[i] < XCAL_cuts[i][1] );
+		is_in_xcal = ( xcal[i] >= XCAL_cuts[i][0] && xcal[i] < XCAL_cuts[i][1] );
+		//is_in_xcal_mid = ( xcal[i] <= xcal_cuts[i][2] || xcal[i] >= xcal_cuts[i][3] );
+		
+		
 		
 		// XNXF cut boolean
 		TCutG* cut_xnxf = (TCutG*)cut_list_xnxf->At(i);
@@ -316,7 +334,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		}
 			
 		// *HIST* xcal with cuts
-		if ( is_in_used_det && is_in_rdt_and_td_total && is_in_theta_min && is_in_XCAL ){ 
+		if ( is_in_used_det && is_in_rdt_and_td_total && is_in_theta_min && is_in_xcal ){ 
 			if ( SW_XCAL[0] == 1 ){
 				h_xcal[i][1]->Fill( xcal[i] );
 				h_xcal_e[i][1]->Fill( xcal[i], ecrr[i] );
@@ -373,6 +391,15 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		}
 		
 		
+		// EXCITATION SPECTRUM GENERATION
+		// Full cuts (Mg) with RBR theta_custom cuts
+		if ( is_in_used_det && is_in_rdt_and_td_total && is_in_theta_custom && is_in_xcal ){
+			if ( SW_EX[0] == 1 ){
+				if ( ALL_ROWS == 1 ){ h_ex_full->Fill( Ex[i] ); }
+				if ( ROW_BY_ROW == 1 ){ h_ex_rbr[ i % 6 ]->Fill( Ex[i] ); }
+				if ( DET_BY_DET == 1 ){ h_ex_dbd[i]->Fill( Ex[i] ); }
+			}
+		}
 		
 		
 		// Do full cuts (Mg)
@@ -384,6 +411,18 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[2]->Fill( z[i], ecrr[i] ); }
 			//if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_evz_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( z[i], ecrr[i] ); }
 			
+			// *HIST* EVZ band cut
+			if ( SW_EVZ[0] == 1 ){
+				for ( Int_t j = 1; j < 6; j++ ){
+					for ( Int_t k = 0; k < 5; k++ ){
+						if ( thetaCM[i] >= 10*j + 2*k && thetaCM[i] < 10*j + 2*(k+1) ){
+							h_evz_bands[k]->Fill( z[i], ecrr[i] );
+						}
+					}
+				}
+			}
+			
+			
 			// Add additional angle cut
 			if ( is_in_theta_range ){
 				if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[3]->Fill( z[i], ecrr[i] ); }
@@ -393,11 +432,6 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			// *HIST* Full excitation plot (Mg)
 			//if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_ex_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( Ex[i] ); }
 			if ( SW_EX_SI[0] == 1 ){ h_ex_si[0]->Fill( Ex[i] ); }
-			if ( SW_EX[0] == 1 ){
-				if ( ALL_ROWS == 1 ){ h_ex_full->Fill( Ex[i] ); }
-				if ( ROW_BY_ROW == 1 ){ h_ex_rbr[ i % 6 ]->Fill( Ex[i] ); }
-				if ( DET_BY_DET == 1 ){ h_ex_dbd[i]->Fill( Ex[i] ); }
-			}
 			
 			// Implement the desired row numbers only
 			if ( i % 6 == ROW_NUMBER || ROW_NUMBER == -1 ){

@@ -77,7 +77,7 @@ void HDrawEx(){
 		c_ex_dbd_comb->Divide(6,4);
 	}
 	
-	TString root_name = Form( "%s/posXXX_ex", print_dir.Data() );
+	TString root_name = Form( "%s/pos%i_ex", print_dir.Data(), ARR_POSITION );
 	TFile* f;
 	TString spec_name;
 	
@@ -96,7 +96,7 @@ void HDrawEx(){
 			c_ex_full = new TCanvas( "c_ex_full", "Full excitation spectrum",  C_WIDTH, C_HEIGHT );
 			GlobSetCanvasMargins( c_ex_full );
 			h_ex_full->Draw();
-			spec_name = Form( "%s/posXXX_ex_full", print_dir.Data() );
+			spec_name = Form( "%s/pos%i_ex_full", print_dir.Data(), ARR_POSITION );
 			
 			// Plot evolution spectrum
 			for ( Int_t j = 0; j < 5; j++ ){
@@ -112,7 +112,7 @@ void HDrawEx(){
 				if ( PRINT_ROOT == 1 ){ f->cd(); h_ex_full->Write(); }
 				
 				for ( Int_t j = 0; j < 5; j++ ){
-					PrintAll( c_ex_evolution[j], Form( "%s/posXXX_ex_evolution_%i", print_dir.Data(), j ) );
+					PrintAll( c_ex_evolution[j], Form( "%s/pos%i_ex_evolution_%i", print_dir.Data(), ARR_POSITION, j ) );
 					if ( PRINT_ROOT == 1 ){ f->cd(); h_ex_full_evolution[j]->Write(); }
 				}
 			}
@@ -129,7 +129,7 @@ void HDrawEx(){
 			c_ex_rbr[i] = new TCanvas( Form( "c_ex_rbr_%i", i ), Form( "Ex | Row %i", i ), C_WIDTH, C_HEIGHT );
 			GlobSetCanvasMargins( c_ex_rbr[i] );
 			h_ex_rbr[i]->Draw();
-			spec_name = Form( "%s/posXXX_ex_rbr_%i", print_dir.Data(), i );
+			spec_name = Form( "%s/pos%i_ex_rbr_%i", print_dir.Data(), ARR_POSITION, i );
 			
 			// Print spectrum if desired
 			if ( SW_EX[1] == 1 ){
@@ -145,7 +145,7 @@ void HDrawEx(){
 		
 		// Detector by detector
 		if ( ( i == DET_NUMBER || ( DET_NUMBER == -1 ) ) && DET_BY_DET == 1 ){
-			spec_name = Form( "%s/posXXX_ex_dbd_%i", print_dir.Data(), i );
+			spec_name = Form( "%s/pos%i_ex_dbd_%02i", print_dir.Data(), ARR_POSITION,  i );
 			if ( CANVAS_COMBINE == 0 ){
 				// Plot spectrum
 				c_ex_dbd[i] = new TCanvas( Form( "c_ex_dbd_%i", i ), Form( "Ex | Det %i", i ), C_WIDTH, C_HEIGHT );
@@ -168,7 +168,7 @@ void HDrawEx(){
 				
 				// Print spectrum if desired
 				if ( SW_EX[1] == 1 && i == 23 ){
-					PrintAll( c_ex_dbd_comb, Form( "%s/posXXX_ex_dbd_comb", print_dir.Data() ) );
+					PrintAll( c_ex_dbd_comb, Form( "%s/pos%i_ex_dbd_comb", print_dir.Data(), ARR_POSITION ) );
 				}
 				
 				

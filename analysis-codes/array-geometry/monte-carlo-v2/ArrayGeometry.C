@@ -24,7 +24,7 @@
 #include <iostream>
 #include <fstream>
 
-void ArrayGeometryEX( Double_t ex = EX ){
+void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t theta_ub = THETA_UB ){
 	// Batch mode
 	if ( BATCH_MODE ){ gROOT->SetBatch(kTRUE); }
 
@@ -775,9 +775,9 @@ void ArrayGeometryEX( Double_t ex = EX ){
 
 // MAIN FUNCTION ------------------------------------------------------------------------------- //
 void ArrayGeometry(){
-	const Int_t NUM_STATES = 11;
-	const Bool_t ALL = 0;
-	Double_t STATES[NUM_STATES] = {
+	const Int_t NUM_STATES = 4;
+	const Bool_t ALL = 1;
+	/*Double_t STATES[NUM_STATES] = {
 		0.00000,
 		0.05460,
 		1.09435,
@@ -790,11 +790,21 @@ void ArrayGeometry(){
 		3.96590,
 		//4.28395
 		4.30000
+	};*/
+	
+	Double_t theta_lb_arr[4] = { 16.3, 17.2, 17.6, 18.0 };
+	Double_t theta_ub_arr[4] = { 17.0, 17.7, 18.3, 18.6 };
+	
+	Double_t STATES[NUM_STATES] = {
+		0.06,
+		1.45,
+		2.50,
+		3.20,
 	};
 
 	if ( ALL == 1 ){
 		for ( Int_t i = 0; i < NUM_STATES; i++ ){
-			ArrayGeometryEX( STATES[i] );
+			ArrayGeometryEX( STATES[i],  theta_lb_arr[i],  theta_ub_arr[i] );
 			gROOT->ls();
 		}
 	}

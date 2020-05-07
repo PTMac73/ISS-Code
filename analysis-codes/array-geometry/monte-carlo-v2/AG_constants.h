@@ -128,22 +128,22 @@ const Double_t RDT_RADIUS_TO_CLEAR = RDT_SI_INNER_RAD + TMath::Sqrt(2)*0.5*RDT_D
 // SAMPLING ------------------------------------------------------------------------------------ //
 // CM Theta's to spam
 Double_t theta_spacing = 0.01;	// [DEG]
-Double_t theta_lb = 18.60;		// [DEG]
-Double_t theta_ub = 19.30;		// [DEG]
+Double_t THETA_LB= 15.00;		// [DEG]
+Double_t THETA_UB = 19.00;		// [DEG]
 
 // Number of events per theta
-const Int_t NUM_EVENTS_PER_THETA = 62500;//000;
+const Int_t NUM_EVENTS_PER_THETA = 10000;
 
 // Proton z's to spam
 Double_t z_spacing = 0.01;		// [cm]
 const Int_t NUM_ZP = (Int_t)( ( 0 - ej_side_X1 )/z_spacing );
-const Int_t NUM_THETA = (Int_t)( ( theta_ub - theta_lb )/theta_spacing ) + 1;
+const Int_t NUM_THETA = (Int_t)( ( THETA_UB - THETA_LB )/theta_spacing ) + 1;
 
 // Recoil z's to spam (add 1 so that the detector surface is definitely included)
 const Int_t NUM_ZR = (Int_t)( ( TARGET_RDT_DISTANCE - 0 )/z_spacing ) + 1;
 
 // Choose which angles to look at
-const Double_t THETA_HEAD = 19.2;
+const Double_t THETA_HEAD = 18.0;
 const Double_t EVENT_NUMBER = 1;
 
 // Log file precision

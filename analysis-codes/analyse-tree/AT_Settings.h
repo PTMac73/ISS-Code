@@ -34,17 +34,19 @@ TString cut_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/working/ALL-MgC
 TString cut_dir_si = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-codes/analyse-tree/cuttlefish.root";
 
 // Decide how to plot excitation spectra
-const Bool_t ALL_ROWS = 1;
+const Bool_t ALL_ROWS = 0;
 const Bool_t ROW_BY_ROW = 1;
-const Bool_t DET_BY_DET = 0;
+const Bool_t DET_BY_DET = 1;
 
 // Select row/det number to look at (-1 means do them all)
 const Int_t DET_NUMBER = -1;
 const Int_t ROW_NUMBER = -1;
 
+// Array position - can only be one or two
+const Int_t ARR_POSITION = 2;
 
 // Select angle cuts
-const Double_t THETA_MIN = 19.21; //16.6278;
+const Double_t THETA_MIN = 11.0;//19.21; //16.6278;
 const Double_t THETA_LB = 11.0;
 const Double_t THETA_UB = 14.5;
 
@@ -71,12 +73,12 @@ TFile* out_root_file;
 const Bool_t  SW_EX_COMPARE[3] = { 0, 1, 1 };
 const Bool_t    SW_RDT_CUTS[3] = { 0, 1, 0 };
 const Bool_t      SW_EVZ_SI[3] = { 0, 0, 0 };
-const Bool_t          SW_EX[3] = { 0, 1, 1 };
+const Bool_t          SW_EX[3] = { 1, 1, 1 };
 const Bool_t       SW_EX_SI[3] = { 0, 0, 0 };
 const Bool_t SW_EVZ_COMPARE[3] = { 0, 1, 0 };
 const Bool_t         SW_EVZ[3] = { 0, 1, 0 };
 const Bool_t        SW_XNXF[3] = { 0, 1, 0 };
-const Bool_t        SW_XCAL[3] = { 1, 1, 0 };
+const Bool_t        SW_XCAL[3] = { 0, 1, 0 };
 const Bool_t          SW_TD[3] = { 0, 1, 0 };
 const Bool_t     SW_SIGTIME[3] = { 0, 1, 0 };
 
@@ -111,10 +113,11 @@ Bool_t is_in_rdt_and_TD[4] = { 0, 0, 0, 0 };
 Bool_t is_in_rdt_and_TD_total = 0;
 
 Bool_t is_in_xcal = 0;
-Bool_t is_in_xcal_mid = 0;
-Bool_t is_in_XCAL = 0;			// Local version of xcal cuts
+//Bool_t is_in_xcal_mid = 0;
+//Bool_t is_in_XCAL = 0;			// Local version of xcal cuts
 Bool_t is_in_theta_min = 0;
 Bool_t is_in_theta_range = 0;
+Bool_t is_in_theta_custom = 0;
 Bool_t is_in_row = 0;
 Bool_t is_in_xnxf_cut = 0;
 
@@ -223,6 +226,15 @@ Double_t xnCorr[24] = {
 	1.099749,	// 23
 };
 
+Double_t thetaCM_cuts[6][2] = {
+	{ 17.0, 17.0 },	// ROW 0
+	{ 17.7, 17.7 },	// ROW 1
+	{ 18.3, 18.8 },	// ROW 2
+	{ 18.8, 19.4 },	// ROW 3
+	{ 19.4, 19.4 },	// ROW 4
+	{ 19.4, 19.4 } 	// ROW 5
+};
+
 // 0 is intercept, 1 is gradient
 Double_t xfxneCorr[24][2] = {
 	{   3.375253, 0.887861 },	// 00
@@ -308,8 +320,7 @@ Double_t rawE_pos[24][4] = {
 	{ 0760.0,  1240.0, 1310.0, 1390.0 }  // 23
 	
 };
-
-Float_t XCAL_cuts[24][2] = {
+/*Float_t XCAL_cuts[24][2] = {
 	{ 0.01, 0.96 }, // 00
 	{ 0.00, 0.96 }, // 01
 	{ 0.04, 1.00 }, // 02
@@ -334,6 +345,33 @@ Float_t XCAL_cuts[24][2] = {
 	{ 0.06, 1.00 }, // 21
 	{ 0.06, 0.99 }, // 22
 	{ 0.00, 0.95 }  // 23
+};
+*/
+Float_t XCAL_cuts[24][2] = {
+	{ 0.00, 1.00 }, // 00
+	{ 0.00, 1.00 }, // 01
+	{ 0.00, 1.00 }, // 02
+	{ 0.00, 1.00 }, // 03
+	{ 0.00, 1.00 }, // 04
+	{ 0.00, 1.00 }, // 05
+	{ 0.00, 1.00 }, // 06
+	{ 0.00, 1.00 }, // 07
+	{ 0.00, 1.00 }, // 08
+	{ 0.00, 1.00 }, // 09
+	{ 0.00, 1.00 }, // 10
+	{ 0.00, 1.00 }, // 11
+	{ 0.00, 1.00 }, // 12
+	{ 0.00, 1.00 }, // 13
+	{ 0.00, 1.00 }, // 14
+	{ 0.00, 1.00 }, // 15
+	{ 0.00, 1.00 }, // 16
+	{ 0.00, 1.00 }, // 17
+	{ 0.00, 1.00 }, // 18
+	{ 0.00, 1.00 }, // 19
+	{ 0.00, 1.00 }, // 20
+	{ 0.00, 1.00 }, // 21
+	{ 0.00, 1.00 }, // 22
+	{ 0.00, 1.00 }  // 23
 };
 
 Int_t TD_rdt_e_cuts[24][2] = {

@@ -63,12 +63,12 @@ void HDrawExSi(){
 	if ( SW_EX_SI[1] == 1 ){
 		PrintAll( c_ex_si, spec_name );
 		
-		if ( PRINT_ROOT == 1 ){
+		/*if ( PRINT_ROOT == 1 ){
 			out_root_file->cd();
 			for ( Int_t i = 0; i < 2; i++ ){
 				h_ex_si[i]->Write();
 			}
-		}
+		}*/
 		
 	}
 	

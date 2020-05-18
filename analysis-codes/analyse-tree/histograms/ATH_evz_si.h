@@ -66,12 +66,12 @@ void HDrawEVZSi(){
 		TString spec_name = Form( "%s/posXXX_evzsi", print_dir.Data() );
 		PrintAll( c_evz_si, spec_name );
 		
-		if ( PRINT_ROOT == 1 ){
+		/*if ( PRINT_ROOT == 1 ){
 			out_root_file->cd();
 			for ( Int_t i = 0; i < 3; i++ ){
 				h_evz_si[i]->Write();
 			}
-		}
+		}*/
 		
 	}
 	

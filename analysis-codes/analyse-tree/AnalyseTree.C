@@ -92,7 +92,8 @@ void AnalyseTree::Begin(TTree* t)
 	// Get the cuts
 	TFile *f = new TFile( cut_dir.Data() );
 	if ( f->IsOpen() ){
-		cut_list = (TObjArray*)f->FindObjectAny("cutList");
+		cut_list = (TObjArray*)f->FindObjectAny("cuttlefish");
+		//cut_list = (TObjArray*)f->FindObjectAny("cutList");
 		f->Close();
 	}
 	else{
@@ -237,7 +238,8 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		// Other
 		is_in_theta_min = ( thetaCM[i] >= THETA_MIN );
 		is_in_theta_custom = ( thetaCM[i] >= thetaCM_cuts[i % 6][ARR_POSITION-1] );
-		is_in_theta_range = ( thetaCM[i] >= THETA_LB && thetaCM[i] <= THETA_UB );
+		is_in_theta_singles = ( thetaCM[i] >= thetaCM_singles_cuts[i % 6][ARR_POSITION-1][0] && thetaCM[i] < thetaCM_singles_cuts[i % 6][ARR_POSITION-1][1] );
+		is_in_theta_range = ( thetaCM[i] >= THETA_LB && thetaCM[i] < THETA_UB );
 		is_in_xcal = ( xcal[i] >= XCAL_cuts[i][0] && xcal[i] < XCAL_cuts[i][1] );
 		//is_in_xcal_mid = ( xcal[i] <= xcal_cuts[i][2] || xcal[i] >= xcal_cuts[i][3] );
 		
@@ -346,17 +348,26 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			// *HIST* E v.s. z plot - singles
 			if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[0]->Fill( z[i], ecrr[i] ); }
 			if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[0]->Fill( z[i], ecrr[i] ); }
+			//if ( SW_EVZ[0] == 1 ){ h_evz_sides[ (Int_t)TMath::Floor( i/6 ) ]->Fill( z[i], ecrr[i] ); }
+			
+			
 			
 			// Add additional angle cut
-			if ( is_in_theta_range ){
+			if ( is_in_theta_singles ){
 				if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[1]->Fill( z[i], ecrr[i] ); }
+				
+				// Implement the desired row numbers only
+				if ( ROW_BY_ROW == 1 && ( i % 6 == ROW_NUMBER || ROW_NUMBER == -1 ) ){
+					// *HIST* Compare excitation spectra 1
+					if ( SW_EX_COMPARE[0] == 1 ){ h_ex_compare1[i % 6]->Fill( Ex[i] ); }
+				}
+				
+				if ( DET_BY_DET == 1 && ( i == DET_NUMBER || DET_NUMBER == -1 ) ){
+					// *HIST* Compare excitation spectra 1
+					if ( SW_EX_COMPARE[0] == 1 ){ h_ex_dbd_singl[i]->Fill( Ex[i] ); }
+				}
 			}
 			
-			// Implement the desired row numbers only
-			if ( i % 6 == ROW_NUMBER || ROW_NUMBER == -1 ){
-				// *HIST* Compare excitation spectra 1
-				if ( SW_EX_COMPARE[0] == 1 ){ h_ex_compare1[i % 6]->Fill( Ex[i] ); }
-			}
 		}
 		
 		// EVOLUTION OF CUTS
@@ -396,9 +407,14 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		if ( is_in_used_det && is_in_rdt_and_td_total && is_in_theta_custom && is_in_xcal ){
 			if ( SW_EX[0] == 1 ){
 				if ( ALL_ROWS == 1 ){ h_ex_full->Fill( Ex[i] ); }
-				if ( ROW_BY_ROW == 1 ){ h_ex_rbr[ i % 6 ]->Fill( Ex[i] ); }
+				if ( ROW_BY_ROW == 1 ){
+					h_ex_rbr[ i % 6 ][0]->Fill( Ex[i] );
+					//if ( i < 12 || i > 17 ){ h_ex_rbr[ i % 6 ][1]->Fill( Ex[i] ); }
+				}
 				if ( DET_BY_DET == 1 ){ h_ex_dbd[i]->Fill( Ex[i] ); }
 			}
+			
+			if ( SW_EVZ[0] == 1 ){ h_evz_custom->Fill( z[i], ecrr[i] ); }
 		}
 		
 		
@@ -407,9 +423,10 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			
 			// *HIST* Full E v.s. z (Mg)
 			if ( SW_EVZ[0] == 1 ){ h_evz->Fill( z[i], ecrr[i] ); }
+			if ( SW_EVZ[0] == 1 ){ h_evz_sides[ (Int_t)TMath::Floor( i/6 ) ]->Fill( z[i], ecrr[i] ); }
 			if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[1]->Fill( z[i], ecrr[i] ); }
 			if ( SW_EVZ_COMPARE[0] == 1 ){ h_evz_compare[2]->Fill( z[i], ecrr[i] ); }
-			//if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_evz_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( z[i], ecrr[i] ); }
+			if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_evz_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( z[i], ecrr[i] ); }
 			
 			// *HIST* EVZ band cut
 			if ( SW_EVZ[0] == 1 ){
@@ -430,13 +447,20 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			
 			
 			// *HIST* Full excitation plot (Mg)
-			//if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_ex_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( Ex[i] ); }
+			if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_ex_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( Ex[i] ); }
 			if ( SW_EX_SI[0] == 1 ){ h_ex_si[0]->Fill( Ex[i] ); }
 			
 			// Implement the desired row numbers only
-			if ( i % 6 == ROW_NUMBER || ROW_NUMBER == -1 ){
-				// *HIST* Compare excitation spectra 2
-				if ( SW_EX_COMPARE[0] == 1 ){ h_ex_compare2[i % 6]->Fill( Ex[i] ); }
+			if ( is_in_theta_singles ){
+				if ( ROW_BY_ROW == 1 && ( i % 6 == ROW_NUMBER || ROW_NUMBER == -1 ) ){
+					// *HIST* Compare excitation spectra 2
+					if ( SW_EX_COMPARE[0] == 1 ){ h_ex_compare2[i % 6]->Fill( Ex[i] ); }
+				}
+				
+				if ( DET_BY_DET == 1 && ( i == DET_NUMBER || DET_NUMBER == -1 ) ){
+					// *HIST* Compare excitation
+					if ( SW_EX_COMPARE[0] == 1 ){ h_ex_dbd_clean[i]->Fill( Ex[i] ); }
+				}
 			}
 		}
 

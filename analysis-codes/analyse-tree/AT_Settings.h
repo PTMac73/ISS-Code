@@ -30,13 +30,15 @@ const Int_t C_HEIGHT = 900;
 
 // Directories
 TString print_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/Mg-Analysis/SPE-Files";
-TString cut_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/working/ALL-MgCuts3.root";
-TString cut_dir_si = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-codes/analyse-tree/cuttlefish.root";
+//TString cut_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/working/ALL-MgCuts3.root";
+TString cut_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-codes/analyse-tree/mg_cuts.root";
+TString cut_dir_new = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-codes/analyse-tree/cuttlefish.root";
+TString cut_dir_si = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-codes/analyse-tree/si_cuts.root";
 
 // Decide how to plot excitation spectra
 const Bool_t ALL_ROWS = 0;
 const Bool_t ROW_BY_ROW = 1;
-const Bool_t DET_BY_DET = 1;
+const Bool_t DET_BY_DET = 0;
 
 // Select row/det number to look at (-1 means do them all)
 const Int_t DET_NUMBER = -1;
@@ -47,8 +49,8 @@ const Int_t ARR_POSITION = 2;
 
 // Select angle cuts
 const Double_t THETA_MIN = 11.0;//19.21; //16.6278;
-const Double_t THETA_LB = 11.0;
-const Double_t THETA_UB = 14.5;
+const Double_t THETA_LB = 12.5;
+const Double_t THETA_UB = 20.0;
 
 // PRINT OPTIONS
 const Bool_t DISPLAY_CANVAS = 0;
@@ -59,7 +61,6 @@ const Bool_t CANVAS_COMBINE = 0;
 
 // Cut creator
 const Bool_t DRAW_NEW_CUTS = 0;
-TFile* out_root_file;
 
 // Other constant booleans
 
@@ -76,8 +77,8 @@ const Bool_t      SW_EVZ_SI[3] = { 0, 0, 0 };
 const Bool_t          SW_EX[3] = { 1, 1, 1 };
 const Bool_t       SW_EX_SI[3] = { 0, 0, 0 };
 const Bool_t SW_EVZ_COMPARE[3] = { 0, 1, 0 };
-const Bool_t         SW_EVZ[3] = { 0, 1, 0 };
-const Bool_t        SW_XNXF[3] = { 0, 1, 0 };
+const Bool_t         SW_EVZ[3] = { 1, 1, 0 };
+const Bool_t        SW_XNXF[3] = { 0, 0, 0 };
 const Bool_t        SW_XCAL[3] = { 0, 1, 0 };
 const Bool_t          SW_TD[3] = { 0, 1, 0 };
 const Bool_t     SW_SIGTIME[3] = { 0, 1, 0 };
@@ -118,6 +119,7 @@ Bool_t is_in_xcal = 0;
 Bool_t is_in_theta_min = 0;
 Bool_t is_in_theta_range = 0;
 Bool_t is_in_theta_custom = 0;
+Bool_t is_in_theta_singles = 0;
 Bool_t is_in_row = 0;
 Bool_t is_in_xnxf_cut = 0;
 
@@ -320,7 +322,7 @@ Double_t rawE_pos[24][4] = {
 	{ 0760.0,  1240.0, 1310.0, 1390.0 }  // 23
 	
 };
-/*Float_t XCAL_cuts[24][2] = {
+Float_t XCAL_cuts[24][2] = {
 	{ 0.01, 0.96 }, // 00
 	{ 0.00, 0.96 }, // 01
 	{ 0.04, 1.00 }, // 02
@@ -346,7 +348,7 @@ Double_t rawE_pos[24][4] = {
 	{ 0.06, 0.99 }, // 22
 	{ 0.00, 0.95 }  // 23
 };
-*/
+/*
 Float_t XCAL_cuts[24][2] = {
 	{ 0.00, 1.00 }, // 00
 	{ 0.00, 1.00 }, // 01
@@ -372,7 +374,7 @@ Float_t XCAL_cuts[24][2] = {
 	{ 0.00, 1.00 }, // 21
 	{ 0.00, 1.00 }, // 22
 	{ 0.00, 1.00 }  // 23
-};
+};*/
 
 Int_t TD_rdt_e_cuts[24][2] = {
 	{  -7,  4 },	// 00
@@ -400,6 +402,57 @@ Int_t TD_rdt_e_cuts[24][2] = {
 	{ -22,  6 },	// 22
 	{ -16,  6 } 	// 23
 };
+
+
+Float_t thetaCM_singles_cuts[6][2][2] = {
+	{ { 11.0, 14.5 }, { 11.0, 90.0 } }, 
+	{ { 11.0, 17.0 }, { 11.0, 90.0 } }, 
+	{ { 12.0, 19.0 }, { 14.0, 90.0 } }, 
+	{ { 12.5, 20.0 }, { 00.0, 00.0 } }, 
+	{ { 00.0, 00.0 }, { 00.0, 00.0 } },
+	{ { 00.0, 00.0 }, { 00.0, 00.0 } }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #endif

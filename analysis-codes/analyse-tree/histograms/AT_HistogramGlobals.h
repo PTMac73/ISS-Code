@@ -188,7 +188,13 @@ Double_t GetMeanBinPosition( TH1F* h, Double_t lb, Double_t ub, Double_t &err ){
 
 
 
-
+TString SideString( Int_t det ){
+	if ( det >=  0 && det <=  5 ){ return "left"; }	
+	else if ( det >=  6 && det <= 11 ){ return "bottom"; }
+	else if ( det >= 12 && det <= 17 ){ return "right"; }
+	else if ( det >= 18 && det <= 23 ){ return "top"; }
+	else{ return ""; }
+}
 
 
 

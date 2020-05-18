@@ -38,7 +38,7 @@ void HCreateRDTCuts(){
 		h_rdt_cuts[i] = new TH2F( Form( "h_rdt_cuts_%i", i ), "", 900, 0, 9000, 1000, 0, 6000 );
 		GlobCreate2DHists( h_rdt_cuts[i], Form( "rdt[%i]", i + 4 ), Form( "rdt[%i]", i ) );
 		h_rdt_cuts[i]->SetMarkerSize( 0.2 );
-	/*
+
 		h_rdt_ex_mg[i] = new TH1F( Form( "h_rdt_ex_mg_%i", i ), "", 450, -1, 8 );
 		h_rdt_ex_mg[i]->SetFillColorAlpha(kBlack, 0.3);
 		h_rdt_ex_mg[i]->SetLineColor(kWhite);
@@ -58,7 +58,6 @@ void HCreateRDTCuts(){
 		
 		GlobSetHistFonts( h_rdt_ex_mg[i] );
 		GlobSetHistFonts( h_rdt_evz_mg[i] );
-		*/
 	}
 	
 	return;
@@ -71,7 +70,7 @@ void HDrawRDTCuts( TTree* t ){
 	cuttlefish = new TObjArray();
 	TCutG* cuttle;
 	
-	TString root_name = Form( "%s/posXXX_rdt", print_dir.Data() );
+	TString root_name = Form( "%s/pos%i_rdt", print_dir.Data(), ARR_POSITION );
 	TFile* f;
 	TString spec_name;
 	
@@ -122,14 +121,14 @@ void HDrawRDTCuts( TTree* t ){
 		
 		// Combine canvas print settings
 		if ( CANVAS_COMBINE == 1 ){
-			spec_name = Form( "%s/posXXX_rdt_cuts_all", print_dir.Data() );
+			spec_name = Form( "%s/pos%i_rdt_cuts_all", print_dir.Data(), ARR_POSITION );
 			PrintAll( c_rdt_cuts_comb, spec_name );
 		}
 		
 		// Separate canvas print settings
 		else{
 			for ( Int_t i = 0; i < 4; i++ ){
-				spec_name = Form( "%s/posXXX_rdt_cuts_%i", print_dir.Data(), i );
+				spec_name = Form( "%s/pos%i_rdt_cuts_%i", print_dir.Data(), ARR_POSITION, i );
 				PrintAll( c_rdt_cuts[i], spec_name );;
 			}
 		}

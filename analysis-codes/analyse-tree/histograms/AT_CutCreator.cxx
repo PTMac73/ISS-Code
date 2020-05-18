@@ -193,10 +193,10 @@ TCutG* CreateCut( TH2 *h, TCanvas* c, TString cut_name = "cut", TTree* t = NULL,
 }
 
 void WriteCutFile( TObjArray* arr ){
-	TFile *f = new TFile( cut_dir_si.Data(), "RECREATE" );
+	TFile *f = new TFile( cut_dir_new.Data(), "RECREATE" );
 	if ( f->IsOpen() ){
 		arr->Write( arr->GetName(), TObject::kSingleKey );
-		std::cout << "Cuttlefish created!" << "\n";
+		std::cout << "New cut file created!" << "\n";
 		f->Close();
 	}
 	else{

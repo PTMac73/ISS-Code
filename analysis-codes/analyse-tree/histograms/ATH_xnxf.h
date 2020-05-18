@@ -164,18 +164,18 @@ void PrintAlphaCentroids(){
 
 // Populate TString array of names
 void MakeSpecName( Int_t i ){
-	spec_name[0]  = Form( "%s/posXXX_xnxf_%i", print_dir.Data(), i );			// (0) XN-XF hist monochrome
-	spec_name[1]  = Form( "%s/posXXX_xnxf_p_%i", print_dir.Data(), i );			// (1) XN-XF profile
-	spec_name[2]  = Form( "%s/posXXX_xnxfE_%i", print_dir.Data(), i );			// (2) XNXF-E hist monochrome
-	spec_name[3]  = Form( "%s/posXXX_xnxfE_p_%i", print_dir.Data(), i );		// (3) XNXF-E profile
-	spec_name[4]  = Form( "%s/posXXX_xnE_%i", print_dir.Data(), i );			// (4) XN-E hist monochrome
-	spec_name[5]  = Form( "%s/posXXX_xfE_%i", print_dir.Data(), i );			// (5) XF-E hist monochrome
-	spec_name[6]  = Form( "%s/posXXX_xnxf_col_%i", print_dir.Data(), i );		// (6) XN-XF hist coloured
-	spec_name[7]  = Form( "%s/posXXX_xnE_col_%i", print_dir.Data(), i );		// (7) XN-E hist coloured
-	spec_name[8]  = Form( "%s/posXXX_xfE_col_%i", print_dir.Data(), i );		// (8) XF-E hist coloured
-	spec_name[9]  = Form( "%s/posXXX_xnxfE_col_%i", print_dir.Data(), i );		// (9) XNXF-E hist coloured
-	spec_name[10] = Form( "%s/posXXX_ecalibration_%i", print_dir.Data(), i );	//(10) E Calibration hist
-	spec_name[11] = Form( "%s/posXXX_ecal_fits_%i", print_dir.Data(), i );		//(11) E Calibration graph
+	spec_name[0]  = Form( "%s/pos%i_xnxf_%i", print_dir.Data(), ARR_POSITION, i );			// (0) XN-XF hist monochrome
+	spec_name[1]  = Form( "%s/pos%i_xnxf_p_%i", print_dir.Data(), ARR_POSITION, i );		// (1) XN-XF profile
+	spec_name[2]  = Form( "%s/pos%i_xnxfE_%i", print_dir.Data(), ARR_POSITION, i );			// (2) XNXF-E hist monochrome
+	spec_name[3]  = Form( "%s/pos%i_xnxfE_p_%i", print_dir.Data(), ARR_POSITION, i );		// (3) XNXF-E profile
+	spec_name[4]  = Form( "%s/pos%i_xnE_%i", print_dir.Data(), ARR_POSITION, i );			// (4) XN-E hist monochrome
+	spec_name[5]  = Form( "%s/pos%i_xfE_%i", print_dir.Data(), ARR_POSITION, i );			// (5) XF-E hist monochrome
+	spec_name[6]  = Form( "%s/pos%i_xnxf_col_%i", print_dir.Data(), ARR_POSITION, i );		// (6) XN-XF hist coloured
+	spec_name[7]  = Form( "%s/pos%i_xnE_col_%i", print_dir.Data(), ARR_POSITION, i );		// (7) XN-E hist coloured
+	spec_name[8]  = Form( "%s/pos%i_xfE_col_%i", print_dir.Data(), ARR_POSITION, i );		// (8) XF-E hist coloured
+	spec_name[9]  = Form( "%s/pos%i_xnxfE_col_%i", print_dir.Data(), ARR_POSITION, i );		// (9) XNXF-E hist coloured
+	spec_name[10] = Form( "%s/pos%i_ecalibration_%i", print_dir.Data(), ARR_POSITION, i );	//(10) E Calibration hist
+	spec_name[11] = Form( "%s/pos%i_ecal_fits_%i", print_dir.Data(), ARR_POSITION, i );		//(11) E Calibration graph
 }
 
 // MAIN FUNCTIONS ------------------------------------------------------------------------------ //
@@ -381,7 +381,7 @@ void HDrawXNXF(){
 	
 	
 	// Create names and files
-	TString root_name = Form( "%s/posXXX_xnxf", print_dir.Data() );
+	TString root_name = Form( "%s/pos%i_xnxf", print_dir.Data(), ARR_POSITION );
 	TFile* f;
 	
 	// Open root file if desired
@@ -648,7 +648,7 @@ void HDrawXNXF(){
 				
 				// Print spectrum if desired
 				if ( SW_EX[1] == 1 && i == 23 ){
-					PrintAll( c_xnxf_comb, Form( "%s/posXXX_xnxf_comb", print_dir.Data() ) );
+					PrintAll( c_xnxf_comb, Form( "%s/pos%i_xnxf_comb", print_dir.Data(), ARR_POSITION ) );
 				}
 				*/
 				// ***************************************************************************** //

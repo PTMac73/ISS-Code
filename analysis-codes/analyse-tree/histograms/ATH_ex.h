@@ -29,7 +29,7 @@
 // Switch for this is SW_EX
 // Number of histograms = 24 (DBD) + 6 (RBR) + 1 (Full)
 TH1F* h_ex_full = NULL;			// Full spectrum
-TH1F* h_ex_rbr[6];				// RBR spectrum
+TH1F* h_ex_rbr[6][2];			// RBR spectrum: [0] is full, [1] has RHS removed
 TH1F* h_ex_dbd[24];				// DBD spectrum
 TH1F* h_ex_full_evolution[5];	// Full spectrum evolution
 
@@ -50,7 +50,8 @@ void HCreateEx(){
 		
 		// Row by row
 		if ( ( i == ROW_NUMBER || ( ROW_NUMBER == -1 && i < 6 ) ) && ROW_BY_ROW == 1 ){
-			CreateExSpectrum( h_ex_rbr[i], Form( "h_ex_rbr_%i", i ) );
+			CreateExSpectrum( h_ex_rbr[i][0], Form( "h_ex_rbr_%i_LO", i ) );
+			CreateExSpectrum( h_ex_rbr[i][1], Form( "h_ex_rbr_%i_HI", i ) );
 		}
 		
 		// Detector by detector
@@ -67,7 +68,7 @@ void HCreateEx(){
 void HDrawEx(){
 	// Define some local variables
 	TCanvas* c_ex_full;
-	TCanvas* c_ex_rbr[6];
+	TCanvas* c_ex_rbr[6][2];
 	TCanvas* c_ex_dbd[24];
 	TCanvas* c_ex_dbd_comb;
 	TCanvas* c_ex_evolution[5];
@@ -126,19 +127,28 @@ void HDrawEx(){
 		// Row by row
 		if ( ( i == ROW_NUMBER || ( ROW_NUMBER == -1 && i < 6 ) ) && ROW_BY_ROW == 1 ){
 			// Plot spectrum
-			c_ex_rbr[i] = new TCanvas( Form( "c_ex_rbr_%i", i ), Form( "Ex | Row %i", i ), C_WIDTH, C_HEIGHT );
-			GlobSetCanvasMargins( c_ex_rbr[i] );
-			h_ex_rbr[i]->Draw();
+			c_ex_rbr[i][0] = new TCanvas( Form( "c_ex_rbr_%i_LO", i ), Form( "Ex | Row %i | All rows", i ), C_WIDTH, C_HEIGHT );
+			GlobSetCanvasMargins( c_ex_rbr[i][0] );
+			h_ex_rbr[i][0]->Draw();
+			
+			c_ex_rbr[i][1] = new TCanvas( Form( "c_ex_rbr_%i_HI", i ), Form( "Ex | Row %i | No RHS", i ), C_WIDTH, C_HEIGHT );
+			GlobSetCanvasMargins( c_ex_rbr[i][1] );
+			h_ex_rbr[i][1]->Draw();
+			
 			spec_name = Form( "%s/pos%i_ex_rbr_%i", print_dir.Data(), ARR_POSITION, i );
 			
 			// Print spectrum if desired
 			if ( SW_EX[1] == 1 ){
-				PrintAll( c_ex_rbr[i], spec_name );
-				if ( PRINT_ROOT == 1 ){ f->cd(); h_ex_rbr[i]->Write(); }
+				PrintAll( c_ex_rbr[i][0], spec_name + "" );
+				//PrintAll( c_ex_rbr[i][1], spec_name + "_HI" );
+				if ( PRINT_ROOT == 1 ){ f->cd(); h_ex_rbr[i][0]->Write(); /*h_ex_rbr[i][1]->Write();*/ }
 			}
 			
 			// Write SPE file if desired
-			if ( SW_EX[2] == 1 ){ WriteSPE( h_ex_rbr[i]->GetName(), Form( "%s", spec_name.Data() ) ); }
+			if ( SW_EX[2] == 1 ){
+				WriteSPE( h_ex_rbr[i][0]->GetName(), Form( "%s", ( spec_name + "" ).Data() ) );
+				//WriteSPE( h_ex_rbr[i][1]->GetName(), Form( "%s", ( spec_name + "_HI" ).Data() ) );
+			}
 			
 		}
 		

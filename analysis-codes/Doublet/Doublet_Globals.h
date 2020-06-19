@@ -28,8 +28,8 @@ Double_t PT[NUM_L][NUM_DATA_POINTS];
 // Define spacing and upper and lower bounds (max and min - they cannot get higher or lower than these)
 const Double_t STEP_SIZE_I = 1e-3;
 const Double_t LB_0 = 0.0;
-const Double_t UB_0 = 1.0;
+const Double_t UB_0 = 3.0;
 const Double_t LB_1 = 0.0;
-const Double_t UB_1 = 1.0;
+const Double_t UB_1 = 3.0;
 
 #endif

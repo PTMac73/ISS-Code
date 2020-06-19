@@ -29,10 +29,20 @@
 // Switch for this is SW_EX
 // Number of histograms = 24 (DBD) + 6 (RBR) + 1 (Full)
 TH1F* h_ex_full = NULL;			// Full spectrum
-TH1F* h_ex_rbr[6][2];			// RBR spectrum: [0] is full, [1] has RHS removed
+TH1F* h_ex_full_best = NULL;	// Full spectrum (best)
+TH1F* h_ex_rbr[6][2];			// RBR spectrum: [0] is full, [1] is best resolution detectors
 TH1F* h_ex_dbd[24];				// DBD spectrum
 TH1F* h_ex_full_evolution[5];	// Full spectrum evolution
 
+
+Bool_t ex_print_opt[6] = {
+	0,	// (0) full spectrum
+	0,	// (1) RBR spectrum (all good dets)
+	0,	// (2) RBR spectrum (best resolution dets)
+	0,	// (3) DBD spectrum
+	0,	// (4) spectrum evolution
+	1	// (5) full spectrum (best)
+};
 
 void HCreateEx(){
 	// *LOOP* over detectors
@@ -41,6 +51,7 @@ void HCreateEx(){
 		// Full spectrum
 		if ( i == 0 && ALL_ROWS == 1 ){
 			CreateExSpectrum( h_ex_full, "h_ex_full" );
+			CreateExSpectrum( h_ex_full_best, "h_ex_full_best" );
 		}
 		
 		// Evolution
@@ -50,8 +61,8 @@ void HCreateEx(){
 		
 		// Row by row
 		if ( ( i == ROW_NUMBER || ( ROW_NUMBER == -1 && i < 6 ) ) && ROW_BY_ROW == 1 ){
-			CreateExSpectrum( h_ex_rbr[i][0], Form( "h_ex_rbr_%i_LO", i ) );
-			CreateExSpectrum( h_ex_rbr[i][1], Form( "h_ex_rbr_%i_HI", i ) );
+			CreateExSpectrum( h_ex_rbr[i][0], Form( "h_ex_rbr_%i", i ) );
+			CreateExSpectrum( h_ex_rbr[i][1], Form( "h_ex_rbr_%i_best", i ) );
 		}
 		
 		// Detector by detector
@@ -68,6 +79,7 @@ void HCreateEx(){
 void HDrawEx(){
 	// Define some local variables
 	TCanvas* c_ex_full;
+	TCanvas* c_ex_full_best;
 	TCanvas* c_ex_rbr[6][2];
 	TCanvas* c_ex_dbd[24];
 	TCanvas* c_ex_dbd_comb;
@@ -97,6 +109,11 @@ void HDrawEx(){
 			c_ex_full = new TCanvas( "c_ex_full", "Full excitation spectrum",  C_WIDTH, C_HEIGHT );
 			GlobSetCanvasMargins( c_ex_full );
 			h_ex_full->Draw();
+			
+			c_ex_full_best = new TCanvas( "c_ex_full_best", "Full excitation spectrum (best res)",  C_WIDTH, C_HEIGHT );
+			GlobSetCanvasMargins( c_ex_full_best );
+			h_ex_full_best->Draw();
+			
 			spec_name = Form( "%s/pos%i_ex_full", print_dir.Data(), ARR_POSITION );
 			
 			// Plot evolution spectrum
@@ -109,17 +126,27 @@ void HDrawEx(){
 			
 			// Print spectrum if desired
 			if ( SW_EX[1] == 1 ){
-				PrintAll( c_ex_full, spec_name );
-				if ( PRINT_ROOT == 1 ){ f->cd(); h_ex_full->Write(); }
+				if( ex_print_opt[0] == 1 ){ PrintAll( c_ex_full, spec_name ); }
+				if( ex_print_opt[5] == 1 ){ PrintAll( c_ex_full_best, spec_name + "_best" ); }
+				if ( PRINT_ROOT == 1 ){
+					f->cd();
+					if( ex_print_opt[0] == 1 ){ h_ex_full->Write(); }
+					if( ex_print_opt[5] == 1 ){ h_ex_full_best->Write(); }
+				}
 				
 				for ( Int_t j = 0; j < 5; j++ ){
-					PrintAll( c_ex_evolution[j], Form( "%s/pos%i_ex_evolution_%i", print_dir.Data(), ARR_POSITION, j ) );
-					if ( PRINT_ROOT == 1 ){ f->cd(); h_ex_full_evolution[j]->Write(); }
+					if( ex_print_opt[4] == 1 ){
+						PrintAll( c_ex_evolution[j], Form( "%s/pos%i_ex_evolution_%i", print_dir.Data(), ARR_POSITION, j ) ); 
+						if ( PRINT_ROOT == 1 ){ f->cd(); h_ex_full_evolution[j]->Write(); }
+					}
 				}
 			}
 			
 			// Write SPE file if desired
-			if ( SW_EX[2] == 1 ){ WriteSPE( h_ex_full->GetName(), Form( "%s", spec_name.Data() ) ); }
+			if ( SW_EX[2] == 1 ){
+				if( ex_print_opt[0] == 1 ){ WriteSPE( h_ex_full->GetName(), Form( "%s", spec_name.Data() ) ); }
+				if( ex_print_opt[5] == 1 ){ WriteSPE( h_ex_full_best->GetName(), Form( "%s", ( spec_name + "_best" ).Data() ) ); }
+			}
 			
 		}
 		
@@ -139,15 +166,19 @@ void HDrawEx(){
 			
 			// Print spectrum if desired
 			if ( SW_EX[1] == 1 ){
-				PrintAll( c_ex_rbr[i][0], spec_name + "" );
-				//PrintAll( c_ex_rbr[i][1], spec_name + "_HI" );
-				if ( PRINT_ROOT == 1 ){ f->cd(); h_ex_rbr[i][0]->Write(); /*h_ex_rbr[i][1]->Write();*/ }
+				if( ex_print_opt[1] == 1 ){ PrintAll( c_ex_rbr[i][0], spec_name + "" ); }
+				if( ex_print_opt[2] == 1 ){ PrintAll( c_ex_rbr[i][1], spec_name + "_best" ); }
+				if ( PRINT_ROOT == 1 ){ 
+					f->cd();
+					if( ex_print_opt[1] == 1 ){ h_ex_rbr[i][0]->Write(); }
+					if( ex_print_opt[2] == 1 ){ h_ex_rbr[i][1]->Write(); }
+				}
 			}
 			
 			// Write SPE file if desired
 			if ( SW_EX[2] == 1 ){
-				WriteSPE( h_ex_rbr[i][0]->GetName(), Form( "%s", ( spec_name + "" ).Data() ) );
-				//WriteSPE( h_ex_rbr[i][1]->GetName(), Form( "%s", ( spec_name + "_HI" ).Data() ) );
+				if( ex_print_opt[1] == 1 ){ WriteSPE( h_ex_rbr[i][0]->GetName(), Form( "%s", ( spec_name + "" ).Data() ) ); }
+				if( ex_print_opt[2] == 1 ){ WriteSPE( h_ex_rbr[i][1]->GetName(), Form( "%s", ( spec_name + "_best" ).Data() ) ); }
 			}
 			
 		}
@@ -165,7 +196,7 @@ void HDrawEx(){
 				
 				// Print spectrum if desired
 				if ( SW_EX[1] == 1 ){
-					PrintAll( c_ex_dbd[i], spec_name );
+					if( ex_print_opt[3] == 1 ){ PrintAll( c_ex_dbd[i], spec_name ); }
 				}
 				
 			}
@@ -178,17 +209,17 @@ void HDrawEx(){
 				
 				// Print spectrum if desired
 				if ( SW_EX[1] == 1 && i == 23 ){
-					PrintAll( c_ex_dbd_comb, Form( "%s/pos%i_ex_dbd_comb", print_dir.Data(), ARR_POSITION ) );
+					if( ex_print_opt[3] == 1 ){ PrintAll( c_ex_dbd_comb, Form( "%s/pos%i_ex_dbd_comb", print_dir.Data(), ARR_POSITION ) ); }
 				}
 				
 				
 			}
 			
 			// Write ROOT file if desired
-			if ( PRINT_ROOT == 1 && SW_EX[1] == 1 ){ f->cd(); h_ex_dbd[i]->Write(); }
+			if ( PRINT_ROOT == 1 && SW_EX[1] == 1 && ex_print_opt[3] == 1 ){ f->cd(); h_ex_dbd[i]->Write(); }
 			
 			// Write SPE file if desired
-			if ( SW_EX[2] == 1 ){ WriteSPE( h_ex_dbd[i]->GetName(), Form( "%s", spec_name.Data() ) ); }
+			if ( SW_EX[2] == 1 && ex_print_opt[3] == 1 ){ WriteSPE( h_ex_dbd[i]->GetName(), Form( "%s", spec_name.Data() ) ); }
 		} 
 	
 	

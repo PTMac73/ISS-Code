@@ -36,16 +36,16 @@ TString cut_dir_new = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-co
 TString cut_dir_si = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-codes/analyse-tree/si_cuts.root";
 
 // Decide how to plot excitation spectra
-const Bool_t ALL_ROWS = 0;
+const Bool_t ALL_ROWS = 1;
 const Bool_t ROW_BY_ROW = 1;
-const Bool_t DET_BY_DET = 0;
+const Bool_t DET_BY_DET = 1;
 
 // Select row/det number to look at (-1 means do them all)
 const Int_t DET_NUMBER = -1;
 const Int_t ROW_NUMBER = -1;
 
 // Array position - can only be one or two
-const Int_t ARR_POSITION = 2;
+const Int_t ARR_POSITION = 1;
 
 // Select angle cuts
 const Double_t THETA_MIN = 11.0;//19.21; //16.6278;
@@ -75,9 +75,9 @@ const Bool_t  SW_EX_COMPARE[3] = { 0, 1, 1 };
 const Bool_t    SW_RDT_CUTS[3] = { 0, 1, 0 };
 const Bool_t      SW_EVZ_SI[3] = { 0, 0, 0 };
 const Bool_t          SW_EX[3] = { 1, 1, 1 };
-const Bool_t       SW_EX_SI[3] = { 0, 0, 0 };
+const Bool_t       SW_EX_SI[3] = { 0, 1, 1 };
 const Bool_t SW_EVZ_COMPARE[3] = { 0, 1, 0 };
-const Bool_t         SW_EVZ[3] = { 1, 1, 0 };
+const Bool_t         SW_EVZ[3] = { 0, 1, 0 };
 const Bool_t        SW_XNXF[3] = { 0, 0, 0 };
 const Bool_t        SW_XCAL[3] = { 0, 1, 0 };
 const Bool_t          SW_TD[3] = { 0, 1, 0 };
@@ -91,6 +91,7 @@ TObjArray* cuttlefish;		// Cuts to be read out
 
 // Cut booleans
 Bool_t is_in_used_det = 0;
+Bool_t is_in_best_det = 0;
 
 Bool_t is_in_rdt[4] = { 0, 0, 0, 0 };
 Bool_t is_in_rdt_total = 0;
@@ -143,6 +144,15 @@ Bool_t det_array[6][4] = {
 	{ 1, 1, 1, 1 },
 	{ 1, 1, 1, 1 },
 	{ 1, 0, 1, 1 }
+};
+
+Bool_t best_det_array[6][4] = {
+	{ 0, 1, 0, 0 },
+	{ 1, 0, 0, 0 },
+	{ 1, 0, 0, 0 },
+	{ 1, 0, 0, 0 },
+	{ 0, 1, 0, 0 },
+	{ 0, 0, 1, 0 }
 };
 /*
 // Form is xlow, xup, ylow, yup ----OLD ONES BASED ON fin1.root

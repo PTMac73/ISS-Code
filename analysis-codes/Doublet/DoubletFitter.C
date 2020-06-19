@@ -47,10 +47,10 @@ void DoubletFitter( TString in_file_loc = input_file_dir ){
 		for ( Int_t j = 0; j < NUM_L; j++ ){
 			
 			// Only fill if j < i so that you only test between two angular distributions once
-			if ( i == 2 && j == 0 /*j < i*/ ){
+			if ( i == 0 && j == 2 /*j < i*/ ){
 				// Put in some initial estimates
-				Eta[i][j][0] = 0.5;
-				Eta[i][j][1] = 0.5;
+				Eta[i][j][0] = 1.5;
+				Eta[i][j][1] = 1.5;
 
 				// Now calculate properly
 				Eta[i][j][2] = CalculateEtas( X, E, exp_fit, pt_fit[i], pt_fit[j], Eta[i][j][0], Eta[i][j][1] );
@@ -75,10 +75,10 @@ void DoubletFitter( TString in_file_loc = input_file_dir ){
 			printf(" L1 : L2 : Eta_1       : Eta_2       : Chi^2      \n");
 			printf("----:----:-------------:-------------:--------------\n");
 		}
-		for ( Int_t j = 0; j < NUM_L; j++ ){
-			for ( Int_t i = 0; i < NUM_L; i++ ){
-				if ( i > j ){
-					std::cout << std::setw(3) << j << " : " << std::setw(2) << i << " : " << std::setw(11) << std::fixed << std::setprecision(8) << Eta[i][j][1] << " : " << std::setw(11) << std::fixed << std::setprecision(8) << Eta[i][j][0] << " : " << std::setw(11) << std::fixed << std::setprecision(8) << Eta[i][j][2] << "\n";
+		for ( Int_t i = 0; i < NUM_L; i++ ){
+			for ( Int_t j = 0; j < NUM_L; j++ ){
+				if ( i < j ){
+					std::cout << std::setw(3) << i << " : " << std::setw(2) << j << " : " << std::setw(11) << std::fixed << std::setprecision(8) << Eta[i][j][0] << " : " << std::setw(11) << std::fixed << std::setprecision(8) << Eta[i][j][1] << " : " << std::setw(11) << std::fixed << std::setprecision(8) << Eta[i][j][2] << "\n";
 					//printf("%i\t%i\t%8.8f\t%8.8f\t%8.8f\n", j, i, Eta[i][j][1], Eta[i][j][0], Eta[i][j][2] );
 				}
 			}

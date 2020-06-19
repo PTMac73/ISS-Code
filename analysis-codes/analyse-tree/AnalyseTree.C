@@ -181,7 +181,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 	b_RDT->GetEntry(entry);
 	b_XCAL->GetEntry(entry);              
 	b_ECRR->GetEntry(entry);              b_TD_RDT_E->GetEntry(entry);
-	b_Ex->GetEntry(entry);                
+	b_Ex->GetEntry(entry);                b_Ex_si->GetEntry(entry);
 	b_ThetaCM->GetEntry(entry);           b_DetID->GetEntry(entry);
 	b_TD_RDT_E_CUTS->GetEntry(entry);     b_XCAL_CUTS->GetEntry(entry);
 
@@ -206,6 +206,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 
 		// Calculate cut booleans
 		is_in_used_det = ( det_array[ i % 6 ][ (Int_t)TMath::Floor( i/6 ) ] == 1 );
+		is_in_best_det = ( best_det_array[ i % 6 ][ (Int_t)TMath::Floor( i/6 ) ] == 1 );
 		// is_in_rdt goes here
 		// Monitors timing and recoil-timing  
 		is_in_td_total = 0;
@@ -415,8 +416,50 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			}
 			
 			if ( SW_EVZ[0] == 1 ){ h_evz_custom->Fill( z[i], ecrr[i] ); }
+			
+			// Si-Mg excitation spectrum generation
+			if ( SW_EX_SI[0] == 1 ){ 
+				h_ex_si[0]->Fill( Ex[i] );
+				h_ex_si[2]->Fill( Ex_si[i] );
+			}
 		}
 		
+		// BEST DETECTOR SPECTRUM GENERATION
+		if ( is_in_best_det && is_in_rdt_and_td_total && is_in_theta_custom && is_in_xcal ){
+			if ( SW_EX[0] == 1 ){
+				h_ex_rbr[ i % 6 ][1]->Fill( Ex[i] );
+				h_ex_full_best->Fill( Ex[i] );
+			}
+		}
+		
+		// SHARPY'S Z CUTS
+		/*
+		Bool_t sharpy_z = ( \
+			( z[i] >= -47.5 && z[i] < -42.90 && i % 6 == 0 ) || \
+			( z[i] >= -41.6 && z[i] < -37.80 && i % 6 == 1 ) || \
+			( z[i] >= -35.7 && z[i] < -31.70 && i % 6 == 2 ) || \
+			( z[i] >= -29.7 && z[i] < -26.05 && i % 6 == 3 ) || \
+			( z[i] >= -24.0 && z[i] < -19.50 && i % 6 == 4 ) || \
+			( z[i] >= -18.2 && z[i] < -14.00 && i % 6 == 5 ) \
+		);
+		*/
+		Bool_t sharpy_z = ( \
+			( z[i] >= -44.5 && z[i] < -39.9 && i % 6 == 0 ) || \
+			( z[i] >= -38.6 && z[i] < -34.8 && i % 6 == 1 ) || \
+			( z[i] >= -32.7 && z[i] < -28.7 && i % 6 == 2 ) || \
+			( z[i] >= -26.7 && z[i] < -23.0 && i % 6 == 3 ) || \
+			( z[i] >= -21.0 && z[i] < -16.5 && i % 6 == 4 ) || \
+			( z[i] >= -15.2 && z[i] < -11.0 && i % 6 == 5 ) \
+		);
+		
+
+		/*if ( is_in_used_det && is_in_rdt_and_td_total && thetaCM[i] >= 11.0 && sharpy_z ){
+			if ( SW_EX[0] == 1 ){
+				if ( ROW_BY_ROW == 1 ){
+					h_ex_rbr[ i % 6 ][0]->Fill( Ex[i] );
+				}
+			}
+		}*/
 		
 		// Do full cuts (Mg)
 		if ( is_in_used_det && is_in_rdt_and_td_total && is_in_theta_min && is_in_xcal ){
@@ -448,7 +491,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			
 			// *HIST* Full excitation plot (Mg)
 			if ( SW_RDT_CUTS[0] == 1 ){ h_rdt_ex_mg[ (Int_t)TMath::Floor( i/6 ) ]->Fill( Ex[i] ); }
-			if ( SW_EX_SI[0] == 1 ){ h_ex_si[0]->Fill( Ex[i] ); }
+			
 			
 			// Implement the desired row numbers only
 			if ( is_in_theta_singles ){
@@ -466,12 +509,15 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 
 
 		// Do full cuts (Si)
-		if ( is_in_used_det && found_si_cuts && is_in_rdt_si_and_td_total && is_in_theta_min && is_in_xcal ){
+		if ( is_in_used_det && found_si_cuts && is_in_rdt_si_and_td_total && is_in_theta_custom && is_in_xcal ){
 			// *HIST* Full E v.s. z (Si)
 			if ( SW_EVZ_SI[0] == 1 ){ h_evz_si[2]->Fill( z[i], ecrr[i] ); }
 			
 			// *HIST* Full Ex (Si)
-			if ( SW_EX_SI[0] == 1 ){ h_ex_si[1]->Fill( Ex[i] ); }
+			if ( SW_EX_SI[0] == 1 ){
+				h_ex_si[1]->Fill( Ex[i] );
+				h_ex_si[3]->Fill( Ex_si[i] );	
+			} 
 		}
 		
 	} // *LOOP* over detectors

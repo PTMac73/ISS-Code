@@ -49,6 +49,7 @@ public :
 	Int_t           td_rdt_e[24][4];
 	Float_t         Ex[24];
 	Float_t         Ex_corrected[24];
+	Float_t			Ex_si[24];
 	Float_t         thetaCM[24];
 	Int_t           detID[24];
 	Int_t           td_rdt_e_cuts[24][2];
@@ -81,6 +82,7 @@ public :
 	TBranch        *b_TD_RDT_E;
 	TBranch        *b_Ex;
 	TBranch        *b_Ex_CORRECTED;
+	TBranch		   *b_Ex_si;
 	TBranch        *b_ThetaCM;
 	TBranch        *b_DetID;
 	TBranch        *b_TD_RDT_E_CUTS;
@@ -154,6 +156,7 @@ void AnalyseTree::Init(TTree *tree)
 	fChain->SetBranchAddress( "td_rdt_e", td_rdt_e, &b_TD_RDT_E );
 	fChain->SetBranchAddress( "Ex", Ex, &b_Ex );
 	fChain->SetBranchAddress( "Ex_corrected", Ex_corrected, &b_Ex_CORRECTED );
+	fChain->SetBranchAddress( "Ex_si", Ex_si, &b_Ex_si );
 	fChain->SetBranchAddress( "thetaCM", thetaCM, &b_ThetaCM );
 	fChain->SetBranchAddress( "detID", detID, &b_DetID );
 	fChain->SetBranchAddress( "td_rdt_e_cuts", td_rdt_e_cuts, &b_TD_RDT_E_CUTS );

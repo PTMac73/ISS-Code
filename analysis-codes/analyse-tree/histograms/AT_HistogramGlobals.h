@@ -123,6 +123,20 @@ void CreateExSpectrum( TH1F*& h, TString name ){
 	return;
 }
 
+// Deifne lower and upper bounds
+void CreateExSpectrum( TH1F*& h, TString name, Double_t lb, Double_t ub ){
+	Int_t nbins = (Int_t)( 50*( ub - lb ) );
+	h = new TH1F( name.Data(), name.Data(), nbins, lb, ub );
+	h->SetTitle("");
+	h->GetXaxis()->SetTitle("Excitation Energy (MeV)");
+	h->GetYaxis()->SetTitle("Counts per 20 keV");	
+	h->SetLineColor(kRed);	
+	GlobSetHistFonts( h );
+	return;
+}
+
+
+
 // Format generic 2D histograms
 void GlobCreate2DHists( TH2F* h, TString x_label, TString y_label ){
 	h->SetTitle("");

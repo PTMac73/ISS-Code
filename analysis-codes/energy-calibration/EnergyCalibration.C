@@ -19,6 +19,7 @@
 
 // Define global fit parameters
 FitResult_t fit1[NUM_POSI][NUM_ROWS];	// For calibrating positions to energy
+FitResult_t fit1_full;	// For calibrating positions to energy
 //FitResult_t fit2[NUM_POSI][NUM_ROWS];	// For calibrating energies to position
 
 
@@ -135,6 +136,54 @@ void EnergyCalibration(){
 	}// *LOOP* OVER POSITIONS (i)
 	
 	
+	
+	// CALCULATE CALIBRATION FOR THE FULL POSITION
+	// Define arrays to hold the variables from the data table
+	Double_t* x = new Double_t[NUM_STAT];
+	Double_t* x_err = new Double_t[NUM_STAT];
+	Double_t* y = new Double_t[NUM_STAT];
+	Double_t* y_err = new Double_t[NUM_STAT];
+	
+	for ( Int_t k = 0; k < NUM_STAT; k++ ){
+		x[k]     = data_table_pos1_full[k][0];
+		x_err[k] = data_table_pos1_full[k][1];
+		y[k]     = data_table_pos1_full[k][2];
+		y_err[k] = data_table_pos1_full[k][3];
+	}
+	
+	// Print arrays
+	if ( swVERBOSE ){
+		std::cout << "PRINT ARRAYS: Full array for pos 1, # = " << NUM_STAT <<  "\n";
+		PrintArray( x, x_err, y, y_err, NUM_STAT );
+	}
+	
+	
+	// Create TGraphs and TCanvases and format them
+	TGraphErrors* g_ecal_full = new TGraphErrors( NUM_STAT, x, y, x_err, y_err );
+	FormatGraph( g_ecal_full );
+	g_ecal_full->SetTitle( Form( "Position %i | FULL", 1 ) );
+	
+	TCanvas* c_ecal_full = new TCanvas( "c_ecal_full", "Calibrate position to energy fits", C_WIDTH, C_HEIGHT );
+	c_ecal_full->SetCanvasSize(C_WIDTH,C_HEIGHT);
+	GlobSetCanvasMargins( c_ecal_full, 0.1, 0.02, 0.1, 0.1 );
+	g_ecal_full->Draw("AP");
+	
+	
+	// Get straight line parameters
+	TFitResultPtr s = g_ecal_full->Fit(sline, "SQ");
+	if ( swVERBOSE ){ std::cout << "\u03c7^2 = " << s->Chi2() << "\n"; }
+	TMatrixDSym* covmc = (TMatrixDSym*)s->GetCovarianceMatrix().Clone();
+	SetFitParameters( sline->GetParameter(1), sline->GetParameter(0), covmc, fit1_full );
+	if ( swVERBOSE ){ PrintFitParameters( fit1_full ); }
+	
+	// Delete the arrays
+	delete[] x;
+	delete[] x_err;
+	delete[] y;
+	delete[] y_err;
+	
+	
+	
 	// CALCULATE THE AVERAGE FIT (FOR EMPTY STATES)
 	FitResult_t average_fit;
 	SetEmptyFit( average_fit );
@@ -182,6 +231,12 @@ void EnergyCalibration(){
 			<< std::setw(w) << ( fit1[1][j].empty_flag == 0 ? fit1[1][j].c : average_fit.c ) << "\n";
 	}
 	
+	// Print the full fit parameters
+	std::cout << "\nFull fit parameters:\n";
+	std::cout
+		<< std::setw(w) << fit1_full.m << sp 
+		<< std::setw(w) << fit1_full.c << "\n";
+	
 	// Table 2
 	std::cout << "\n\n>>> TABLE 2 <<<" << "\n\n";
 	std::cout << std::left << std::setw(w) << "> \u03c3(M) <" << sp << std::setw(w) << "> \u03c3(C) <" << sp << std::setw(w) << "> cov(M,C) <" << sp << std::setw(w) << "> \u03c3(M) <" << sp << std::setw(w) << "> \u03c3(C) <" << sp << std::setw(w) << "> cov(M,C) <" << "\n";
@@ -196,11 +251,16 @@ void EnergyCalibration(){
 			<< std::setw(w) << ( fit1[1][j].empty_flag == 0 ? (*fit1[1][j].covmc)(1,0)  : (*average_fit.covmc)(1,0) ) << sp << "\n";
 	}
 	
+	std::cout << "\nFull fit parameters:\n";
+	std::cout 
+		<< std::setw(w) << TMath::Sqrt( (*fit1_full.covmc)(1,1) ) << sp
+		<< std::setw(w) << TMath::Sqrt( (*fit1_full.covmc)(0,0) ) << sp
+		<< std::setw(w) << (*fit1_full.covmc)(1,0) << sp << "\n\n\n";
+
+
 	// Print the canvas
 	c_ecal->Print("energy_cal_fits.pdf");
-	
-
-	std::cout << "Deleted arrays from memory\n";
+	c_ecal_full->Print("energy_cal_full.pdf");
 
 	return;
 }

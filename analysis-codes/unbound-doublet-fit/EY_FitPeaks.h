@@ -21,15 +21,17 @@ struct FitPeakOptions_t{
 	Double_t sig_est;
 	Double_t sig_range;
 	Bool_t fix_widths;
+	Bool_t fix_positions;
 	const Double_t* pe;
 };
 
-void SetFitOptions( FitPeakOptions_t &opt, Int_t num_peaks, Int_t peak_num, Bool_t fix_widths, const Double_t* pe = peak_energies, Double_t sig_est = 0.25*PEAK_WIDTH_ESTIMATE, Double_t sig_range = 0.2*PEAK_WIDTH_ESTIMATE ){
+void SetFitOptions( FitPeakOptions_t &opt, Int_t num_peaks, Int_t peak_num, Bool_t fix_widths, Bool_t fix_positions = 0, const Double_t* pe = peak_energies, Double_t sig_est = 0.25*PEAK_WIDTH_ESTIMATE, Double_t sig_range = 0.2*PEAK_WIDTH_ESTIMATE ){
 	opt.num_peaks = num_peaks;
 	opt.peak_num = peak_num;
 	opt.sig_est = sig_est;
 	opt.sig_range = sig_range;
 	opt.fix_widths = fix_widths;
+	opt.fix_positions = fix_positions;
 	opt.pe = pe;
 	return;
 }
@@ -49,7 +51,6 @@ TF1* EstimatePeakParameters( TH1D* h, FitPeakOptions_t &opt, Int_t**& var_type_a
 	
 	// Generate the fit
 	TString fit_str = GetFitString( opt.num_peaks, BG_DIM, var_type_arr, opt.peak_num, opt.fix_widths );
-	std::cout << fit_str << "\n";
 	TF1* fit_func = new TF1( fit_name.Data(), fit_str, lb, ub );
 	fit_func->SetLineColor(kBlack);
 	fit_func->SetNpx(2000);
@@ -69,14 +70,13 @@ TF1* EstimatePeakParameters( TH1D* h, FitPeakOptions_t &opt, Int_t**& var_type_a
 			// Amplitudes
 			else if ( i > 0 && j == 0 ){
 				amp_est = GetAmpEstimate( h, opt.pe[i + opt.peak_num - 1] - 0.5*PEAK_WIDTH_ESTIMATE, opt.pe[i + opt.peak_num - 1] + 0.5*PEAK_WIDTH_ESTIMATE );
-				std::cout << "AMP-EST (" << i-1 << "):" << amp_est << "\n";
 				fit_func->SetParameter( var_type_arr[i][j], amp_est );
 				fit_func->SetParLimits( var_type_arr[i][j], 0.0*amp_est, 1.2*amp_est );
 			}
 			
 			// Mus
 			else if ( i > 0 && j == 1 ){
-				if ( peak_fix_positions[i + opt.peak_num - 1] == 1 ){
+				if ( opt.fix_positions == 1 ){
 					fit_func->FixParameter( var_type_arr[i][j], opt.pe[i + opt.peak_num - 1]);
 				}
 				else{
@@ -98,7 +98,7 @@ TF1* EstimatePeakParameters( TH1D* h, FitPeakOptions_t &opt, Int_t**& var_type_a
 				// Variable-width peaks
 				else if ( var_type_arr[i][j] > var_type_arr[i][j-1] && opt.fix_widths == 0 ){
 					fit_func->SetParameter( var_type_arr[i][j], opt.sig_est );
-					fit_func->SetParLimits( var_type_arr[i][j], opt.sig_est, opt.sig_est + PEAK_WIDTH_ESTIMATE );
+					fit_func->SetParLimits( var_type_arr[i][j], opt.sig_est, CalculatePeakUpperWidth( i - 1, opt.sig_est ) );
 				}
 					
 			}
@@ -111,27 +111,46 @@ TF1* EstimatePeakParameters( TH1D* h, FitPeakOptions_t &opt, Int_t**& var_type_a
 
 void PrintFF( TF1* fit_func, Int_t** vta, Int_t num_peaks, std::ostream& f = std::cout ){
 	// Define first-column width
-	Int_t w = 7;
+	Int_t w = 10;
+	Int_t prec = 6;
+	TString sp = "    ";
+	TString bl = "-";
+	Double_t lb = 0;
+	Double_t ub = 0;
 	
 	// Print header
 	f << "\n>>> Fitting function parameters <<<\n";
-	f << std::left << std::setw(w) << "KEY : " << std::setw(8) << "AMP" << "\t" << std::setw(8) << "MU" << "\t" << std::setw(8) << "SIG" << "\n";
+	std::cout << "FORMULA: " << fit_func->GetExpFormula() << "\n";
+	f << std::left << std::setw(w) << std::right << "KEY :" << std::left << sp
+		<< std::setw(w) << "AMP" << sp << std::setw(w) << "[lb]" << sp << std::setw(w) << "[ub]" << sp
+		<< std::setw(w) << "MU"  << sp << std::setw(w) << "[lb]" << sp << std::setw(w) << "[ub]" << sp
+		<< std::setw(w) << "SIG"  << sp << std::setw(w) << "[lb]" << sp << std::setw(w) << "[ub]" << sp << "\n";
 	
 	for ( Int_t i = 0; i < num_peaks + 1; i++ ){
 		// Print first column
-		if ( i == 0 ){ f << std::setw(w) << "BG : "; }
-		else{ f << std::setw(w) << Form( "P%i : ", i-1 ); }
+		f << std::setw(w) << std::right << ( i == 0 ? "BG :" : Form( "P%i :", i-1 ) ) << std::left << sp;
 	
 		// Print other columns
 		for ( Int_t j = 0; j < 3; j++ ){
+			// Get parameter limits
+			fit_func->GetParLimits( vta[i][j], lb, ub );
+			
+			// Print the section
 			if ( vta[i][j] != -1 ){
-				f << std::setprecision(6) << std::setw(8) << fit_func->GetParameter( vta[i][j] ) << "\t";
+				f << std::setprecision(prec) << std::setw(w) << fit_func->GetParameter( vta[i][j] ) << sp
+					<< std::setprecision(prec) << std::setw(w) << lb << sp
+					<< std::setprecision(prec) << std::setw(w) << ub << sp;
 			}
-			else{ f << std::setw(8) << "X" << "\t"; }
+			else{ 
+				f << std::setprecision(prec) << std::setw(w) << bl << sp
+					<< std::setprecision(prec) << std::setw(w) << bl << sp
+					<< std::setprecision(prec) << std::setw(w) << bl << sp;
+			}
 		}
 		
 		// Finish the line
 		f << "\n";
+		
 	}
 	f << "\n";
 	

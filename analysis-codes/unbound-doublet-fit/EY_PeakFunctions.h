@@ -194,6 +194,23 @@ void PrintPeak( Peak_t &p, std::ostream& f = std::cout ){
 	return;
 }
 
+void PrintPeakHeader( std::ostream& f = std::cout ){
+	
+	f <<  
+	std::setw(print_width) << "POSITION" << 
+	std::setw(print_width) << "" << "\t" << 
+	std::setw(print_width) << "WIDTH" << "\t" << 
+	std::setw(print_width) << "" << "\t" << 
+	std::setw(print_width) << "HEIGHT" << "\t" << 
+	std::setw(print_width) << "" << "\t" << 
+	std::setw(print_width) << "AREA" << "\t" << 
+	std::setw(print_width) << "" << "\t" << 
+	std::setw(print_width) << "CENTROID" << "\t" << 
+	std::setw(print_width) << "" << "\n";
+	
+	return;
+}
+
 
 // ============================================================================================= //
 // ============================================================================================= //

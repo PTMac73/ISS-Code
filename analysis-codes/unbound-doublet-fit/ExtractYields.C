@@ -54,7 +54,7 @@ void ExtractYieldsHist( TH1D* h, Int_t pos, Int_t spectrum_type ){
 	// FIT THE TWO STRONG PEAKS IF POSSIBLE ------------------------------------------------ //
 	// Estimate the peak parameters
 	FitPeakOptions_t pre_fit_opt;
-	SetFitOptions( pre_fit_opt, 2, 0, 1, pre_peak_energies );
+	SetFitOptions( pre_fit_opt, 2, 0, 1, 0, pre_peak_energies );
 	Int_t** pre_var_type_arr;
 	TF1* pre_fit_func = EstimatePeakParameters( h, pre_fit_opt, pre_var_type_arr, "pre_fit_func", PRE_MIN, PRE_MAX );
 
@@ -67,7 +67,7 @@ void ExtractYieldsHist( TH1D* h, Int_t pos, Int_t spectrum_type ){
 	// Draw if desired
 	h->Draw();
 	c_pre_fit->Modified(); c_pre_fit->Update();
-	c_pre_fit->Print( GenerateCanvasPrintName( pos, spectrum_type, 1 ) );
+	c_pre_fit->Print( GenerateFileName( svg, pos, 1 ) );
 	
 	// Calculate the width
 	sig_est = pre_fit_func->GetParameter( pre_var_type_arr[1][2] );
@@ -93,10 +93,14 @@ void ExtractYieldsHist( TH1D* h, Int_t pos, Int_t spectrum_type ){
 	// Estimate the peak parameters
 	Int_t num_full_peaks = NUM_PEAKS;//num_peaks_in_spectrum[row_num][pos-1];
 	FitPeakOptions_t fit_opt;
-	SetFitOptions( fit_opt, num_full_peaks, 0, 0, peak_energies, sig_est, sig_range );
+	
+//	SetFitOptions( FitPeakOptions_t &opt, Int_t num_peaks, Int_t peak_num, Bool_t fix_widths, Bool_t fix_positions, const Double_t* pe, Double_t sig_est, Double_t sig_range )
+	SetFitOptions( fit_opt, num_full_peaks, 0, 0, 0, peak_energies, sig_est, sig_range );
+	
+	
 	Int_t** var_type_arr;
 	TF1* fit_func = EstimatePeakParameters( h, fit_opt, var_type_arr, "fit_func", E_MIN, E_MAX );
-
+	PrintFF( fit_func, var_type_arr, 3 );
 
 	// Format the fit function
 	fit_func->SetLineColor( kBlack );
@@ -113,20 +117,21 @@ void ExtractYieldsHist( TH1D* h, Int_t pos, Int_t spectrum_type ){
 	
 		
 	// Delete the old data file if it exists
-	if ( std::remove( GetDataFileName( pos, spectrum_type ) ) != 0 ){
+	if ( std::remove( GenerateFileName( dat, pos ) ) != 0 ){
 		std::cout << "Error deleting data file.\n";
 	}
 
 	// Open the file
 	std::ofstream out_file;
-	out_file.open( GetDataFileName( pos, spectrum_type ), std::ofstream::app );
-	
+	out_file.open( GenerateFileName( dat, pos ), std::ofstream::app );
+	PrintFF( fit_func, var_type_arr, 3, out_file );
+	PrintPeakHeader( out_file );
 	
 	// Start the loop
 	for ( Int_t i = 0; i < num_full_peaks; i++ ){
 	
 		// Calculate peak quantities and print the peaks to file ( including the GS doublet for comparison)
-		CalculatePeakQuantities( fit_result_ptr, BG_DIM, var_type_arr[i+1][0], var_type_arr[i+1][2], peaks[i] );
+		CalculatePeakQuantities( fit_result_ptr, BG_DIM, var_type_arr[i+1][0], var_type_arr[i+1][2], peaks[i] ); 
 		PrintPeak( peaks[i], out_file );
 			
 		f_peaks[i] = new TF1( Form( "fit_func%i", i ), GetFitStringSimple( 1, BG_DIM ), peak_energies[i] - 5*PEAK_WIDTH_ESTIMATE, peak_energies[i] + 5*PEAK_WIDTH_ESTIMATE );
@@ -175,7 +180,7 @@ void ExtractYieldsHist( TH1D* h, Int_t pos, Int_t spectrum_type ){
 	out_file.close();
 	
 	// Print the spectrum
-	c_spec->Print( GenerateCanvasPrintName( pos, spectrum_type ) );
+	c_spec->Print( GenerateFileName( svg, pos, spectrum_type ) );
 	
 	
 	
@@ -209,7 +214,7 @@ void ExtractYieldsHist( TH1D* h, Int_t pos, Int_t spectrum_type ){
 	return;
 }
 	
-	
+// ---===---===---===---===---===---===---===---===---===---===---===---===---===---===---===--- //
 void ExtractYields( Int_t pos = 1, Int_t spectrum_type = 2 ){
 	// Declare variables
 	TFile* f;						// File containing the histograms
@@ -264,61 +269,4 @@ void ExtractYields( Int_t pos = 1, Int_t spectrum_type = 2 ){
 	
 	return;
 }
-
-		
-
-/* TODO
- * Make axis label font bigger
- * Start from -0.5
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

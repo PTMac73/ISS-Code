@@ -29,6 +29,7 @@ Double_t CMAngleCalculator(double ex, double z, Bool_t print = 1 ){
 
 	// Now calculate derived quantities from fixed quantities
 	double T1 = 9.473*m1/u;										// Kinetic energy of the beam [LAB] [ 9.473 MeV / u ]
+	std::cout << "T1 = " << T1 << "\n";
 	double e1 = T1 + m1;										// Total energy of beam particle [LAB] in MeV
 	double etot = e1 + m2;										// Total energy [LAB] in MeV
 	double etot_cm = TMath::Sqrt( m1*m1 + m2*m2 + 2*e1*m2 );	// Total energy [CM] (related to invariant mass) in MeV
@@ -39,10 +40,12 @@ Double_t CMAngleCalculator(double ex, double z, Bool_t print = 1 ){
 	double m4ex = m4 + ex;															// Invariant mass of the recoil nucleus
 	double e3_cm = 0.5*( etot_cm*etot_cm + m3*m3 - m4ex*m4ex )/etot_cm;				// Energy of the outgoing proton [CM]
 	double p3_cm = TMath::Sqrt(e3_cm*e3_cm - m3*m3);								// Momentum of the outgoing proton [CM]
-
+	
 	double p_para = q*B*z/( 2*TMath::Pi() );										// Parallel component of the momentum in MeV / c [LAB] -------> THIS IS A GUESS!!
 	double p_para_cm = p_para/gamLab_CM - beta*e3_cm;								// Parallel component of the momentum in MeV / c [CM]
 	double p_perp_cm = TMath::Sqrt( e3_cm*e3_cm - p_para_cm*p_para_cm - m3*m3 );	// Perpendicular component of the momentum in MeV / c [CM]
+	
+	std::cout << m1 << "\t" << m2 << "\t" << m3 << "\t" << m4 << "\n";
 
 	// Calculate the function to be minimised and its first derivative
 	double fp = ( 2*p_perp_cm/( q*B ) )*TMath::Sin( q*B*z/( 2*gamLab_CM*( p_para_cm + beta*e3_cm ) ) ) - rho;

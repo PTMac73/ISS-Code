@@ -42,11 +42,11 @@ TString GetPolynomialString( Int_t par_num_begin = 0, Int_t dim = 0 ){
 
 
 // GET TOTAL NUMBER OF VARIABLES TO USE IN FIT WITH RELATIVE WIDTHS ---------------------------- //
-Int_t GetNumFitVars( Int_t num_peaks, Int_t bg_dim = 0 ){
+Int_t GetNumFitVars( Int_t num_peaks, Int_t bg_dim = 0, Bool_t fix_widths = 1 ){
 	// Calculate the number of variables
 	Int_t num_pars = bg_dim + 1;
 	for ( Int_t i = 0; i < num_peaks; i++ ){
-		if ( peak_fix_widths[i] == 0 ){ num_pars += 3; }
+		if ( fix_widths == 0 ){ num_pars += 3; }
 		else{ num_pars += 2; }
 	}
 	return num_pars;
@@ -120,6 +120,7 @@ void PrintVTA( Int_t** arr, Int_t num_peaks, std::ostream& f = std::cout ){
 	Int_t w = 7;
 	
 	// Header
+	f << "\n>>> Variable type array parameters <<<\n";
 	f << std::setw(w) << "KEY : " << std::setw(4) << "AMP" << "\t" << std::setw(4) << "MU" << "\t" << std::setw(4) << "SIG" << "\n";
 	
 	
@@ -143,7 +144,7 @@ void PrintVTA( Int_t** arr, Int_t num_peaks, std::ostream& f = std::cout ){
 
 
 // GENERATE TOTAL FIT STRINGS ------------------------------------------------------------------ //
-TString GetFitString( Int_t num_peaks, Int_t bg_dim, Int_t** variable_type_arr, Int_t peak_num = 0 ){
+TString GetFitString( Int_t num_peaks, Int_t bg_dim, Int_t** variable_type_arr, Bool_t* fix_widths ){
 	TString fit_str = "";
 	
 	// Add background to string
@@ -152,8 +153,8 @@ TString GetFitString( Int_t num_peaks, Int_t bg_dim, Int_t** variable_type_arr, 
 	Int_t var_ctr = 0;
 	Int_t width_var = -1;
 	Bool_t b_fill_arr = 1;
-	Bool_t b_add_one_more = 0;
 	if( variable_type_arr == NULL ){ b_fill_arr = 0; }
+	Bool_t b_add_one_more = 0;
 	
 	// Add background to variable counter type
 	for ( Int_t i = 0; i < 3; i++ ){
@@ -166,7 +167,7 @@ TString GetFitString( Int_t num_peaks, Int_t bg_dim, Int_t** variable_type_arr, 
 
 	// Add Gaussian peaks with some constrained widths
 	for ( Int_t i = 0; i < num_peaks; i++ ){
-		if ( peak_fix_widths[i + peak_num] == 0 ){
+		if ( !fix_widths[i] ){
 			// Don't fix the widths
 			fit_str += GetGaussianString( var_ctr );
 			for ( Int_t j = 0; j < 3; j++ ){

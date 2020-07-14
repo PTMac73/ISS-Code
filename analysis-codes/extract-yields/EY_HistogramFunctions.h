@@ -35,7 +35,7 @@ Double_t GetAmpEstimate( TH1D* h, Double_t lb, Double_t ub ){
 void FormatHistogram( TH1D* h ){
 	h->GetXaxis()->SetTitle( "Excitation Energy (MeV)" );
 	h->GetXaxis()->CenterTitle();
-	h->GetXaxis()->SetRangeUser(-0.5,5);
+	h->GetXaxis()->SetRangeUser(-0.5,7);
 	
 	h->GetYaxis()->SetTitle( "Counts per 20 keV" );
 	h->GetYaxis()->CenterTitle();

@@ -66,6 +66,8 @@ dkms.conf
 *.dat
 *.txt
 *.csv
+*.tex
+*.aux
 
 tags
 

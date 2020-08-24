@@ -1,4 +1,4 @@
-// SolidAngleCalculator.C
+// ELUMSolidAngleCalculator.C
 // Calculates the solid angle for the luminosity detector, by solving a transcendental equation
 // ============================================================================================= //
 // Patrick MacGregor
@@ -6,41 +6,25 @@
 // School of Physics and Astronomy
 // The University of Manchester
 // ============================================================================================= //
-#include <TMath.h>
-#include <TGraph.h>
-#include <TMultiGraph.h>
-#include <TLine.h>
 #include <TBox.h>
 #include <TCanvas.h>
-#include <TStyle.h>
-#include <TString.h>
+#include <TGraph.h>
 #include <TH1.h>
+#include <THStack.h>
+#include <TLine.h>
+#include <TMath.h>
+#include <TMultiGraph.h>
+#include <TString.h>
+#include <TStyle.h>
+
 #include <iostream>
-#include <vector>
+
+#include "ELUMSolidAngleCalculator.h"
 #include "conversion.h"
-
-// DEFINE GLOBAL SWITCHES
-Bool_t SWITCH_DRAW_CANVAS = 0;
-Bool_t SWITCH_PRINT_CANVAS = 0;
-Bool_t SWITCH_VERBOSE = 0;
-Int_t C_SCALE = 300;
-Int_t C_WIDTH = 4*C_SCALE;
-Int_t C_HEIGHT = 3*C_SCALE;
-
-// Define radius function [ mm ] - > units are [ [s^-1], [mm], [1/c], [1/c] ]
-Double_t CalculateRadius( Double_t cyclotron_freq, Double_t z, Double_t v_para, Double_t v_perp ){
-	return ( v_perp*TMath::C()*MToMM()/cyclotron_freq )*( 1.0 - TMath::Cos( cyclotron_freq*z/( v_para*TMath::C()*MToMM() ) ) );
-}
-
-Double_t CalculateSolidAngle( Double_t theta1, Double_t theta2 ){
-	return 2*TMath::Pi()*( TMath::Cos( theta1 ) - TMath::Cos( theta2 ) );
-}
-
-
 
 // MAIN FUNCTION =============================================================================== //
 // z_elum is the distance from target to elum [mm]
-Double_t SolidAngleCalculator( Double_t z_elum = 134.8 ){
+Double_t SolidAngleCalculator( Double_t z_elum = 125.7/*134.8*/ ){
 	// OPTIONS
 	if ( SWITCH_DRAW_CANVAS == 0 ){
 		  gROOT->SetBatch(kTRUE);
@@ -50,12 +34,13 @@ Double_t SolidAngleCalculator( Double_t z_elum = 134.8 ){
 	// CONSTANTS OF MOTION --------------------------------------------------------------------- //
 	// M1 = 28Mg, M2 = 2H, M3 = 2H, M4 = 28Mg
 	Double_t mass_excess[4] = { -15.018845, 13.13572176, 13.13572176, -15.018845};	// [MeV]
+	Double_t charge_numbers[4] = { 12, 1, 1, 12 };									// [e]
 	Int_t mass_numbers[4] = { 28, 2, 2, 28 };										// Just a number
 	Double_t mass[4];																// [AMU]
 	for ( Int_t k = 0; k < 4; k++ ){
-		mass[k] = MassExcessToMass( mass_numbers[k], mass_excess[k] );				
+		mass[k] = MassExcessToMass( mass_numbers[k], mass_excess[k], charge_numbers[k] );				
 	}
-	vector <Int_t> num_revolutions = {1};														// Number of turns
+
 	Double_t ejectile_charge = 1;													// [e]
 	Double_t b_field = 2.5;															// [T]
 	Double_t beam_energy_per_nucleon = 9.473;										// MeV per u
@@ -64,14 +49,30 @@ Double_t SolidAngleCalculator( Double_t z_elum = 134.8 ){
 
 	// Define distances
 	Double_t z_elum_error = 0.7;		// Error on distance from target to elum [mm]
-	Double_t Al_distance = 13.42;		// Distance from elum to Al shield [mm]
-	Double_t Al_thickness = 12.8;		// Thickness of the Al shield [mm]
+	Double_t Al_distance = 13.42;		// Distance from elum to Al shield [mm] --> eLog 209
+	Double_t Al_thickness = 12.8;		// Thickness of the Al shield [mm] --> eLog 209
+	Double_t tube_thickness = 2.0;		// Thickness of the tube (unknown) [mm]
 	Double_t radius_in = 48.00;			// Inner radius of elum [mm]
 	Double_t radius_out = 96.00;		// Outer radius of elum [mm]
 
+	// Define angle limits
+	Double_t angle_limits[CHECK_NUM_REV][CHECK_TYPES][CHECK_MINMAX] = {
+	{							// 1 REVOLUTION
+		{ 100.0, 0.0 },			// Total angle limits
+		{ 100.0, 0.0 },			// Below shield success angle limits
+		{ 100.0, 0.0 },			// Above shield success angle limits
+	},
+	{							// 2 REVOLUTIONS
+		{ 100.0, 0.0 },			// Total angle limits
+		{ 100.0, 0.0 },			// Below shield success angle limits
+		{ 100.0, 0.0 },			// Above shield success angle limits
+	}
+};
+
 	// Calculate the range of angles (i.e. number of indices in array)
-	Double_t angle_divisions = 0.002;
-	Int_t lb_angle = -180;
+	Double_t angle_divisions = 0.001;
+	const Double_t THETA_SPACING = 0.15;
+	Int_t lb_angle = 0;
 	Int_t ub_angle = 180;
 	const Int_t range_angles = TMath::Ceil( ( ub_angle - lb_angle )/angle_divisions ) + 1;
 
@@ -84,165 +85,315 @@ Double_t SolidAngleCalculator( Double_t z_elum = 134.8 ){
 	Double_t T_cm_3 = mass[3]*T_cm_f/( mass[2] + mass[3] );								// Final energy of ejectile in CM [MeV]
 	Double_t v3 = TMath::Sqrt( 2*T_cm_3/(mass[2]*AMU) );								// Final velocity of ejectile in CM [MeV]
 
-
-	// CALCULATE ANGLE-DEPENDENT QUANTITIES ---------------------------------------------------- //
 	// Define the quantites to be calculated in loop over angles
 	Double_t *theta_cm = new Double_t[range_angles];		// Angle of scattering in CM [rad]
 	Double_t *theta_lab = new Double_t[range_angles];		// Angle of scattering in LAB
 	Double_t *T_lab_3 = new Double_t[range_angles];			// Lab energy of ejectile in CM [MeV]
 	Double_t *v_para = new Double_t[range_angles];			// Parallel velocity of ejectile in LAB [1/c]
 	Double_t *v_perp = new Double_t[range_angles];			// Perpendicular velocity of ejectile in LAB [1/c]
-	Double_t r_shield_0 = 0.0, r_shield_1 = 0.0;			// Distance from beam axis at shield (both edges) [mm]
-	Double_t r_elum = 0.0;									// Distance from beam axis at elum [mm]
-	vector <Int_t> index_temp;								// Records the indices of all the successful runs
+	Traj_t *traj_arr = new Traj_t[range_angles];			// Stores the trajectory information
+	
+	// Bools to work out their exit status
+	Bool_t brun_red;
+	Bool_t brun_orange;
+	Bool_t brun_green;
+	Bool_t in_shield_z = 0;
+	Bool_t fail_flag = 0;									// Goes to 1 if you hit something
+	
+	// Define graph and set formatting options
+	Double_t z_scale = 0.5;									// Size of step in z [mm]
+	Int_t size_of_array = (Int_t)(z_elum/z_scale + 1);		// Number of steps in z in total
+	Double_t z[size_of_array];								// Holds the z values [mm]
+	Double_t r[size_of_array];								// Holds the r values [mm]
+	Double_t max_radius = 0;								// Work out the maximum distance from the beam axis [mm]
+	Double_t total_solid_angle = 0;
+	Double_t fail_z, fail_r, fail_index;					// Define points where failure occurred
+	TGraph *g_rz[range_angles];
+	TMultiGraph *mg = new TMultiGraph();
+	
+	// Histogram for recording energies
+	TH1D* h_elum_energy[7];
+	TH1D* h_ptr;
+	for ( Int_t i = 0; i < 7; i++ ){
+		h_elum_energy[i] = new TH1D( Form( "h_elum_energy%i", i ), "ENERGY!", 1000, 0, 5 );
+	}
+	h_ptr = h_elum_energy[3];
+	THStack* hs = new THStack( "hs", "" );
 
+
+	// CALCULATE TRAJECTORIES ------------------------------------------------------------------ //
 	// LOOP OVER THETA_CM
 	for ( Int_t k = 0; k < range_angles; k++ ){
+		// Calculate angle-specific quantities
 		theta_cm[k] = ( lb_angle + k*angle_divisions )*TMath::DegToRad();									// [rad]
 		T_lab_3[k] = T_cm_3 + 0.5*mass[2]*AMU*V_cm*V_cm + mass[2]*AMU*v3*V_cm*TMath::Cos( theta_cm[k] );	// [MeV]
 		v_para[k] = V_cm + v3*TMath::Cos( theta_cm[k] );													// [1/c]
 		v_perp[k] = v3*TMath::Sin( theta_cm[k] );															// [1/c]
-		
-		// Calculate the distances from the array at specific values of z
-		r_shield_0 = CalculateRadius( cyclotron_freq, z_elum - Al_distance - Al_thickness, v_para[k], v_perp[k] );		// [mm]
-		r_shield_1 = CalculateRadius( cyclotron_freq, z_elum - Al_distance, v_para[k], v_perp[k] );						// [mm]
-		r_elum = CalculateRadius( cyclotron_freq, z_elum, v_para[k], v_perp[k] );										// [mm]
-
-		// Calculate the lab angle
 		theta_lab[k] = TMath::ASin( v3*TMath::Sin( theta_cm[k] )/TMath::Sqrt( v_para[k]*v_para[k] + v_perp[k]*v_perp[k] ) );
-		
-		// Check if it the particle satisfies the conditions of:
-		/*	* The radius at the left and right-hand-side of the shield is > outer radius of the shield i.e. goes above the shield
-			* The radius at the elum is > inner radius of elum and < outer radius i.e. it hits the detector
-		*/	
-		if ( r_shield_0 > radius_out && r_shield_1 > radius_out && r_elum > radius_in && r_elum < radius_out ){
-			index_temp.push_back(k);
-		}
-	}
 
-	// Found all the successful angles - now test to see how many turns they complete
-	Double_t z_scale_1 = 1.0;									// Define a relatively large z over which to test things
-	Int_t size_of_array_1 = (Int_t)(z_elum/z_scale_1 + 1);		// Define the size of an array with this z scale
-	Double_t r_temp[size_of_array_1];							// Define a temporary radius
-	vector < Int_t > index_success;								// Define a vector to store the successful indices
-	vector < Int_t > num_turns_completed;						// Counter for the number of completed turns in a given trajectory
-	Int_t num_turns_temp;										// Define a temporary counter for the number of turns
-	Double_t r_thresh = 5.0;									// Threshold to help count the number of turns  [mm]
-
-	// Loop over theta
-	for ( Int_t i = 0; i < (Int_t)index_temp.size(); i++ ){
 		// Reset the number of completed turns
-		num_turns_temp = 0;
-
-		// Loop over z
-		for ( Int_t j = 0; j < size_of_array_1; j++ ){
-			// Calculate the radius along the track
-			r_temp[j] = CalculateRadius( cyclotron_freq, z_scale_1*j, v_para[index_temp[i]], v_perp[index_temp[i]] );
-			
-			// Calculate the number of turns
-			if ( j > 0 && r_temp[j] > r_thresh && r_temp[j-1] <= r_thresh ){
-				num_turns_temp++;
-			}
-
+		//traj_arr[k].rev = 0;
+		if ( v_para[k] == 0 ){
+			traj_arr[k].rev = -1;
 		}
-	
-		// Store the index if it is good
-		for ( Int_t k = 0; k < (Int_t)num_revolutions.size(); k++ ){
-			if ( num_turns_temp == num_revolutions[k] ){
-				index_success.push_back( index_temp[i] );
-				num_turns_completed.push_back( num_turns_temp );
-			}
-		}
-		
-	}
-
-	// CALCULATE THE SUCCESSFUL TRAJECTORIES IN FULL
-	// Define graph and set formatting options
-	Double_t z_scale = 0.1;										// Size of step in z [mm]
-	Int_t size_of_array = (Int_t)(z_elum/z_scale + 1);			// Number of steps in z in total
-	Double_t z_success[size_of_array];							// Holds the z values (same for each trajectory) [mm]
-	Double_t theta_success[index_success.size()];				// Holds the angles of all the successful trajectories
-	Double_t r_success[index_success.size()][size_of_array];	// Holds the radii of all of the successful trajectories [mm]
-	Double_t T_lab_3_success[index_success.size()];				// Holds the lab energy of the ejectile [MeV]
-	Double_t max_radius = 0;									// Work out the maximum distance from the beam axis [mm]
-	Double_t total_solid_angle = 0;
-
-
-	// Populate arrays for positions and radii - loop over theta
-	if ( SWITCH_VERBOSE == 1 ){ printf( "NUM_REV \tTHETA_CM\tENERGY\t\tSOLID ANGLE\n" ); }
-	for ( Int_t i = 0; i < (Int_t)index_success.size(); i++ ){
-		// Populate theta
-		theta_success[i] = theta_cm[index_success[i]];
-				
-		// Populate the lab energies
-		T_lab_3_success[i] = T_lab_3[index_success[i]];
-
-		// Calculate the solid angle (discriminating on the energy so that you get one peak)
-		total_solid_angle += CalculateSolidAngle( 0.5*( theta_cm[index_success[i]] + theta_cm[index_success[i]-1] ) , 0.5*( theta_cm[index_success[i]+1] + theta_cm[index_success[i]] ) );
-		if ( SWITCH_VERBOSE == 1 ){ printf("%8i\t%8.4f\u00b0\t%8f MeV\t%8f sr\n", num_turns_completed[i], theta_success[i]*TMath::RadToDeg(), T_lab_3_success[i], total_solid_angle ); }
 		else{
-			if ( i == 0 ){ std::cout << std::setw(8) << z_elum << "\t" << std::setw(7) << theta_success[i]*TMath::RadToDeg() << "\u00b0\t"; }
-			if ( i == (Int_t)index_success.size() - 1 ){ std::cout << std::setw(7) << theta_success[i]*TMath::RadToDeg() << "\u00b0\t" << std::setw(12) << total_solid_angle << std::endl; }
+			traj_arr[k].rev = TMath::Ceil( cyclotron_freq*z_elum*MMToM()/( TMath::TwoPi()*v_para[k]*TMath::C() ) ) - 1;
 		}
 		
+		// Reset the flags and fail values
+		fail_flag = 0;
+		fail_z = 0.0;
+		fail_r = 0.0;
+		fail_index = 0.0;
 
-		// Loop over z
+		// LOOP OVER Z - calculate full trajectory and then fix later
 		for ( Int_t j = 0; j < size_of_array; j++ ){
+		
 			// Populate z in constant steps
-			if ( i == 0 ){ z_success[j] = z_scale*j; }
-
-			// Calculate the radius along the track
-			r_success[i][j] = CalculateRadius( cyclotron_freq, z_success[j], v_para[index_success[i]], v_perp[index_success[i]] );
+			z[j] = z_scale*j;
 			
-			// Find the max radius
-			if ( r_success[i][j] > max_radius ){ max_radius = r_success[i][j]; }
-		}
-	}
-	
-	
-	// Define new graphs
-	TGraph *g_rz[index_success.size()];
-	TMultiGraph *mg = new TMultiGraph();
+			// Calculate the radius along the track
+			r[j] = CalculateRadius( cyclotron_freq, z[j], v_para[k], v_perp[k] );
+		
+			// Test conditions if it has not hit anything
+			if ( fail_flag == 0 ){
+			
+				// Find the max radius
+				if ( r[j] > max_radius ){ max_radius = r[j]; }
+				
+				// BAD TRAJECTORIES -- IMPOSSIBLE
+				if ( TMath::IsNaN( r[j] ) ){
+					fail_flag = 1;
+					fail_index = j;
+					fail_r = 0.0;
+					fail_z = z[j];
+				}
+				
+				// BAD TRAJECTORIES -- SHIELD
+				// Check for bad trajectories from bottom, top, and left hitting shield
+				if( z[j] >= z_elum - Al_distance - Al_thickness && z[j] <= z_elum - Al_distance ){
+					if ( r[j] >= radius_in - tube_thickness && r[j-1] < radius_in - tube_thickness ){ // Approached from bottom
+						Double_t m = ( r[j] - r[j-1] )/( z[j] - z[j-1] );
+						fail_z = ( radius_in - tube_thickness - ( r[j] - m*z[j] ) )/m;
+						fail_r = radius_in - tube_thickness;
+						fail_index = j;
+						fail_flag = 1;
+					}
+					else if ( r[j] <= radius_out && r[j-1] > radius_out ){ // Approached from top
+						Double_t m = ( r[j] - r[j-1] )/( z[j] - z[j-1] );
+						fail_z = ( radius_out - ( r[j] - m*z[j] ) )/m;
+						fail_r = radius_out;
+						fail_index = j;
+						fail_flag = 1;
+					}
+					else if ( z[j-1] < z_elum - Al_distance - Al_thickness && r[j-1] >= radius_in - tube_thickness && r[j-1] <= radius_out ){// Approached from left - test at z_elum to see if it fails
+						if ( CalculateRadius( cyclotron_freq, z_elum - Al_distance - Al_thickness, v_para[k], v_perp[k] ) >= radius_in - tube_thickness && CalculateRadius( cyclotron_freq, z_elum - Al_distance - Al_thickness, v_para[k], v_perp[k] ) <= radius_out ){
+							fail_z = z_elum - Al_distance - Al_thickness;
+							fail_r = CalculateRadius( cyclotron_freq, z_elum - Al_distance - Al_thickness, v_para[k], v_perp[k] );
+							fail_index = j;
+							fail_flag = 1;
+						}
+					}
+				}
+				// BAD TRAJECTORIES -- TUBE
+				else if ( z[j] >= z_elum - Al_distance && z[j] <= z_elum ){
+					if ( r[j] >= radius_in - tube_thickness && r[j-1] < radius_in - tube_thickness ){ // Approached from bottom
+						Double_t m = ( r[j] - r[j-1] )/( z[j] - z[j-1] );
+						fail_z = ( radius_in - tube_thickness - ( r[j] - m*z[j] ) )/m;
+						fail_r = radius_in - tube_thickness;
+						fail_index = j;
+						fail_flag = 1;
+					}
+					else if ( r[j] <= radius_in && r[j-1] > radius_in ){ // Approached from top
+						Double_t m = ( r[j] - r[j-1] )/( z[j] - z[j-1] );
+						fail_z = ( radius_in - ( r[j] - m*z[j] ) )/m;
+						fail_r = radius_in;
+						fail_index = j;
+						fail_flag = 1;
+					}
+				}
+				
+				// Calculate the number of turns (of full trajectory)
+				/*if ( j > 1 && r[j] > r[j-1] && r[j-1] < r[j-2] ){
+					traj_arr[k].rev++;
+				}*/
+				
+				// Calculate if it goes above the shield or below it
+				if ( CalculateRadius( cyclotron_freq, z_elum - Al_distance - Al_thickness, v_para[k], v_perp[k] ) < radius_out ){
+					traj_arr[k].above_shield = 0;
+				}
+				else{ traj_arr[k].above_shield = 1; }
+				
+			}
 
-	// Populate and format the new graphs
-	Int_t allowed_colours[14] = {1, 632, 416, 600, 400, 920, 616, 432, 800, 820, 840, 860, 880, 900};
-	for ( Int_t i = 0; i < (Int_t)index_success.size(); i++ ){
-		g_rz[i] = new TGraph( size_of_array, z_success, r_success[i] );
-		g_rz[i]->SetLineWidth(1);
-		g_rz[i]->SetLineColor( allowed_colours[i%14] );
-		mg->Add( g_rz[i] );
+		}
+
+		// Fix trajectories if they failed
+		if ( fail_flag == 1 ){
+			for ( Int_t j = fail_index; j < size_of_array; j++ ){
+				r[j] = fail_r;
+				z[j] = fail_z;
+			}
+		}
+
+		
+		// Calculate the status of the particle
+		// Calculate radius at end of array
+		Double_t rtemp = CalculateRadius( cyclotron_freq, z_elum, v_para[k], v_perp[k] );
+
+		// Particle hits shield
+		if ( fail_flag == 1 ){
+			// Particle would've hit elum
+			if ( rtemp >= radius_in && rtemp <= radius_out ){
+				traj_arr[k].status = 1;
+			}
+			// Particle misses elum
+			else{
+				traj_arr[k].status = 2;
+			}
+		}
+		// Particle misses shield, but does it hit elum?
+		else{
+			if ( rtemp >= radius_in && rtemp <= radius_out ){
+				traj_arr[k].status = 0;
+			}
+			// Particle misses elum
+			else{
+				traj_arr[k].status = 3;
+			}
+		}
+
+		// Now check for angle limits etc.
+		Double_t angle_thresh = 5;
+		if ( traj_arr[k].rev >= 0 && traj_arr[k].rev <= 1  ){
+			if ( traj_arr[k].status == 0 ){
+				// Test above and below shield limits
+				if ( theta_cm[k] < angle_limits[ traj_arr[k].rev ][ traj_arr[k].above_shield + 1 ][ 0 ] && ( TMath::Abs( theta_cm[k] - angle_limits[ traj_arr[k].rev ][ traj_arr[k].above_shield + 1 ][ 0 ] ) < angle_thresh*TMath::DegToRad() || angle_limits[ traj_arr[k].rev ][ traj_arr[k].above_shield + 1 ][ 0 ] > TMath::Pi() ) ){ 
+					angle_limits[ traj_arr[k].rev ][ traj_arr[k].above_shield + 1 ][ 0 ] = theta_cm[k];
+				}
+				if ( theta_cm[k] > angle_limits[ traj_arr[k].rev ][ traj_arr[k].above_shield + 1 ][ 1 ] && ( TMath::Abs( theta_cm[k] - angle_limits[ traj_arr[k].rev ][ traj_arr[k].above_shield + 1 ][ 1 ] ) < angle_thresh*TMath::DegToRad() || angle_limits[ traj_arr[k].rev ][ traj_arr[k].above_shield + 1 ][ 1 ] < 0.01 ) ){
+					angle_limits[ traj_arr[k].rev ][ traj_arr[k].above_shield + 1 ][ 1 ] = theta_cm[k];
+				}
+			}
+			
+			// Test regular maximum and minimum for all trajectories
+			if ( theta_cm[k] < angle_limits[ traj_arr[k].rev ][ 0 ][ 0 ] && ( TMath::Abs( theta_cm[k] - angle_limits[ traj_arr[k].rev ][ 0 ][ 0 ] ) < angle_thresh*TMath::DegToRad() || angle_limits[ traj_arr[k].rev ][ 0 ][ 0 ] > TMath::Pi() ) ){
+				angle_limits[ traj_arr[k].rev ][ 0 ][ 0 ] = theta_cm[k];
+			}
+			if ( theta_cm[k] > angle_limits[ traj_arr[k].rev ][ 0 ][ 1 ] && ( TMath::Abs( theta_cm[k] - angle_limits[ traj_arr[k].rev ][ 0 ][ 1 ] ) < angle_thresh*TMath::DegToRad() || angle_limits[ traj_arr[k].rev ][ 0 ][ 1 ] < 0.01 ) ){
+				angle_limits[ traj_arr[k].rev ][ 0 ][ 1 ] = theta_cm[k];
+			}
+		}
+
+		
+		// Calculate the solid angle
+		/*if ( traj_arr[k].status == 0 ){
+			total_solid_angle += CalculateSolidAngle( 0.5*( theta_cm[k] + theta_cm[k - 1] ) , 0.5*( theta_cm[k + 1] + theta_cm[k] ) );
+		}*/
+		
+		// Format graphs
+		g_rz[k] = new TGraph( size_of_array, z, r );
+		g_rz[k]->SetLineWidth(1);
+		if ( traj_arr[k].status == 0 ){ g_rz[k]->SetLineColor( kGreen ); }
+		else if ( traj_arr[k].status == 1 ){ g_rz[k]->SetLineColor( kOrange ); }
+		else if ( traj_arr[k].status == 2 ){ g_rz[k]->SetLineColor( kRed ); }
+		else if ( traj_arr[k].status == 3 ){ g_rz[k]->SetLineColor( kBlue ); }
+		
+		
+		// Add to multigraph
+		if ( ( k % (Int_t)(THETA_SPACING/angle_divisions) == 0 ) && traj_arr[k].rev == 0 ){ mg->Add( g_rz[k] ); }
+		
+		// Add results to histogram
+		if ( traj_arr[k].status == 0 ){
+			if ( traj_arr[k].rev == 0 && traj_arr[k].above_shield == 0 ){ h_elum_energy[0]->Fill( T_lab_3[k] ); }
+			else if ( traj_arr[k].rev == 0 && traj_arr[k].above_shield == 1 ){ h_elum_energy[1]->Fill( T_lab_3[k] ); }
+			else if ( traj_arr[k].rev == 1 && traj_arr[k].above_shield == 0 ){ h_elum_energy[2]->Fill( T_lab_3[k] ); }
+			else if ( traj_arr[k].rev == 1 && traj_arr[k].above_shield == 1 ){ h_elum_energy[3]->Fill( T_lab_3[k] ); }
+			else if ( traj_arr[k].rev == 2 && traj_arr[k].above_shield == 0 ){ h_elum_energy[4]->Fill( T_lab_3[k] ); }
+			else if ( traj_arr[k].rev == 2 && traj_arr[k].above_shield == 1 ){ h_elum_energy[5]->Fill( T_lab_3[k] ); }
+			else{ h_elum_energy[6]->Fill( T_lab_3[k] ); }
+		}
 	}
 
 	// Define a canvas
-	TCanvas *c_rz = new TCanvas( "c_rz", "CANVAS", C_WIDTH, C_HEIGHT );
+	TCanvas *c_rz = new TCanvas( "c_rz", "CANVAS", GetCanvasWidth(C_HEIGHT, 0, -0.05*max_radius, 1.1*z_elum, 1.1*max_radius ), C_HEIGHT );
+	GlobSetCanvasMargins( c_rz );
 
-	// Draw the first TGraph with axes
-	TH1F *c_frame = c_rz->DrawFrame(0, -2, 1.1*z_elum, 1.1*max_radius );
-	c_frame->SetTitle( "Distance from beam axis (r) v.s. distance along beam axis (z); z / mm; r / mm" );
-
-	// Draw the rest with just curves on the same axes
-	mg->Draw("C");
-
-	// Define lines for r1 and r2
-	TBox *shield = new TBox( z_elum - Al_distance - Al_thickness, radius_in, z_elum - Al_distance, radius_out );
-	TLine *elum = new TLine( z_elum, radius_in, z_elum, radius_out );
-
-	// Format the lines
-	shield->SetFillColor(kRed);
-	elum->SetLineWidth(4);
-	elum->SetLineColor(kBlue);
-
-	// Draw the lines
-	shield->Draw("same");
-	elum->Draw("same");
+	// Draw the frame with axes
+	TH1F *c_frame = c_rz->DrawFrame(0, -0.05*max_radius, 1.1*z_elum, 1.1*max_radius );
+	FormatFrame( c_frame, "z (mm)", "r (mm)" );
 	c_rz->SetFrameLineColor(0);
+
+	// Define shield and elum detector
+	TBox *shield = new TBox( z_elum - Al_distance - Al_thickness, radius_in, z_elum - Al_distance, radius_out );
+	TBox *tube = new TBox( z_elum - Al_distance - Al_thickness, radius_in - tube_thickness, z_elum + 0.5, radius_in );
+	TBox *elum = new TBox( z_elum - 0.2, radius_in, z_elum + 0.5, radius_out );
+
+	// Format the drawings
+	shield->SetFillColor(kGray);
+	tube->SetFillColor(kGray);
+	elum->SetFillColor(pcb_green_i);
+
+	// Draw the objects
+	shield->Draw("same");
+	tube->Draw("same");
+	elum->Draw("same");
+
+	// Draw the trajectories with just curves on the same axes
+	mg->Draw("C");
 	c_rz->Modified(); c_rz->Update();
-	
 	// Print the canvas
 	if ( SWITCH_PRINT_CANVAS == 1 ){
-		c_rz->Print("/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/PLOTS/MgTraj.png");
+		c_rz->Print("ELUMSolidAngle.png");
+		c_rz->Print("ELUMSolidAngle.tex");
+		c_rz->Print("ELUMSolidAngle.svg");
+		c_rz->Print("ELUMSolidAngle.pdf");
 	}
 
+	// Print the angle limits
+	/*for ( Int_t i = 0; i < CHECK_NUM_REV; i++ ){
+		std::cout << "REV " << i + 1 << "\n";
+		for ( Int_t j = 0; j < CHECK_TYPES; j++ ){
+			std::cout << std::right << std::setw(8) << 180 - angle_limits[i][j][1]*TMath::RadToDeg() << " ---> " << std::setw(8) << 180 - angle_limits[i][j][0]*TMath::RadToDeg() << "\n";
+		}
+	}*/
+	
+	// Draw the histogram stack
+	h_elum_energy[0]->SetFillColor( kBlack );
+	h_elum_energy[1]->SetFillColor( kGreen );
+	h_elum_energy[2]->SetFillColor( kBlack );
+	h_elum_energy[3]->SetFillColor( kCyan );
+	h_elum_energy[4]->SetFillColor( kBlack );
+	h_elum_energy[5]->SetFillColor( kMagenta );
+	h_elum_energy[6]->SetFillColor( kBlack );
+
+	h_elum_energy[0]->SetLineColor( kBlack );
+	h_elum_energy[1]->SetLineColor( kGreen );
+	h_elum_energy[2]->SetLineColor( kBlack );
+	h_elum_energy[3]->SetLineColor( kCyan );
+	h_elum_energy[4]->SetLineColor( kBlack );
+	h_elum_energy[5]->SetLineColor( kMagenta );
+	h_elum_energy[6]->SetLineColor( kBlack );
+	
+	for ( Int_t i = 0; i < 7; i++ ){
+		hs->Add( h_elum_energy[i] );
+	}
+
+	TCanvas* c_h = new TCanvas( "c_h", "CANVAS", 1200, 900 );
+	GlobSetCanvasMargins( c_h );
+	hs->Draw();
+	FormatFrame( hs, "T_{3} (MeV)", "Counts" );
+	
+	
+	if ( SWITCH_PRINT_CANVAS == 1 ){
+		c_h->Print("elum_energy_hist.png");
+		c_h->Print("elum_energy_hist.tex");
+		c_h->Print("elum_energy_hist.svg");
+		c_h->Print("elum_energy_hist.pdf");
+	}
+	
+	std::cout << z_elum << "\t" << angle_limits[0][2][0]*TMath::RadToDeg() << "\t" << angle_limits[0][2][1]*TMath::RadToDeg() << "\n";
+	
 
 	// Delete arrays that are not needed any more
 	delete[] theta_lab;
@@ -250,12 +401,16 @@ Double_t SolidAngleCalculator( Double_t z_elum = 134.8 ){
 	delete[] T_lab_3;
 	delete[] v_para;
 	delete[] v_perp;
+	for ( Int_t i = 0; i < 7; i++ ){
+		if ( h_elum_energy[i]->IsOnHeap() ){ h_elum_energy[i]->Delete(); }
+	}
 	if ( SWITCH_DRAW_CANVAS == 0 ){
 		delete c_rz;
+		delete c_h;
 		delete mg;
 	}
 	
-	return total_solid_angle;
+	return 0;
 }
 
 
@@ -266,7 +421,7 @@ void ELUMSolidAngleCalculator(){
 	const Int_t num_z = 5;
 	Double_t z_elum[num_z] = { 120.7, 124.7, 125.7, 126.7, 130.7 };
 	Double_t solid_angle[num_z];
-	if (SWITCH_VERBOSE == 0 ){ std::cout << "  Z (mm)\tmin(\u03b8CM)\tmax(\u03b8CM)\tSOLID_ANGLE" << std::endl; }
+	if (SWITCH_VERBOSE == 0 ){ std::cout << "  Z (mm)\tmin(\u03b8CM)\tmax(\u03b8CM)" << std::endl; }
 	for ( Int_t i = 0; i < num_z; i++ ){
 		solid_angle[i] = SolidAngleCalculator( z_elum[i] );
 	}

@@ -31,8 +31,8 @@ void ArrayGeometryEX( Double_t ex = EX ){
 	TCanvas* c0 = new TCanvas( "c_array", "Array Trajectories", CANVAS_WIDTH, CANVAS_HEIGHT );
 	
 	// Draw frame
-	TH1F* frame = c0->DrawFrame( X1, Y1, X2, Y2 );
-	frame->SetTitle( ";z / cm; r / cm" );
+	TH1F* frame0 = c0->DrawFrame( X1, Y1, X2, Y2 );
+	FormatFrame( frame0, "z / cm", "r / cm" );
 
 	// Draw target
 	TBox* b_target = new TBox( 0, -2, 0.5, 2 );
@@ -184,7 +184,7 @@ void ArrayGeometryEX( Double_t ex = EX ){
 			}	// Loop over z (k)
 
 			// Draw successful trajectories in phi
-			if ( theta_cm[i] == theta_lb ){
+			if ( theta_cm[i] == chosen_theta ){
 				g_traj_phi[j] = new TGraph( NUM_Z, x[j], y[j] );
 				g_traj_phi[j]->SetLineColor( traj_colour[j] );
 			}
@@ -220,7 +220,9 @@ void ArrayGeometryEX( Double_t ex = EX ){
 	// DRAW THE ARRAY HEAD ON
 	TCanvas* c1 = new TCanvas( "c_clip", "Clipping on the array", CANVAS_HEIGHT, CANVAS_HEIGHT );
 	c1->cd();
-	c1->DrawFrame( -10, -10, 10, 10 );
+	TH1F* frame1 = c1->DrawFrame( -10, -10, 10, 10 );
+	FormatFrame( frame1, "x / cm", "y / cm" );
+	
 
 	// Draw the four jaws and the inside of the array
 	TBox* b_fj_head = new TBox( -ARR_DIAM/2, -ARR_DIAM/2, ARR_DIAM/2, ARR_DIAM/2 );
@@ -252,14 +254,14 @@ void ArrayGeometryEX( Double_t ex = EX ){
 	// Draw the phi fraction
 	TCanvas* c2 = new TCanvas( "c_phi_frac", "Fraction of phi obstructed", CANVAS_WIDTH, CANVAS_HEIGHT );
 	c2->cd();
-	c2->DrawFrame( TMath::Max( 0.0, theta_lb - theta_spacing ), 0, theta_ub + theta_spacing, 360 );
+	TH1F* frame2 = c2->DrawFrame( TMath::Max( 0.0, theta_lb - theta_spacing ), 0, theta_ub + theta_spacing, 360 );
+	FormatFrame( frame2, "#theta_{cm} / ^{#circ}", "#Delta#phi" );
+	
 	TGraph* g_phi_frac = new TGraph( NUM_THETA, theta_cm, solid_angle );
-	g_phi_frac->SetTitle("");
-	g_phi_frac->GetXaxis()->SetTitle( "#theta_{cm} / ^{#circ}" );
-	g_phi_frac->GetYaxis()->SetTitle( "#Delta#phi" );
 	g_phi_frac->SetMarkerStyle(20);
 	g_phi_frac->SetMarkerSize(0.5);
 	g_phi_frac->Draw("LP");
+	
 	TLine *l_solid_angle = new TLine( c2->GetUxmin(), 8*TMath::ATan( 9.0/23.0 )*TMath::RadToDeg(), c2->GetUxmax(), 8*TMath::ATan( 9.0/23.0 )*TMath::RadToDeg() );
 	l_solid_angle->SetLineStyle(2);
 	l_solid_angle->SetLineColor(kRed);
@@ -269,9 +271,9 @@ void ArrayGeometryEX( Double_t ex = EX ){
 
 	// CALCULATE THE MINIMUM THETA WHERE CLIPPING DOES NOT OCCUR
 	// Print the canvases
-	c0->Print( Form( "output-data/EX_%5.4f-POS_%i-array_side.pdf", ex, POSITION ) );
-	c1->Print( Form( "output-data/EX_%5.4f-POS_%i-array_head_on.pdf", ex, POSITION ) );
-	c2->Print( Form( "output-data/EX_%5.4f-POS_%i-phi_frac.pdf", ex, POSITION ) );
+	c0->Print( Form( "output-data/EX_%5.4f-POS_%i-array_side.tex", ex, POSITION ) );
+	c1->Print( Form( "output-data/EX_%5.4f-POS_%i-array_head_on.tex", ex, POSITION ) );
+	c2->Print( Form( "output-data/EX_%5.4f-POS_%i-phi_frac.tex", ex, POSITION ) );
 
 	// Close the log file
 	log_file.close();
@@ -325,10 +327,10 @@ void ArrayGeometryEX( Double_t ex = EX ){
 
 
 void ArrayGeometry(){
-	const Int_t NUM_STATES = 10;
-	const Bool_t ALL = 0;
+	const Int_t NUM_STATES = 3;//10;
+	const Bool_t ALL = 1;
 	Double_t STATES[NUM_STATES] = {
-		0.00000,
+/*		0.00000,
 		0.05460,
 		1.09109,
 		1.42959,
@@ -338,6 +340,9 @@ void ArrayGeometry(){
 		3.22944,
 		3.97709,
 		4.31613
+*/		5.65,
+		5.84,
+		6.06
 	};
 
 	if ( ALL == 1 ){

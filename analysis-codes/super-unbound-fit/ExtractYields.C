@@ -96,7 +96,7 @@ void ExtractYieldsHist( TH1D* h, Int_t pos, Int_t spectrum_type ){
 	FitPeakOptions_t fit_opt;
 	
 //	SetFitOptions( FitPeakOptions_t &opt, Int_t num_peaks, Int_t peak_num, Bool_t fix_widths, Bool_t fix_positions, const Double_t* pe, Double_t sig_est, Double_t sig_range )
-	SetFitOptions( fit_opt, num_full_peaks, 0, 1, 0, peak_energies, sig_est, sig_range );
+	SetFitOptions( fit_opt, num_full_peaks, 0, 0, 0, peak_energies, sig_est, sig_range );
 	
 	
 	Int_t** var_type_arr;

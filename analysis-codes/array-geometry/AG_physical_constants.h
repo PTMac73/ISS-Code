@@ -17,7 +17,7 @@ const Double_t AMU = 931.494;		// MeV
 // CONSTANTS ABOUT THE SCRIPT
 const Int_t CANVAS_WIDTH = 1200;
 const Int_t CANVAS_HEIGHT = 900;
-const Bool_t BATCH_MODE = 0;
+const Bool_t BATCH_MODE = 1;
 
 // Set colours
 Int_t pcb_green_i = TColor::GetFreeColorIndex();

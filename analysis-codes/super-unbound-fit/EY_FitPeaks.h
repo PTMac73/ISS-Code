@@ -98,7 +98,7 @@ TF1* EstimatePeakParameters( TH1D* h, FitPeakOptions_t &opt, Int_t**& var_type_a
 				// Variable-width peaks
 				else if ( var_type_arr[i][j] > var_type_arr[i][j-1] && opt.fix_widths == 0 ){
 					fit_func->SetParameter( var_type_arr[i][j], opt.sig_est );
-					fit_func->SetParLimits( var_type_arr[i][j], opt.sig_est, opt.sig_est + 5*opt.sig_range );
+					fit_func->SetParLimits( var_type_arr[i][j], opt.sig_est, TMath::Sqrt( TMath::Power( opt.sig_est, 2 ) + TMath::Power( MAX_SF_ESTIMATE*1.21, 2 ) ) );
 				}
 					
 			}

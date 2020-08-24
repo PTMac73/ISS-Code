@@ -144,6 +144,51 @@ void CalculateKP( ReactionParameters &rp, KinematicsParameters &kp, Double_t ex 
 	kp.p3_cm = TMath::Sqrt(kp.e3_cm*kp.e3_cm - rp.m3*rp.m3);								// Momentum of the outgoing proton [CM]
 };
 
+void PrintKP( KinematicsParameters &kp ){
+	Int_t w = 12;
+	std::cout << 
+		std::left << std::setw(w) << "T1" << kp.T1 << "\n" << 
+		std::left << std::setw(w) << "E1" << kp.e1 << "\n" << 
+		std::left << std::setw(w) << "Etot" << kp.etot << "\n" << 
+		std::left << std::setw(w) << "EtotCM" << kp.etot_cm << "\n" << 
+		std::left << std::setw(w) << "GamLABCM" << kp.gamLAB_CM << "\n" << 
+		std::left << std::setw(w) << "Beta" << kp.beta << "\n" << 
+		std::left << std::setw(w) << "Rho" << kp.rho << "\n" << 
+		std::left << std::setw(w) << "m4ex" << kp.m4ex << "\n" << 
+		std::left << std::setw(w) << "E3CM" << kp.e3_cm << "\n" << 
+		std::left << std::setw(w) << "p3CM" << kp.p3_cm << "\n";
+	return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif
 

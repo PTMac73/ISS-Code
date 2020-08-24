@@ -25,13 +25,14 @@ TString print_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-code
 
 // Things that probably won't change
 const Int_t BG_DIM = 0; 		// (0 = const, 1 = linear etc.)
-const Int_t NUM_PEAKS = 3;		// Number of peaks in the spectrum
+const Int_t NUM_PEAKS = 1;		// Number of peaks in the spectrum
 const Double_t E_MIN = 5.38;	// Minimum energy on the spectrum
-const Double_t E_MAX = 6.17;	// Maximum energy on the spectrum
+const Double_t E_MAX = 5.8;//6.17;	// Maximum energy on the spectrum
 const Double_t PRE_MIN = 0.4;	// Minimum energy for the two strong states used to get widths
 const Double_t PRE_MAX = 1.9;	// Maximum energy for the two strong states used to get widths
 
-Double_t PEAK_WIDTH_ESTIMATE = 0.1;		// Range within which peak definitely falls
+Double_t PEAK_WIDTH_ESTIMATE = 0.2;		// Range within which peak definitely falls
+Double_t MAX_SF_ESTIMATE = 0.5;
 
 const Double_t NEUTRON_SEP_ENERGY = 3.655;
 const Double_t GS_DOUB_LB = -PEAK_WIDTH_ESTIMATE;	// Bounds for the ground state doublet yield evaluation
@@ -55,9 +56,9 @@ const Double_t pre_peak_energies[2] = {
 };
 
 const Double_t peak_energies[NUM_PEAKS] = {
-	5.5,
-	5.76,
-	6.10
+	5.55,
+	//5.76,
+	//6.07
 };
 
 

@@ -20,8 +20,8 @@ Double_t JoulesToMeV( ){
 	return 1.0/( ELECTRIC_CHARGE*(1e6) );
 }
 // Converts mass excess to mass in u
-Double_t MassExcessToMass( Int_t A, Double_t mass_excess ){
-	return (A*AMU + mass_excess)/AMU;
+Double_t MassExcessToMass( Int_t A, Double_t mass_excess, Double_t q ){
+	return (A*AMU + mass_excess - q*0.511)/AMU;
 }
 // Converts AMU to kg
 Double_t AMUToKg( ){
@@ -30,6 +30,10 @@ Double_t AMUToKg( ){
 // Converts metres to millimetres
 Double_t MToMM(){
 	return 1000.0;
+}
+// Converts millimetres to metres
+Double_t MMToM(){
+	return 0.001;
 }
 // Converts metres to centimetres
 Double_t MToCM(){

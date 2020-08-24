@@ -52,12 +52,13 @@ Double_t cyclotron_freq = ejectile_charge*UC_EToC()*b_field/( mass[2]/UC_KGToMEV
 
 // GEOMETRY ------------------------------------------------------------------------------------ //
 // Theta's to spam
-Double_t theta_spacing = 0.1;	// [DEG]
-Double_t theta_lb = 11.0;		// [DEG]
-Double_t theta_ub = 25.0;		// [DEG]
+Double_t theta_spacing = 0.2;	// [DEG]
+Double_t theta_lb = 0.0;		// [DEG]
+Double_t theta_ub = 22.0;		// [DEG]
+Double_t chosen_theta = 8;		// [DEG]
 
 // Phi's to spam (initial)
-Double_t phi_spacing = 0.1; // [DEG]
+Double_t phi_spacing = 1; // [DEG]
 Double_t phi_lb = 0.0;		// [DEG]
 Double_t phi_ub = 360.0 - phi_spacing;		// [DEG]
 
@@ -89,8 +90,8 @@ const Double_t LAST_CENTROID_TO_PCB = 3.405;	// [cm]
 
 
 // Beam spot offset
-const Double_t BEAM_SPOT_OFF_X = TMath::Sqrt(0.2);	// [cm]
-const Double_t BEAM_SPOT_OFF_Y = TMath::Sqrt(0.2);	// [cm]
+const Double_t BEAM_SPOT_OFF_X = 0.0;//TMath::Sqrt(0.2);	// [cm]
+const Double_t BEAM_SPOT_OFF_Y = 0.0;//TMath::Sqrt(0.2);	// [cm]
 
 
 

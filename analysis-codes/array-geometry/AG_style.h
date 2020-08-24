@@ -9,9 +9,12 @@
 #ifndef AG_STYLE_H_
 #define AG_STYLE_H_
 
-#include <TStyle.h>
+
 #include <TColor.h>
+#include <TH1F.h>
 #include <TROOT.h>
+#include <TString.h>
+#include <TStyle.h>
 
 TStyle* ptm_style = (TStyle*)gStyle->Clone();
 
@@ -31,8 +34,6 @@ Double_t Y1 = -0.5*DY;
 Double_t Y2 = 0.5*DY;
 
 
-
-
 void CreateStyle( TStyle* st ){
 	st->SetName("ptm_style");
 
@@ -42,6 +43,25 @@ void CreateStyle( TStyle* st ){
 	st->SetPadTopMargin(marg_t);
 	st->SetPadBottomMargin(marg_b);
 }
+
+
+
+void FormatFrame( TH1F* h, TString xlabel, TString ylabel ){
+	h->SetTitle( "" );
+	h->GetXaxis()->SetTitle( xlabel );
+	h->GetYaxis()->SetTitle( ylabel );
+	
+	h->GetXaxis()->CenterTitle();
+	h->GetYaxis()->CenterTitle();
+	
+	h->GetXaxis()->SetTitleFont(62);
+	h->GetYaxis()->SetTitleFont(62);
+	
+	h->GetXaxis()->SetLabelFont(62);
+	h->GetYaxis()->SetLabelFont(62);
+	return;	
+}
+
 
 
 #endif

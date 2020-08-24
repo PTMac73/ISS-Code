@@ -68,6 +68,7 @@ dkms.conf
 *.csv
 *.tex
 *.aux
+*.ps
 
 tags
 

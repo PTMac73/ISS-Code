@@ -37,11 +37,11 @@ TH1F* h_ex_full_evolution[5];	// Full spectrum evolution
 
 Bool_t ex_print_opt[6] = {
 	0,	// (0) full spectrum
-	0,	// (1) RBR spectrum (all good dets)
+	1,	// (1) RBR spectrum (all good dets)
 	0,	// (2) RBR spectrum (best resolution dets)
 	0,	// (3) DBD spectrum
 	0,	// (4) spectrum evolution
-	1	// (5) full spectrum (best)
+	0	// (5) full spectrum (best)
 };
 
 void HCreateEx(){
@@ -158,7 +158,7 @@ void HDrawEx(){
 			GlobSetCanvasMargins( c_ex_rbr[i][0] );
 			h_ex_rbr[i][0]->Draw();
 			
-			c_ex_rbr[i][1] = new TCanvas( Form( "c_ex_rbr_%i_HI", i ), Form( "Ex | Row %i | No RHS", i ), C_WIDTH, C_HEIGHT );
+			c_ex_rbr[i][1] = new TCanvas( Form( "c_ex_rbr_%i_HI", i ), Form( "Ex | Row %i | Best dets", i ), C_WIDTH, C_HEIGHT );
 			GlobSetCanvasMargins( c_ex_rbr[i][1] );
 			h_ex_rbr[i][1]->Draw();
 			

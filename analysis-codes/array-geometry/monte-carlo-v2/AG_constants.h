@@ -38,7 +38,7 @@ TColor *fj_red = new TColor( fj_red_i, 189.0/255.0, 124.0/255.0, 124.0/255.0 );
 */
 
 // Position
-const Int_t POSITION = 1;
+const Int_t POSITION = 0;
 
 // Mass Excesses [MeV] (obtained from https://www.nndc.bnl.gov/wallet/wc8.html)
 const Double_t Delta[4] = { -15.018, 13.136, 7.289, -10.60 };
@@ -78,10 +78,10 @@ Double_t Si_centroids[2][6] = {
 	{ 42.368, 36.487, 30.611, 24.748, 18.912, 13.176 }
 };
 
-const Double_t SI_WIDTH = 5.5;			// [cm]
+const Double_t SI_WIDTH = 5.05;			// [cm]
 const Double_t SI_HEIGHT = 0.9;			// [cm]
 
-const Double_t PCB_WIDTH = 2.3;			// [cm]
+const Double_t PCB_WIDTH = 1.8;			// [cm]
 const Double_t PCB_LENGTH = 38.8;		// [cm]
 
 const Double_t ARR_DIAM = 2.3;			// [cm]
@@ -91,14 +91,14 @@ const Double_t SLIT_LENGTH = 3.271;		// [cm]
 
 const Double_t LAST_CENTROID_TO_PCB = 3.405;	// [cm]
 
-const Double_t TARGET_RDT_DISTANCE = GetArrayRDTDistance(POS);	// [cm] --> Edith's report
+const Double_t TARGET_RDT_DISTANCE = GetTargetRDTDistance();	// [cm] --> Edith's report
 
 // Calculate z at the four-jaws
 const Double_t z_fj = - Si_centroids[POSITION][5] + LAST_CENTROID_TO_PCB + SLIT_LENGTH;
 
 // Ejectile side-on plotting
-Double_t ej_side_X1 = -50.0;														// Left hand edge
-Double_t ej_side_X2 = 5.0;															// Right hand edge
+Double_t ej_side_X1 = -Si_centroids[POSITION][5] + LAST_CENTROID_TO_PCB - PCB_LENGTH - 2; // Left hand edge
+Double_t ej_side_X2 = 1.0;															// Right hand edge
 Double_t ej_side_DY = (ej_side_X2-ej_side_X1)*(1 - marg_t - marg_b)*h/( (1 - marg_r - marg_l)*w );	// The resulting height of the plot
 Double_t ej_side_Y1 = -0.5*ej_side_DY;														// Symmetrical spacing either side
 Double_t ej_side_Y2 = 0.5*ej_side_DY;
@@ -120,41 +120,42 @@ const Double_t RDT_SI_OUTER_RAD = 5.0;			// [cm]		* Outer radius of silicon pad
 const Double_t RDT_ANGULAR_COVERAGE = 82.0;		// [DEG]	* Angular coverage of silicon pad
 const Double_t RDT_PCB_INNER_RAD = 0.525;		// [cm]		* Inner radius of PCB board
 const Double_t RDT_PCB_OUTER_RAD = 5.15;		// [cm]		* Outer radius of PCB board
-const Double_t RDT_ROTATION = 0.0;				// [DEG]	* Rotate the detector by this angle
+const Double_t RDT_ROTATION = 54.0;				// [DEG]	* Rotate the detector by this angle [https://isolde-elog.web.cern.ch/iss/231]
 const Double_t RDT_DETECTOR_GAP = 0.1;			// [cm]		* The gap between each detector from the others
-const Double_t RDT_RADIAL_ALIGNMENT = 0.1;		// [cm]		* The radial tolerance that each trajectory must clear
+const Double_t RDT_RADIAL_ALIGNMENT = 0.0;		// [cm]		* The radial tolerance that each trajectory must clear
 const Double_t RDT_RADIUS_TO_CLEAR = RDT_SI_INNER_RAD + TMath::Sqrt(2)*0.5*RDT_DETECTOR_GAP + TMath::Sqrt(2)*0.5*RDT_RADIAL_ALIGNMENT;
 
 // SAMPLING ------------------------------------------------------------------------------------ //
+// EJECTILE SIDE ANGLE LIMITS
+const Double_t THETA_DT_LIM = 43.8;
+
 // CM Theta's to spam
-Double_t theta_spacing = 0.01;	// [DEG]
-Double_t THETA_LB= 15.00;		// [DEG]
-Double_t THETA_UB = 19.00;		// [DEG]
+Double_t theta_spacing = 0.5;	// [DEG]
+Double_t THETA_LB= 0.00;		// [DEG]
+Double_t THETA_UB = THETA_DT_LIM;		// [DEG] MAX = 48 for GS
 
 // Number of events per theta
-const Int_t NUM_EVENTS_PER_THETA = 10000;
+const Int_t NUM_EVENTS_PER_THETA = 2000;
 
 // Proton z's to spam
-Double_t z_spacing = 0.01;		// [cm]
+Double_t z_spacing = 0.05;		// [cm]
 const Int_t NUM_ZP = (Int_t)( ( 0 - ej_side_X1 )/z_spacing );
-const Int_t NUM_THETA = (Int_t)( ( THETA_UB - THETA_LB )/theta_spacing ) + 1;
 
 // Recoil z's to spam (add 1 so that the detector surface is definitely included)
 const Int_t NUM_ZR = (Int_t)( ( TARGET_RDT_DISTANCE - 0 )/z_spacing ) + 1;
 
 // Choose which angles to look at
-const Double_t THETA_HEAD = 18.0;
-const Double_t EVENT_NUMBER = 1;
+//const Double_t THETA_HEAD = 18.5;
+const Double_t EVENT_NUMBER = 0;
+const Double_t CHOSEN_PHI = 0.0;
 
 // Log file precision
 const Int_t log_prec = 8;
 const Int_t log_width = 16;
 
 // Number of trajectories to plot
-const Int_t NUM_TRAJECTORIES = 200;
-
-
-
+const Int_t NUM_TRAJECTORIES = 150;
+const Double_t NUM_SIDE_ANGLE_INCREMENT = 20*theta_spacing;
 
 
 

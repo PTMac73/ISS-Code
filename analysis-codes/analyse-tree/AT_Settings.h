@@ -38,14 +38,14 @@ TString cut_dir_si = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-cod
 // Decide how to plot excitation spectra
 const Bool_t ALL_ROWS = 1;
 const Bool_t ROW_BY_ROW = 1;
-const Bool_t DET_BY_DET = 1;
+const Bool_t DET_BY_DET = 0;
 
 // Select row/det number to look at (-1 means do them all)
 const Int_t DET_NUMBER = -1;
 const Int_t ROW_NUMBER = -1;
 
 // Array position - can only be one or two
-const Int_t ARR_POSITION = 1;
+const Int_t ARR_POSITION = 2;
 
 // Select angle cuts
 const Double_t THETA_MIN = 11.0;//19.21; //16.6278;
@@ -71,7 +71,7 @@ const Bool_t DRAW_NEW_CUTS = 0;
 	(1) Print the histograms (pdf, root etc)
 	(2) Write SPE files
 */
-const Bool_t  SW_EX_COMPARE[3] = { 0, 1, 1 };
+const Bool_t  SW_EX_COMPARE[3] = { 0, 1, 0 };
 const Bool_t    SW_RDT_CUTS[3] = { 0, 1, 0 };
 const Bool_t      SW_EVZ_SI[3] = { 0, 0, 0 };
 const Bool_t          SW_EX[3] = { 1, 1, 1 };
@@ -243,8 +243,10 @@ Double_t thetaCM_cuts[6][2] = {
 	{ 17.7, 17.7 },	// ROW 1
 	{ 18.3, 18.8 },	// ROW 2
 	{ 18.8, 19.4 },	// ROW 3
-	{ 19.4, 19.4 },	// ROW 4
-	{ 19.4, 19.4 } 	// ROW 5
+	//{ 19.4, 19.4 },	// ROW 4
+	//{ 19.4, 19.4 },	// ROW 5
+	{ 20.63, 20.63 }, 	// ROW 4
+	{ 20.63, 20.63 } 	// ROW 5
 };
 
 // 0 is intercept, 1 is gradient
@@ -418,9 +420,9 @@ Float_t thetaCM_singles_cuts[6][2][2] = {
 	{ { 11.0, 14.5 }, { 11.0, 90.0 } }, 
 	{ { 11.0, 17.0 }, { 11.0, 90.0 } }, 
 	{ { 12.0, 19.0 }, { 14.0, 90.0 } }, 
-	{ { 12.5, 20.0 }, { 00.0, 00.0 } }, 
-	{ { 00.0, 00.0 }, { 00.0, 00.0 } },
-	{ { 00.0, 00.0 }, { 00.0, 00.0 } }
+	{ { 12.5, 20.0 }, { 16.5, 24.0 } }, 
+	{ { 18.5, 23.0 }, { 19.0, 25.0 } },
+	{ { 20.5, 24.5 }, { 21.0, 26.0 } }
 };
 
 

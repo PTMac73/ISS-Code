@@ -27,7 +27,7 @@ const Int_t BG_DIM = 0; 		// (0 = const, 1 = linear etc.)
 
 // REGION-SPECIFIC QUANTITIES
 
-const Int_t NUM_PEAKS = 13;
+const Int_t NUM_PEAKS = 11;
 
 // Min/max energy for the region
 Double_t E_LIMITS[2] = {
@@ -47,9 +47,7 @@ const Double_t peak_energies[NUM_PEAKS] = {
 	3.874186853,
 	4.011653487,
 	4.313766313,
-	5.5,
-	5.76,
-	6.0,
+	5.5
 };
 
 Int_t peak_colours[NUM_PEAKS] = {
@@ -63,8 +61,6 @@ Int_t peak_colours[NUM_PEAKS] = {
 	kBlue,
 	kBlue,
 	kBlue,
-	kBlue,
-	kBlue,
 	kBlue
 };
 
@@ -73,12 +69,12 @@ Int_t peak_colours[NUM_PEAKS] = {
 Bool_t fix_widths[NUM_PEAKS] = { 
 	1,1,1,1,1,1,1,
 	1,1,1,
-	1,1,1 
+	1 
 };
 Bool_t fix_positions[NUM_PEAKS] = {
 	0,0,0,0,0,0,0,
 	0,0,0,
-	0,0,0
+	0
 };
 
 // UNBOUND DOUBLET PARAMETERS

@@ -9,9 +9,18 @@
 #ifndef AG_STYLE_H_
 #define AG_STYLE_H_
 
-#include <TStyle.h>
+#include <TCanvas.h>
 #include <TColor.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TStyle.h>
 #include <TROOT.h>
+
+// PRINTING OPTIONS
+Bool_t PRINT_SVG = 1;
+Bool_t PRINT_PDF = 1;
+Bool_t PRINT_TEX = 1;
+Bool_t PRINT_PNG = 1;
 
 TStyle* ptm_style = (TStyle*)gStyle->Clone();
 
@@ -35,14 +44,58 @@ void CreateStyle( TStyle* st ){
 	st->SetPadBottomMargin(marg_b);
 
 	// Fonts
-	st->SetTitleFont( 62, "xyz" );
 	st->SetTitleOffset( 1.0, "xyz" );
-	st->SetLabelFont( 62, "xyz" );
-
-
-
 	st->SetOptStat(0);
 }
+
+void FormatFrame( TH1* h, TString xlabel, TString ylabel ){
+	h->SetTitle( "" );
+	h->GetXaxis()->SetTitle( xlabel );
+	h->GetYaxis()->SetTitle( ylabel );
+	
+	h->GetXaxis()->CenterTitle();
+	h->GetYaxis()->CenterTitle();
+	
+	h->GetXaxis()->SetTitleFont(62);
+	h->GetYaxis()->SetTitleFont(62);
+	h->GetZaxis()->SetTitleFont(62);
+	
+	h->GetXaxis()->SetLabelFont(62);
+	h->GetYaxis()->SetLabelFont(62);
+	h->GetZaxis()->SetLabelFont(62);
+	return;	
+}
+
+void FormatFrame( TH2* h, TString xlabel, TString ylabel ){
+	h->SetTitle( "" );
+	h->GetXaxis()->SetTitle( xlabel );
+	h->GetYaxis()->SetTitle( ylabel );
+	
+	h->GetXaxis()->CenterTitle();
+	h->GetYaxis()->CenterTitle();
+	
+	h->GetXaxis()->SetTitleFont(62);
+	h->GetYaxis()->SetTitleFont(62);
+	h->GetZaxis()->SetTitleFont(62);
+	
+	h->GetXaxis()->SetLabelFont(62);
+	h->GetYaxis()->SetLabelFont(62);
+	h->GetZaxis()->SetLabelFont(62);
+	return;	
+}
+
+
+void PrintCanvas( TCanvas* c, TString base_name ){
+	if ( PRINT_SVG ){ c->Print( Form( "%s.svg", base_name.Data() ) ); }
+	if ( PRINT_PDF ){ c->Print( Form( "%s.pdf", base_name.Data() ) ); }
+	if ( PRINT_TEX ){ c->Print( Form( "%s.tex", base_name.Data() ) ); }
+	if ( PRINT_PNG ){ c->Print( Form( "%s.png", base_name.Data() ) ); }
+	return;
+}
+
+
+
+
 
 
 #endif

@@ -60,7 +60,6 @@ Double_t ejectile_charge = 1;					// [e]
 Double_t recoil_charge = 12;
 Double_t b_field = 2.5;							// [T]
 Double_t beam_energy_per_nucleon = 9.473;		// [MeV per u]
-const Int_t POS = 1;
 
 // Non-angle dependent quantities
 Double_t Q = ( ( mass[0] + mass[1] ) - ( mass[2] + mass[3] ) );								// Nuclear Q-value [MeV]
@@ -127,15 +126,15 @@ const Double_t RDT_RADIUS_TO_CLEAR = RDT_SI_INNER_RAD + TMath::Sqrt(2)*0.5*RDT_D
 
 // SAMPLING ------------------------------------------------------------------------------------ //
 // EJECTILE SIDE ANGLE LIMITS
-const Double_t THETA_DT_LIM = 43.8;
+const Double_t THETA_DT_LIM = 43.23;
 
 // CM Theta's to spam
-Double_t theta_spacing = 0.5;	// [DEG]
+Double_t theta_spacing = 0.02;	// [DEG]
 Double_t THETA_LB= 0.00;		// [DEG]
 Double_t THETA_UB = THETA_DT_LIM;		// [DEG] MAX = 48 for GS
 
 // Number of events per theta
-const Int_t NUM_EVENTS_PER_THETA = 2000;
+const Int_t NUM_EVENTS_PER_THETA = 20000;
 
 // Proton z's to spam
 Double_t z_spacing = 0.05;		// [cm]
@@ -154,8 +153,8 @@ const Int_t log_prec = 8;
 const Int_t log_width = 16;
 
 // Number of trajectories to plot
-const Int_t NUM_TRAJECTORIES = 150;
-const Double_t NUM_SIDE_ANGLE_INCREMENT = 20*theta_spacing;
+const Int_t NUM_TRAJECTORIES = TMath::Min( NUM_EVENTS_PER_THETA, 200 );
+const Double_t NUM_SIDE_ANGLE_INCREMENT = 10*theta_spacing;
 
 
 

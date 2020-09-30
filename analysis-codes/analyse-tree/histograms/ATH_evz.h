@@ -27,16 +27,20 @@
 // Switch for this is SW_EVZ
 TH2F* h_evz;
 TH2F* h_evz_custom;
+TH2F* h_evz_highlight[2];
 TH2F* h_evz_evolution[5];
+TH2F* h_evz_before[4];
+TH2F* h_evz_after[4];
 TH2F* h_evz_bands[5];
 TH2F* h_evz_sides[4];
 
-Bool_t evz_print_opt[5] = {
+Bool_t evz_print_opt[6] = {
 	0, // (0) EVZ Spectrum  --> Standard spectrum
 	0, // (1) EVZ Custom    --> Custom thetaCM cuts to avoid the lack of recoil-coincidences
-	1, // (2) EVZ Evolution --> Evolves through the cuts
+	0, // (2) EVZ Evolution --> Evolves through the cuts
 	0, // (3) EVZ Bands     --> Splits the spectrum up into 2 DEG bands
-	1  // (4) EVZ Sides     --> Does each side of the array individually
+	0, // (4) EVZ Sides     --> Does each side of the array individually
+	1  // (5) EVZ highlight --> Highlights angular region of the E vs. z chart (singles + td + xcal)
 };
 
 
@@ -66,6 +70,11 @@ void HCreateEVZ(){
 	for ( Int_t i = 0; i < 4; i++ ){
 		CreateEVZSpectrum( h_evz_sides[i], Form( "h_evz_%s", SideString( 6*i ).Data() ) );
 	}
+	
+	// (5) EVZ highlight
+	CreateEVZSpectrum( h_evz_highlight[0], "h_evz_highlight0" );
+	CreateEVZSpectrum( h_evz_highlight[1], "h_evz_highlight1" );
+	h_evz_highlight[0]->SetMarkerColor(kBlack);
 }
 
 void HDrawEVZ(){
@@ -74,6 +83,8 @@ void HDrawEVZ(){
 	TCanvas* c_evz_bands;
 	TCanvas* c_evz_custom;
 	TCanvas* c_evz_sides[4];
+	TCanvas* c_change;
+	TCanvas* c_evz_highlight;
 	
 	TString root_name = Form( "%s/pos%i_evz", print_dir.Data(), ARR_POSITION );
 	TFile* f;
@@ -97,8 +108,8 @@ void HDrawEVZ(){
 	// (2) EVZ Evolution
 	for ( Int_t i = 0; i < 5; i++ ){
 		c_evz_evolution[i] = new TCanvas( Form( "c_evz_evolution_%i", i ), Form( "EVOLUTION OF EVZ | Case %i", i ), C_WIDTH, C_HEIGHT );
-		GlobSetCanvasMargins( c_evz_evolution[i] );
-		h_evz_evolution[i]->Draw();
+		GlobSetCanvasMargins( c_evz_evolution[i], 0.1, 0.11, 0.02, 0.1 );
+		h_evz_evolution[i]->Draw("colz");
 	}
 	
 	// (3) EVZ Bands
@@ -118,6 +129,12 @@ void HDrawEVZ(){
 		h_evz_sides[i]->Draw();
 	}
 	
+	// (5) EVZ highlight
+	c_evz_highlight = new TCanvas( "c_evz_highlight", "", C_WIDTH, C_HEIGHT );
+	GlobSetCanvasMargins( c_evz_highlight, 0.09, 0.11, 0.02, 0.1 );
+	SetPadTicks( c_evz_highlight );
+	h_evz_highlight[0]->Draw("colz");
+	h_evz_highlight[1]->Draw("SAME");
 	
 	// Print spectrum if desired
 	if ( SW_EVZ[1] == 1 ){
@@ -130,6 +147,7 @@ void HDrawEVZ(){
 		if ( evz_print_opt[4] == 1 ){
 			for ( Int_t i = 0; i < 4; i++ ){ PrintAll( c_evz_sides[i], Form( "%s/pos%i_evz_sides_%s", print_dir.Data(), ARR_POSITION, SideString(6*i).Data() ) ); }	// (4) EVZ Sides
 		}
+		if ( evz_print_opt[5] == 1 ){ PrintAll( c_evz_highlight, Form( "%s/pos%i_evz_highlight", print_dir.Data(), ARR_POSITION ) ); }
 	}
 	
 	// Write ROOT file if desired
@@ -146,6 +164,7 @@ void HDrawEVZ(){
 		if ( evz_print_opt[4] == 1 ){ 
 			for ( Int_t i = 0; i < 4; i++ ){ h_evz_sides[i]->Write(); }		// (4) EVZ Sides
 		}
+		if ( evz_print_opt[1] == 1 ){ h_evz_highlight[0]->Write(); h_evz_highlight[1]->Write(); } // (5) EVZ highlight
 	}
 	
 	// Write SPE file if desired

@@ -27,12 +27,12 @@ const Int_t BG_DIM = 0; 		// (0 = const, 1 = linear etc.)
 
 // REGION-SPECIFIC QUANTITIES
 
-const Int_t NUM_PEAKS = 11;
+const Int_t NUM_PEAKS = 13;
 
 // Min/max energy for the region
 Double_t E_LIMITS[2] = {
 	0.0,
-	6.2
+	6.3
 };
 
 // Peak energies
@@ -47,34 +47,74 @@ const Double_t peak_energies[NUM_PEAKS] = {
 	3.874186853,
 	4.011653487,
 	4.313766313,
-	5.5
+	5.671,
+	5.913,
+	6.101
 };
 
 Int_t peak_colours[NUM_PEAKS] = {
+	kOrange,
 	kRed,
 	kRed,
 	kRed,
 	kRed,
 	kRed,
 	kRed,
-	kRed,
+	
 	kBlue,
 	kBlue,
 	kBlue,
-	kBlue
+	
+	kCyan,
+	kCyan,
+	kCyan
+};
+
+Double_t peak_label_pos_offset[NUM_PEAKS][2] = {
+	{ 0.03, 22.0 },
+	{ 0.00, 10.0 },
+	{ 0.09, 10.0 },
+	{ 0.00, 20.0 },
+	{ 0.00, 22.0 },
+	{ 0.00, 22.0 },
+	{ 0.00, 25.0 },
+	
+	{ 0.00, 24.5 },
+	{ 0.00, 20.0 },
+	{ 0.00, 20.0 },
+	
+	{ 0.00, 15.0 },
+	{ 0.00, 16.0 },
+	{ 0.00, 15.0 }
+};
+
+TString peak_label[NUM_PEAKS] = {
+	"1*",
+	"2",
+	"3",
+	"4",
+	"5",
+	"6",
+	"7",
+	"8",
+	"9",
+	"10",
+	"11",
+	"12",
+	"13"
 };
 
 
 // REGION BOOLEANS
 Bool_t fix_widths[NUM_PEAKS] = { 
-	1,1,1,1,1,1,1,
-	1,1,1,
-	1 
+	0,1,1,1,1,1,1,
+	0,0,0,
+	1,1,1 
 };
 Bool_t fix_positions[NUM_PEAKS] = {
 	0,0,0,0,0,0,0,
 	0,0,0,
-	0
+	0,0,0
 };
 
 // UNBOUND DOUBLET PARAMETERS
@@ -101,7 +141,7 @@ const Double_t NEUTRON_SEP_ENERGY = 3.655;
 //const Int_t NUM_POSITIONS = 2;
 //const Int_t NUM_SPECTRUM_SECTIONS = 2;
 
-Int_t CANVAS_WIDTH = 1600;
+Int_t CANVAS_WIDTH = 1200;
 Int_t CANVAS_HEIGHT = 900;
 
 // SWITCHES

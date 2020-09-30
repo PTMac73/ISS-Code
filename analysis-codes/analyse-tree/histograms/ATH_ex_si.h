@@ -68,9 +68,13 @@ Int_t si_state_ensdf_colour[NUM_SI_STATES] = {
 void HCreateExSi(){
 	for ( Int_t i = 0; i < 2; i++ ){
 		CreateExSpectrum( h_ex_si[i], Form( "h_ex_si_%i", i ) );
-		CreateExSpectrum( h_ex_si[i+2], Form( "h_ex_si_%i", i+2 ), -1, 20 );
+		CreateExSpectrum( h_ex_si[i+2], Form( "h_ex_si_%i", i+2 ), 5, 15 );
+	}
+	for ( Int_t i = 0; i < 2; i++ ){
 		h_ex_si[2*i]->SetFillColor( kGray );
 		h_ex_si[2*i]->SetLineColor( kGray );
+		h_ex_si[2*i+1]->SetFillColor( kRed );
+		h_ex_si[2*i+1]->SetLineColor( kRed );
 	}
 	
 	return;
@@ -102,15 +106,16 @@ void HDrawExSi(){
 	// In terms of Si
 	c_ex_si[1] = new TCanvas( "c_ex_si_1", "EX-Si", C_WIDTH, C_HEIGHT );
 	GlobSetCanvasMargins( c_ex_si[1] );
+	SetPadTicks( c_ex_si[1] );
 	h_ex_si[2]->Draw();
 	h_ex_si[3]->Draw("SAME");
 	
 	
-	TObjArray* si_lines = new TObjArray();
+	/*TObjArray* si_lines = new TObjArray();
 	for ( Int_t i = 0; i < NUM_SI_STATES; i++ ){
 		si_state_line[i]->Draw("SAME");
 		si_lines->Add( si_state_line[i] );
-	}
+	}*/
 	
 	TString spec_name = Form( "%s/pos%i_exsi", print_dir.Data(), ARR_POSITION );
 
@@ -124,7 +129,7 @@ void HDrawExSi(){
 			for ( Int_t i = 0; i < 4; i++ ){
 				h_ex_si[i]->Write();
 			}
-			si_lines->Write("si_lines", TObject::kSingleKey );
+			//si_lines->Write("si_lines", TObject::kSingleKey );
 		}
 		
 	}

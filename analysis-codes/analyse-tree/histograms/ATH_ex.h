@@ -12,6 +12,7 @@
 #include <TFile.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <THStack.h>
 #include <TString.h>
 #include <TStyle.h>
 
@@ -33,14 +34,16 @@ TH1F* h_ex_full_best = NULL;	// Full spectrum (best)
 TH1F* h_ex_rbr[6][2];			// RBR spectrum: [0] is full, [1] is best resolution detectors
 TH1F* h_ex_dbd[24];				// DBD spectrum
 TH1F* h_ex_full_evolution[5];	// Full spectrum evolution
+TH1F* h_ex_before[4];
+TH1F* h_ex_after[4];
 
 
 Bool_t ex_print_opt[6] = {
 	0,	// (0) full spectrum
-	1,	// (1) RBR spectrum (all good dets)
+	0,	// (1) RBR spectrum (all good dets)
 	0,	// (2) RBR spectrum (best resolution dets)
 	0,	// (3) DBD spectrum
-	0,	// (4) spectrum evolution
+	1,	// (4) spectrum evolution
 	0	// (5) full spectrum (best)
 };
 
@@ -71,7 +74,6 @@ void HCreateEx(){
 			 
 		}
 	}
-	
 	return;
 }
 
@@ -83,7 +85,7 @@ void HDrawEx(){
 	TCanvas* c_ex_rbr[6][2];
 	TCanvas* c_ex_dbd[24];
 	TCanvas* c_ex_dbd_comb;
-	TCanvas* c_ex_evolution[5];
+	TCanvas* c_ex_evolution[4];
 	
 	if ( CANVAS_COMBINE == 1 ){
 		c_ex_dbd_comb = new TCanvas( "c_ex_dbd_comb", "DBD Ex Spectrum", C_WIDTH, C_HEIGHT );
@@ -117,10 +119,23 @@ void HDrawEx(){
 			spec_name = Form( "%s/pos%i_ex_full", print_dir.Data(), ARR_POSITION );
 			
 			// Plot evolution spectrum
-			for ( Int_t j = 0; j < 5; j++ ){
+			for ( Int_t j = 0; j < 4; j++ ){
 				c_ex_evolution[j] = new TCanvas( Form( "c_ex_evolution_%i", j ), Form( "EXCITATION SPECTRUM EVOLUTION | Case %i", j ), C_WIDTH, C_HEIGHT );
 				GlobSetCanvasMargins( c_ex_evolution[j] );
-				h_ex_full_evolution[j]->Draw();
+				h_ex_before[j] = (TH1F*)h_ex_full_evolution[j]->Clone();
+				h_ex_after[j] = (TH1F*)h_ex_full_evolution[j+1]->Clone();
+				
+				h_ex_before[j]->SetLineColor(kGray+2);
+				h_ex_before[j]->SetFillColor(kGray+2);
+				h_ex_after[j]->SetLineColor(kBlack);
+				h_ex_after[j]->SetFillColor(kYellow);
+				THStack *hs = new THStack("hs","");
+				hs->Add(h_ex_before[j]);
+				hs->Add(h_ex_after[j]);
+				hs->Draw("nostack");
+				GlobSetHistFonts(hs);
+				hs->GetXaxis()->SetTitle("E_{x} (MeV)");
+				hs->GetYaxis()->SetTitle("Counts per 20 keV");
 			}
 			
 			
@@ -134,7 +149,7 @@ void HDrawEx(){
 					if( ex_print_opt[5] == 1 ){ h_ex_full_best->Write(); }
 				}
 				
-				for ( Int_t j = 0; j < 5; j++ ){
+				for ( Int_t j = 0; j < 4; j++ ){
 					if( ex_print_opt[4] == 1 ){
 						PrintAll( c_ex_evolution[j], Form( "%s/pos%i_ex_evolution_%i", print_dir.Data(), ARR_POSITION, j ) ); 
 						if ( PRINT_ROOT == 1 ){ f->cd(); h_ex_full_evolution[j]->Write(); }

@@ -17,6 +17,13 @@
 
 #include "conversion.h"
 
+struct MMM_t {
+	Double_t min;
+	Double_t mean;
+	Double_t max;
+	Int_t num;
+};
+
 // Set colours
 Int_t pcb_green_i = TColor::GetFreeColorIndex();
 TColor *pcb_green = new TColor( pcb_green_i, 0.0, 111.0/255.0, 75.0/255.0 );
@@ -28,8 +35,8 @@ Double_t marg_t = 0.010;
 Double_t marg_b = 0.080;
 
 // DEFINE GLOBAL SWITCHES
-Bool_t SWITCH_DRAW_CANVAS = 0;
-Bool_t SWITCH_PRINT_CANVAS = 0;
+Bool_t SWITCH_DRAW_CANVAS = 1;
+Bool_t SWITCH_PRINT_CANVAS = 1;
 Bool_t SWITCH_VERBOSE = 0;
 Int_t C_HEIGHT = 900;
 
@@ -111,6 +118,15 @@ void GlobSetCanvasMargins( TCanvas *c ){
 
 Int_t GetCanvasWidth( Int_t h, Double_t x1, Double_t y1, Double_t x2, Double_t y2 ){
 	return (Int_t)( 4*h*( ( marg_l + marg_r + x2 - x1 )/( marg_b + marg_t + y2 - y1 ) ) );
+}
+
+void CalcRunningAverage( MMM_t &mmm, Double_t val ){
+	if ( mmm.num == 0 ){ mmm.mean = val; }
+	else{ mmm.mean = ( mmm.num*mmm.mean + val )/( mmm.num + 1 ); }
+	if ( val > mmm.max ){ mmm.max = val; }
+	if ( val < mmm.min ){ mmm.min = val; }
+	mmm.num++;
+	return;
 }
 
 #endif

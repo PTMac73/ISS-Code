@@ -123,7 +123,7 @@ void ExtractYieldsHist( TH1D* h, Int_t pos ){
 
 	// Format the fit function
 	fit_func->SetLineColor( kBlack );
-	fit_func->SetLineWidth(3);
+	fit_func->SetLineWidth(2);
 	
 	// Fit the histogram
 	fit_result_ptr = h->Fit( fit_func, "S" );
@@ -148,7 +148,6 @@ void ExtractYieldsHist( TH1D* h, Int_t pos ){
 			f_peaks[j]->FixParameter( k, fit_func->GetParameter( var_type_arr[0][k] ) );
 		}
 		
-		
 		// Set individual peak shapes
 		for ( Int_t k = 0; k < 3; k++ ){
 			f_peaks[j]->FixParameter( k + BG_DIM + 1, fit_func->GetParameter(var_type_arr[j+1][k]) );
@@ -156,7 +155,7 @@ void ExtractYieldsHist( TH1D* h, Int_t pos ){
 		
 		// Format individual peaks
 		f_peaks[j]->SetLineColor(peak_colours[j]);
-		f_peaks[j]->SetLineWidth(2);
+		f_peaks[j]->SetLineWidth(1);
 		f_peaks[j]->Draw("SAME");
 
 		// Update the canvas
@@ -180,11 +179,25 @@ void ExtractYieldsHist( TH1D* h, Int_t pos ){
 	tNSE->SetTextFont(132);
 	tNSE->Draw("SAME");
 	
+	// Number the peaks
+	TText* peak_labels[NUM_PEAKS];
+	for ( Int_t i = 0; i < NUM_PEAKS; i++ ){
+		peak_labels[i] = new TText(peaks[i].mu + peak_label_pos_offset[i][0], peaks[i].amp + peak_label_pos_offset[i][1], peak_label[i] );
+		peak_labels[i]->SetTextAlign(22);
+		peak_labels[i]->SetTextFont(132);
+		peak_labels[i]->SetTextSize(0.03);
+		peak_labels[i]->Draw("SAME");
+		
+	}
+	
+	
 	// Update the canvas
+	TPad* pad = (TPad*)c_spec->GetPad(0);
+	pad->SetTicks(1,1);
 	c_spec->Modified(); c_spec->Update();
 
 	// Print the spectrum
-	c_spec->Print( GenerateFileName( pdf, pos ) );
+	c_spec->Print( GenerateFileName( tex, pos ) );
 		
 	
 	// Append new line and close the file

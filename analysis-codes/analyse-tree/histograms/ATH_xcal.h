@@ -6,12 +6,15 @@
 // Department of Physics and Astronomy
 // The University of Manchester
 // ============================================================================================= //
+#ifndef ATH_XCAL_H_
+#define ATH_XCAL_H_
 
 #include <TCanvas.h>
 #include <TCutG.h>
 #include <TFile.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <THStack.h>
 #include <TLine.h>
 #include <TMath.h>
 #include <TString.h>
@@ -24,13 +27,17 @@
 #include "../AT_Settings.h"
 #include "WriteSPE.h"
 
-
-#ifndef ATH_XCAL_H_
-#define ATH_XCAL_H_
-
 // Switch for this is SW_XCAL
 TH1F* h_xcal[24][2];		// Full spectrum
 TH2F* h_xcal_e[24][2];		// E v.s. xcal plot
+TH1F* h_xcal_full_comp[3];	// Divide xcal up by colour
+THStack* hs_xcal_full_comp;
+
+Bool_t xcal_print_opt[3] = {
+	1,	// (0) xcal
+	1,	// (1) xcal-energy
+	0,	// (2) full xcal spectrum (colour-coded)
+};
 
 
 void HCreateXCAL(){
@@ -41,7 +48,7 @@ void HCreateXCAL(){
 			for ( Int_t j = 0; j < 2; j++ ){
 				h_xcal[i][j] = new TH1F( Form( "h_xcal_%s%i", ( j == 0 ? "" : "cut_" ), i ), "", 200, -0.5, 1.5 );
 				h_xcal[i][j]->SetTitle("");
-				h_xcal[i][j]->GetXaxis()->SetTitle( ( j == 0 ? "xcal" : "" ) );
+				h_xcal[i][j]->GetXaxis()->SetTitle( ( j == 0 ? "X_{psd}" : "" ) );
 				h_xcal[i][j]->GetYaxis()->SetTitle( ( j == 0 ? "Counts" : "" ) );	
 				h_xcal[i][j]->SetFillColor( ( j == 0 ? kRed : kYellow ) );	
 				h_xcal[i][j]->SetLineWidth(1);
@@ -57,6 +64,17 @@ void HCreateXCAL(){
 		}
 	}
 	
+	for ( Int_t i = 0; i < 3; i++ ){
+		h_xcal_full_comp[i] = new TH1F( Form( "h_xcal_full_comp_%i", i ), "", 200, -0.5, 1.5 );
+	}
+	h_xcal_full_comp[0]->SetFillColor(kGreen-7);
+	h_xcal_full_comp[1]->SetFillColor(kRed-7);
+	h_xcal_full_comp[2]->SetFillColor(kBlue-7);
+	
+	h_xcal_full_comp[0]->SetLineColor(kGreen-7);
+	h_xcal_full_comp[1]->SetLineColor(kRed-7);
+	h_xcal_full_comp[2]->SetLineColor(kBlue-7);
+	
 	return;
 }
 
@@ -66,6 +84,7 @@ void HDrawXCAL(){
 	TCanvas* c_xcal_comb;
 	TCanvas* c_xcal[24];
 	TCanvas* c_xcal_e[24];
+	TCanvas* c_xcal_full_comp;
 	
 	if ( CANVAS_COMBINE == 1 ){
 		c_xcal_comb = new TCanvas( "c_xcal_comb", "XCAL Spectrum Combined", 2*C_WIDTH, 2*C_HEIGHT );
@@ -103,54 +122,71 @@ void HDrawXCAL(){
 			}
 			
 			
-			if ( CANVAS_COMBINE == 0 ){
-				// Plot spectrum
-				c_xcal[i] = new TCanvas( Form( "c_xcal_%i", i ), Form( "xcal | Det %i", i ), C_WIDTH, C_HEIGHT );
-				GlobSetCanvasMargins( c_xcal[i] );
-				h_xcal[i][0]->Draw();
-				h_xcal[i][1]->Draw("SAME");
-				cut_line[0]->Draw("SAME");
-				cut_line[1]->Draw("SAME");
-				gStyle->SetTitleFont(62);
-				
-				c_xcal_e[i] = new TCanvas( Form( "c_xcal_e_%i", i ), Form( "xcal-E | Det %i", i ), C_WIDTH, C_HEIGHT );
-				GlobSetCanvasMargins( c_xcal_e[i] );
-				h_xcal_e[i][0]->Draw();
-				h_xcal_e[i][1]->Draw("SAME");
-				
-				// Print spectrum if desired
-				if ( SW_XCAL[1] == 1 ){
-					PrintAll( c_xcal[i], spec_name );
-					PrintAll( c_xcal_e[i], Form( "%s/posXXX_xcal_e_%i", print_dir.Data(), i ) );
-				}
-				
-			}
-			else{
-				// COMBINE SPECTRA INTO ONE CANVAS
-				c_xcal_comb->cd(i+1);
-				h_xcal[i][0]->SetTitle( Form( "Det #%i", i ) );
-				h_xcal[i][0]->Draw();
-				h_xcal[i][1]->Draw("SAME");
-				//TPad* pad = (TPad*)c_xcal_comb->GetPad(i+1);
-				//SetCanvasTitleFont( pad );
-				
-				// Print spectrum if desired
-				if ( SW_XCAL[1] == 1 && i == 23 ){
-					PrintAll( c_xcal_comb, Form( "%s/posXXX_xcal_comb", print_dir.Data() ) );
-				}
-				
-				
-			}
+			// Plot spectrum
+			c_xcal[i] = new TCanvas( Form( "c_xcal_%i", i ), Form( "xcal | Det %i", i ), C_WIDTH, C_HEIGHT );
+			GlobSetCanvasMargins( c_xcal[i] );
+			TPad* pad = (TPad*)c_xcal[i]->GetPad(0);
+			pad->SetTicks(1,1);
+			h_xcal[i][0]->Draw();
+			h_xcal[i][1]->Draw("SAME");
+			cut_line[0]->Draw("SAME");
+			cut_line[1]->Draw("SAME");
+			gStyle->SetTitleFont(62);
 			
+			c_xcal_e[i] = new TCanvas( Form( "c_xcal_e_%i", i ), Form( "xcal-E | Det %i", i ), C_WIDTH, C_HEIGHT );
+			GlobSetCanvasMargins( c_xcal_e[i] );
+			h_xcal_e[i][0]->Draw();
+			h_xcal_e[i][1]->Draw("SAME");
+			
+			// Print spectrum if desired
+			if ( SW_XCAL[1] == 1 ){
+				if ( xcal_print_opt[0] == 1 ){ PrintAll( c_xcal[i], spec_name ); }
+				if ( xcal_print_opt[1] == 1 ){ PrintAll( c_xcal_e[i], Form( "%s/posXXX_xcal_e_%i", print_dir.Data(), i ) ); }
+			}
+				
 			// Write ROOT file if desired
-			if ( PRINT_ROOT == 1 && SW_XCAL[1] == 1 ){ f->cd(); h_xcal[i][0]->Write(); h_xcal[i][1]->Write(); }
+			if ( PRINT_ROOT == 1 && SW_XCAL[1] == 1 ){
+				f->cd();
+				if ( xcal_print_opt[0] == 1 ){ h_xcal[i][0]->Write();h_xcal[i][1]->Write(); }
+				if ( xcal_print_opt[1] == 1 ){ h_xcal_e[i][0]->Write();h_xcal_e[i][1]->Write(); }
+			}
 			
 			// Write SPE file if desired
 			if ( SW_XCAL[2] == 1 ){ ErrorSPE( "XCAL spectra" ); }
-		} 
-	
-	
+		}
+		
+	} // *LOOP* (i)
+		
+	// Draw the xcal stack
+	std::cout << h_xcal_full_comp[0]->GetSize() << "\n";
+	hs_xcal_full_comp = new THStack( "hs", "" );
+	for ( Int_t i = 0; i < 3; i++ ){
+		hs_xcal_full_comp->Add( h_xcal_full_comp[i] );
 	}
+	
+	c_xcal_full_comp = new TCanvas( "c_xcal_full_comp", "", C_WIDTH, C_HEIGHT );
+	GlobSetCanvasMargins( c_xcal_full_comp );
+	hs_xcal_full_comp->Draw();
+	
+	TPad* pad = (TPad*)c_xcal_full_comp->GetPad(0);
+	pad->SetTicks(1,1);
+	
+	GlobSetHistFonts(hs_xcal_full_comp);
+	hs_xcal_full_comp->GetXaxis()->SetTitle("X_{cal}");
+	hs_xcal_full_comp->GetYaxis()->SetTitle("Counts");
+	
+	c_xcal_full_comp->Modified(); c_xcal_full_comp->Update();
+	
+	
+	if ( SW_XCAL[1] == 1 && xcal_print_opt[2] == 1  ){
+		PrintAll( c_xcal_full_comp, Form( "%s/posXXX_xcal_full_comp", print_dir.Data() ) );
+		if ( PRINT_ROOT == 1 ){
+			f->cd(); hs_xcal_full_comp->Write();
+		}
+	}
+	
+	
+	
 	// Close the root file
 	if ( SW_XCAL[1] == 1 && PRINT_ROOT == 1 && f != NULL ){ if ( f->IsOpen() ){ f->Close(); } }
 	return;

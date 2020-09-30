@@ -31,7 +31,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	if ( BATCH_MODE ){ gROOT->SetBatch(kTRUE); }
 
 	// Define the plotting conditions
-	const Double_t THETA_HEAD = 18;//0.5*(theta_ub + theta_lb);
+	const Double_t THETA_HEAD = 15.0;//0.5*(theta_ub + theta_lb);
 	const Int_t NUM_THETA = (Int_t)( ( theta_ub - theta_lb )/theta_spacing ) + 1;
 	const Int_t MOD_SIDE_TRAJECTORIES = (Int_t)( NUM_SIDE_ANGLE_INCREMENT/theta_spacing );
 	const Int_t NUM_THETA_GRAPHS = (Int_t)TMath::Ceil( NUM_THETA/MOD_SIDE_TRAJECTORIES );
@@ -251,81 +251,137 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 					x_success = 0;	y_success = 0;
 					x_failure = 0;	y_failure = 0;
 					
-					if ( k > 0 && TMath::Abs( x3[k-1] ) > ARR_DIAM/2 &&  TMath::Abs( x3[k] ) <= ARR_DIAM/2 ){
-						// X is within array -- calculate gradient and intercept
+					// Find when it is in the array
+					if ( TMath::Abs( x3[k] ) <= ARR_DIAM/2 && TMath::Abs( y3[k] ) <= ARR_DIAM/2 && ( TMath::Abs( x3[k-1] ) > ARR_DIAM/2 || TMath::Abs( y3[k-1] ) > ARR_DIAM/2 ) ){
+						// Now find interpolation parameters for x and y lines
 						GetInterpolation( x3[k-1], y3[k-1], x3[k], y3[k], mx, cx );
-						x_success = ( TMath::Abs( mx*ARR_DIAM/2 + cx ) < SI_HEIGHT/2 );
-						x_failure = ( TMath::Abs( mx*ARR_DIAM/2 + cx ) >= SI_HEIGHT/2 );
+						GetInterpolation( y3[k-1], x3[k-1], y3[k], x3[k], my, cy );
+						
+						// Define temporary x's and y's along boundaries
+						Double_t tempy = mx*TMath::Sign( ARR_DIAM/2, x3[k-1] ) + cx;
+						Double_t tempx = my*TMath::Sign( ARR_DIAM/2, y3[k-1] ) + cy;
+						
+						// Test whether points lie on a straight line in order
+						Bool_t x_straight = ( ( tempx - x3[k-1] > 0 && x3[k] - tempx > 0 ) || ( tempx - x3[k-1] < 0 && x3[k] - tempx < 0 ) );
+						Bool_t y_straight = ( ( tempy - y3[k-1] > 0 && y3[k] - tempy > 0 ) || ( tempy - y3[k-1] < 0 && y3[k] - tempy < 0 ) );
+						
+						// Test whether the point lies on an edge
+						Bool_t x_on_edge = ( TMath::Abs( tempx ) <= ARR_DIAM/2 );
+						Bool_t y_on_edge = ( TMath::Abs( tempy ) <= ARR_DIAM/2 );
+						
+						if ( x_straight && x_on_edge ){
+							if ( TMath::Abs( tempx ) < SI_HEIGHT/2 ){
+								x_success = 1;
+								y3[k] = TMath::Sign( ARR_DIAM/2, y3[k-1] );
+								x3[k] = tempx;
+							}
+							else if ( TMath::Abs( tempx ) >= SI_HEIGHT/2 && TMath::Abs( tempx ) <= ARR_DIAM/2 ){
+								x_failure = 1;
+								y3[k] = TMath::Sign( ARR_DIAM/2, y3[k-1] );
+								x3[k] = tempx;
+							}
+						}
+						else if ( y_straight && y_on_edge ){
+							if ( TMath::Abs( tempy ) < SI_HEIGHT/2 ){
+								y_success = 1;
+								x3[k] = TMath::Sign( ARR_DIAM/2, x3[k-1] );
+								y3[k] = tempy;
+							}
+							else if ( TMath::Abs( tempy ) >= SI_HEIGHT/2 && TMath::Abs( tempy ) <= ARR_DIAM/2 ){
+								y_failure = 1;
+								x3[k] = TMath::Sign( ARR_DIAM/2, x3[k-1] );
+								y3[k] = tempy;
+							}
+						}
+						else{
+							std::cout << std::setprecision(6) << x3[k-1] << "    " << tempx << "    " << x3[k] << "    " << y3[k-1] << "    " << tempy << "    " << y3[k] << "\n";
+						}
+						
 					}
 					
-					if ( k > 0 && TMath::Abs( y3[k-1] ) > ARR_DIAM/2 &&  TMath::Abs( y3[k] ) <= ARR_DIAM/2 ){
+					// Define z failure - z fails if on 4 jaws
+					z_failure = ( z3[k] >= z_fj - 0.5*z_spacing - SLIT_LENGTH && TMath::Abs( x3[k] ) <= ARR_DIAM/2 && TMath::Abs( y3[k] ) <= ARR_DIAM/2 );
+					
+					
+					/*
+					if ( k > 0 && TMath::Abs( x3[k-1] ) > ARR_DIAM/2 && TMath::Abs( x3[k] ) <= ARR_DIAM/2 && TMath::Abs( y3[k-1] ) <= ARR_DIAM/2 ){
 						// X is within array -- calculate gradient and intercept
-						GetInterpolation( y3[k-1], x3[k-1], y3[k], x3[k], my, cy );
-						y_success = ( TMath::Abs( my*ARR_DIAM/2 + cy ) < SI_HEIGHT/2 );
-						y_failure = ( TMath::Abs( my*ARR_DIAM/2 + cy ) >= SI_HEIGHT/2 );
+						GetInterpolation( x3[k-1], y3[k-1], x3[k], y3[k], mx, cx );
+						x3[k] = TMath::Sign( ARR_DIAM/2, x3[k] );
+						y3[k] = mx*x3[k] + cx;
+						x_success = ( TMath::Abs( y3[k] ) < SI_HEIGHT/2 );
+						x_failure = ( TMath::Abs( y3[k] ) >= SI_HEIGHT/2 );
 					}
+					else if ( k > 0 && TMath::Abs( y3[k-1] ) > ARR_DIAM/2 &&  TMath::Abs( y3[k] ) <= ARR_DIAM/2 && TMath::Abs( x3[k-1] ) <= ARR_DIAM/2 ){
+						// Y is within array -- calculate gradient and intercept
+						GetInterpolation( y3[k-1], x3[k-1], y3[k], x3[k], my, cy );
+						y3[k] = TMath::Sign( ARR_DIAM/2, y3[k] );
+						x3[k] = my*y3[k] + cy;
+						y_success = ( TMath::Abs( x3[k] ) < SI_HEIGHT/2 );
+						y_failure = ( TMath::Abs( x3[k] ) >= SI_HEIGHT/2 );
+					}
+					*/
+					
+					
+					
 					
 	
 				    
-					x_success2 = ( TMath::Abs( x3[k] ) <= ARR_DIAM/2 && TMath::Abs( y3[k] ) < SI_HEIGHT/2 );
+					/*x_success2 = ( TMath::Abs( x3[k] ) <= ARR_DIAM/2 && TMath::Abs( y3[k] ) < SI_HEIGHT/2 );
 					y_success2 = ( TMath::Abs( y3[k] ) <= ARR_DIAM/2 && TMath::Abs( x3[k] ) < SI_HEIGHT/2 );
 					x_failure2 = ( TMath::Abs( x3[k] ) <= ARR_DIAM/2 && TMath::Abs( y3[k] ) > SI_HEIGHT/2 && TMath::Abs( y3[k] ) <= ARR_DIAM/2 );
-					y_failure2 = ( TMath::Abs( y3[k] ) <= ARR_DIAM/2 && TMath::Abs( x3[k] ) > SI_HEIGHT/2 && TMath::Abs( x3[k] ) <= ARR_DIAM/2 );
+					y_failure2 = ( TMath::Abs( y3[k] ) <= ARR_DIAM/2 && TMath::Abs( x3[k] ) > SI_HEIGHT/2 && TMath::Abs( x3[k] ) <= ARR_DIAM/2 );*/
 					
-					if ( x_success ){
-						std::cout << "x_success = " << x_success2 << "  " << x3[k-1] << "    " << y3[k-1]  << "    " << x3[k] << "    " << y3[k] << "\n";
-					}
 					
 					// It hits the array
-					if ( ( x_success || y_success || x_success2 || y_success2 ) ){
+					if ( x_success || y_success ){
 						phi_stop = 1;
 						
-						// Now check the z component
-						// z fails if on 4 jaws
-						z_failure = ( z3[k] >= z_fj - 0.5*z_spacing - SLIT_LENGTH );
-						
-						// Define z landing on the strip
-						on_z_strip = 0;
-						for ( Int_t a = 0; a < 6; a++ ){
-							z_strip[a] = ( z3[k] >= -Si_centroids[POSITION][a] - SI_WIDTH/2 && z3[k] <= -Si_centroids[POSITION][a] + SI_WIDTH/2 );
-							on_z_strip = on_z_strip || z_strip[a];
-						}
-						
-						if ( on_z_strip ){
-							traj_colour[j] = (Int_t)kGreen;
-							if ( j > 0 ){
-								d_phi[i][0] += phi_cont;
-								num_proton_hits[i]++;
-							}
-						}
-						else if ( z_failure ){
+						// See if z fails
+						if ( z_failure ){
 							traj_colour[j] = (Int_t)kBlue;
 						}
 						else{
-							traj_colour[j] = (Int_t)kRed;
+							// Define z landing on the strip
+							on_z_strip = 0;
+							for ( Int_t a = 0; a < 6; a++ ){
+								z_strip[a] = ( z3[k] >= -Si_centroids[POSITION][a] - SI_WIDTH/2 && z3[k] <= -Si_centroids[POSITION][a] + SI_WIDTH/2 );
+								on_z_strip = on_z_strip || z_strip[a];
+							}
+							
+							// Test to see if it lands on a strip
+							if ( on_z_strip ){
+								traj_colour[j] = (Int_t)kGreen;
+								if ( j > 0 ){
+									d_phi[i][0] += phi_cont;
+									num_proton_hits[i]++;
+								}
+							}
+							// Fails to land on strip, but on array
+							else{
+								traj_colour[j] = (Int_t)kRed;
+							}
 						}
-						
 						
 					}
 					// It hits the array, but not on a strip
-					else if ( ( x_failure || y_failure ) ){
+					else if ( x_failure || y_failure ){
 						phi_stop = 1;
 						traj_colour[j] = (Int_t)kRed;
 						if ( j > 0 ){ 
 							d_phi[i][1] += phi_cont;
 						}
 					}
-					/*else if ( z_failure ){
+					else if ( z_failure ){
 						phi_stop = 1;
-						traj_colour[j] = (Int_t)kRed;
+						traj_colour[j] = (Int_t)kBlue;
 						if ( j > 0 ){ 
 							d_phi[i][2] += phi_cont;
 						}
 						
-					}*/	
+					}
 
 				}
-				
 				
 				//std::cout << "\n" << NUM_ZP << "--" << i << "--" << j << "--" << k << "\n";
 				//log_file << i << "--" << j << "--" << k << "\n";
@@ -561,14 +617,12 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 		b_si_headon[j]->SetFillColor(kBlack);
 		b_si_headon[j]->Draw("SAME");
 	}
-	
 	// Draw trajectories
 	Int_t ctr_traj_ejectile_head = 0;
 	for ( Int_t j = 0; j < NUM_TRAJECTORIES; j++ ){
-		g_traj_ejectile_head[j]->Draw("C SAME");
+		if ( g_traj_ejectile_head[j] != NULL ){ g_traj_ejectile_head[j]->Draw("C SAME"); }
 		//beam_start[j]->Draw("SAME");
 	}
-
 	if ( bFileOpen ){
 		outfile->cd(); c_traj_ejectile_head->Write();
 	}
@@ -747,7 +801,6 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	
 	// Draw trajectories
 	for ( Int_t j = 0; j < NUM_TRAJECTORIES; j++ ){
-		std::cout << b_ejectile_success[j] << ", ";
 		if ( b_ejectile_success[j] == 1 ){
 			// Calculate whether the trajectories hit the detector
 			Double_t xtemp = g_traj_recoil_head[j]->GetX()[NUM_ZR-1];
@@ -756,19 +809,19 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 
 			if ( rtemp >= RDT_RADIUS_TO_CLEAR ){
 				// Successful hit
-				g_traj_recoil_head[j]->SetLineColorAlpha(kGreen, 0.3);
+				g_traj_recoil_head[j]->SetLineColorAlpha(kGreen, 0.5);
 			}
 			else if ( rtemp < RDT_RADIUS_TO_CLEAR && rtemp >= RDT_SI_INNER_RAD + 0.5*TMath::Sqrt(2)*RDT_DETECTOR_GAP ){
 				// Hits PCB but not the Si
-				g_traj_recoil_head[j]->SetLineColorAlpha(kOrange, 0.3);
+				g_traj_recoil_head[j]->SetLineColorAlpha(kOrange, 0.5);
 			}
 			else if ( rtemp < RDT_SI_INNER_RAD + 0.5*TMath::Sqrt(2)*RDT_DETECTOR_GAP ){
 				// Misses both PCB and Si
-				g_traj_recoil_head[j]->SetLineColorAlpha(kRed, 0.3);
+				g_traj_recoil_head[j]->SetLineColorAlpha(kRed, 0.5);
 			}
 			else{
 				// Does something else
-				g_traj_recoil_head[j]->SetLineColorAlpha(kBlack,0.3);
+				g_traj_recoil_head[j]->SetLineColorAlpha(kBlack,0.5);
 				std::cout << xtemp << "\t" << ytemp << "\t" << rtemp << "\t" << "\n";
 			}
 			
@@ -913,9 +966,6 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 
 // MAIN FUNCTION ------------------------------------------------------------------------------- //
 void ArrayGeometry(){
-	std::cout << "Bananas!\n";
-	int dummy = 0; 
-	
 	const Int_t NUM_STATES = 5;
 	const Bool_t ALL = 0;
 	/*Double_t STATES[NUM_STATES] = {

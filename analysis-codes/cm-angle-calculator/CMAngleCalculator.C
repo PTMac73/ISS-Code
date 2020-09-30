@@ -189,7 +189,7 @@ Double_t CMAngleFindZ( Double_t ex, Double_t theta_cm ){
 
 /*************************************************************************************************/
 void CMAngleFindMinZ( Double_t theta ){
-	const Int_t NUM_STATES = 11;
+	const Int_t NUM_STATES = 13;
 	Double_t STATES[NUM_STATES] = {
 		0.0000,
 		0.0546,
@@ -201,7 +201,10 @@ void CMAngleFindMinZ( Double_t theta ){
 		3.2200,
 		3.9800,
 		4.3600,
-		5.64321980164455
+		//5.64321980164455,
+		5.671,
+		5.913,
+		6.101
 	};
 
 	Int_t n;

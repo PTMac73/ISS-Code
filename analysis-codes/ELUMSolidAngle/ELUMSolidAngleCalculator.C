@@ -33,9 +33,16 @@ Double_t SolidAngleCalculator( Double_t z_elum = 125.7/*134.8*/ ){
 
 	// CONSTANTS OF MOTION --------------------------------------------------------------------- //
 	// M1 = 28Mg, M2 = 2H, M3 = 2H, M4 = 28Mg
+	// 28Mg(d,d)28Mg
 	Double_t mass_excess[4] = { -15.018845, 13.13572176, 13.13572176, -15.018845};	// [MeV]
 	Double_t charge_numbers[4] = { 12, 1, 1, 12 };									// [e]
 	Int_t mass_numbers[4] = { 28, 2, 2, 28 };										// Just a number
+	/*
+	// 28Si(d,d)28Si
+	Double_t mass_excess[4] = { -21.4927, 13.13572176, 13.13572176, -21.4927};	// [MeV]
+	Double_t charge_numbers[4] = { 14, 1, 1, 14 };									// [e]
+	Int_t mass_numbers[4] = { 28, 2, 2, 28 };										// Just a number
+	*/
 	Double_t mass[4];																// [AMU]
 	for ( Int_t k = 0; k < 4; k++ ){
 		mass[k] = MassExcessToMass( mass_numbers[k], mass_excess[k], charge_numbers[k] );				
@@ -84,6 +91,12 @@ Double_t SolidAngleCalculator( Double_t z_elum = 125.7/*134.8*/ ){
 	Double_t T_cm_f = T_cm_i + Q - excitation_energy;									// Final energy in CM [MeV]
 	Double_t T_cm_3 = mass[3]*T_cm_f/( mass[2] + mass[3] );								// Final energy of ejectile in CM [MeV]
 	Double_t v3 = TMath::Sqrt( 2*T_cm_3/(mass[2]*AMU) );								// Final velocity of ejectile in CM [MeV]
+	
+	MMM_t mmm_ejectile_energy;					// Calculate the mean ejectile energy
+	mmm_ejectile_energy.min = 100000;
+	mmm_ejectile_energy.max = 0;
+	mmm_ejectile_energy.mean = 0;
+	mmm_ejectile_energy.num = 0;
 
 	// Define the quantites to be calculated in loop over angles
 	Double_t *theta_cm = new Double_t[range_angles];		// Angle of scattering in CM [rad]
@@ -306,7 +319,7 @@ Double_t SolidAngleCalculator( Double_t z_elum = 125.7/*134.8*/ ){
 		// Add results to histogram
 		if ( traj_arr[k].status == 0 ){
 			if ( traj_arr[k].rev == 0 && traj_arr[k].above_shield == 0 ){ h_elum_energy[0]->Fill( T_lab_3[k] ); }
-			else if ( traj_arr[k].rev == 0 && traj_arr[k].above_shield == 1 ){ h_elum_energy[1]->Fill( T_lab_3[k] ); }
+			else if ( traj_arr[k].rev == 0 && traj_arr[k].above_shield == 1 ){ h_elum_energy[1]->Fill( T_lab_3[k] ); CalcRunningAverage( mmm_ejectile_energy, T_lab_3[k] ); }
 			else if ( traj_arr[k].rev == 1 && traj_arr[k].above_shield == 0 ){ h_elum_energy[2]->Fill( T_lab_3[k] ); }
 			else if ( traj_arr[k].rev == 1 && traj_arr[k].above_shield == 1 ){ h_elum_energy[3]->Fill( T_lab_3[k] ); }
 			else if ( traj_arr[k].rev == 2 && traj_arr[k].above_shield == 0 ){ h_elum_energy[4]->Fill( T_lab_3[k] ); }
@@ -381,8 +394,15 @@ Double_t SolidAngleCalculator( Double_t z_elum = 125.7/*134.8*/ ){
 
 	TCanvas* c_h = new TCanvas( "c_h", "CANVAS", 1200, 900 );
 	GlobSetCanvasMargins( c_h );
+	gStyle->SetOptStat();
 	hs->Draw();
+	c_h->Update();
 	FormatFrame( hs, "T_{3} (MeV)", "Counts" );
+	
+	std::cout << "MEAN = " << mmm_ejectile_energy.mean << "\n";
+	std::cout << "MIN  = " << mmm_ejectile_energy.min  << "\n";
+	std::cout << "MAX  = " << mmm_ejectile_energy.max  << "\n";
+	std::cout << "NUM  = " << mmm_ejectile_energy.num  << "\n";
 	
 	
 	if ( SWITCH_PRINT_CANVAS == 1 ){
@@ -401,13 +421,14 @@ Double_t SolidAngleCalculator( Double_t z_elum = 125.7/*134.8*/ ){
 	delete[] T_lab_3;
 	delete[] v_para;
 	delete[] v_perp;
-	for ( Int_t i = 0; i < 7; i++ ){
-		if ( h_elum_energy[i]->IsOnHeap() ){ h_elum_energy[i]->Delete(); }
-	}
+	
 	if ( SWITCH_DRAW_CANVAS == 0 ){
 		delete c_rz;
 		delete c_h;
 		delete mg;
+		for ( Int_t i = 0; i < 7; i++ ){
+			if ( h_elum_energy[i]->IsOnHeap() ){ h_elum_energy[i]->Delete(); }
+		}
 	}
 	
 	return 0;
@@ -422,7 +443,7 @@ void ELUMSolidAngleCalculator(){
 	Double_t z_elum[num_z] = { 120.7, 124.7, 125.7, 126.7, 130.7 };
 	Double_t solid_angle[num_z];
 	if (SWITCH_VERBOSE == 0 ){ std::cout << "  Z (mm)\tmin(\u03b8CM)\tmax(\u03b8CM)" << std::endl; }
-	for ( Int_t i = 0; i < num_z; i++ ){
+	for ( Int_t i = 2; i < 3; i++ ){
 		solid_angle[i] = SolidAngleCalculator( z_elum[i] );
 	}
 

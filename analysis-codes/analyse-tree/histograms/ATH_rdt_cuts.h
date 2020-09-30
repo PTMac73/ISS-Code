@@ -35,8 +35,9 @@ TObjArray* arr_rdt = new TObjArray();
 
 void HCreateRDTCuts(){
 	for ( Int_t i = 0; i < 4; i++ ){
-		h_rdt_cuts[i] = new TH2F( Form( "h_rdt_cuts_%i", i ), "", 900, 0, 9000, 1000, 0, 6000 );
-		GlobCreate2DHists( h_rdt_cuts[i], Form( "rdt[%i]", i + 4 ), Form( "rdt[%i]", i ) );
+		h_rdt_cuts[i] = new TH2F( Form( "h_rdt_cuts_%i", i ), "", 700, 0, 7000, 400, 0, 4000 );
+		//GlobCreate2DHists( h_rdt_cuts[i], Form( "rdt[%i]", i + 4 ), Form( "rdt[%i]", i ) );
+		GlobCreate2DHists( h_rdt_cuts[i], "E (arbitrary units)", "#Delta E (arbitrary units)"  );
 		h_rdt_cuts[i]->SetMarkerSize( 0.2 );
 
 		h_rdt_ex_mg[i] = new TH1F( Form( "h_rdt_ex_mg_%i", i ), "", 450, -1, 8 );
@@ -91,7 +92,7 @@ void HDrawRDTCuts( TTree* t ){
 		if ( CANVAS_COMBINE == 1 ){ c_rdt_cuts_comb->cd(i+1); }
 		else{
 			c_rdt_cuts[i] = new TCanvas( Form( "c_rdt_cuts_%i", i ), Form( "c_rdt_cuts_%i", i ), C_WIDTH, C_HEIGHT );
-			GlobSetCanvasMargins( c_rdt_cuts[i] );
+			GlobSetCanvasMargins( c_rdt_cuts[i], 0.11, 0.11, 0.02, 0.1 );
 		}
 		
 		// Draw the spectrum and the cuts
@@ -100,12 +101,12 @@ void HDrawRDTCuts( TTree* t ){
 			cuttlefish->Add( cuttle );
 		}
 		else{
-			h_rdt_cuts[i]->Draw();
+			h_rdt_cuts[i]->Draw("colz");
 		}
 		
 		if ( cut_list != NULL ){
 			TCutG* cut = (TCutG*)cut_list->At(i);
-			cut->Draw("SAME");
+			//cut->Draw("SAME");
 		}
 	}
 	

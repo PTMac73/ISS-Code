@@ -50,16 +50,16 @@ TGraphErrors* g_ecalibration[NUM_DETS];		//(11) E Calibration graph
 
 // Define which ones to print
 Bool_t xnxf_print_opt[NUM_DIFF_HISTS] = {
-	0,	// (0) XN-XF hist monochrome (OBSOLETE)
-	0,	// (1) XN-XF profile
+	1,	// (0) XN-XF hist monochrome (OBSOLETE)
+	1,	// (1) XN-XF profile
 	0,	// (2) XNXF-E hist monochrome
-	0,	// (3) XNXF-E profile
+	1,	// (3) XNXF-E profile
 	0,	// (4) XN-E hist monochrome (OBSOLETE)
 	0,	// (5) XF-E hist monochrome (OBSOLETE)
 	0,	// (6) XN-XF hist coloured
 	0,	// (7) XN-E hist coloured
 	0,	// (8) XF-E hist coloured
-	0,	// (9) XNXF-E hist coloured
+	1,	// (9) XNXF-E hist coloured
 	1,	//(10) E Calibration hist
 	1,	//(11) E Calibration graph
 };
@@ -202,33 +202,33 @@ void HCreateXNXF(){
 		if ( i == DET_NUMBER || ( DET_NUMBER == -1 ) ){
 		
 			// (0) *HIST* XN-XF hist monochrome
-			h_xnxf[i] = new TH2F( Form( "h_xnxf_%i", i ), Form( "XN-XF SPECTRUM %i", i ), 200, 0, 2000, 200, 0, 2000 );
-			GlobCreate2DHists( h_xnxf[i], "XF", "XN" );
+			h_xnxf[i] = new TH2F( Form( "h_xnxf_%i", i ), Form( "XN-XF SPECTRUM %i", i ), 500, 0, 1500, 500, 0, 1500 );
+			GlobCreate2DHists( h_xnxf[i], "X_{1}", "X_{2}" );
 			
 			// (1) *HIST* XN-XF profile
-			p_xnxf[i] = new TProfile( Form( "p_xnxf_%i", i ), Form( "XN-XF SPECTRUM %i", i ), 200, xnxf_lims[i][0], xnxf_lims[i][1], xnxf_lims[i][2], xnxf_lims[i][3] );
-			GlobCreateProfile( p_xnxf[i], "XF", "XN" );
+			p_xnxf[i] = new TProfile( Form( "p_xnxf_%i", i ), Form( "XN-XF SPECTRUM %i", i ), 500, xnxf_lims[i][0], xnxf_lims[i][1], xnxf_lims[i][2], xnxf_lims[i][3] );
+			GlobCreateProfile( p_xnxf[i], "X_{1}", "X_{2}" );
 			
 			// (2) *HIST* XNXF-E hist monochrome
-			h_xnxfE[i] = new TH2F( Form( "h_xnxfE_%i", i ), Form( "XNXF-E SPECTRUM %i", i ), 200, 0, 2000, 200, 0, 2000 );
-			GlobCreate2DHists( h_xnxfE[i], "XNXF", "E" );
+			h_xnxfE[i] = new TH2F( Form( "h_xnxfE_%i", i ), Form( "XNXF-E SPECTRUM %i", i ), 500, 0, 1500, 500, 0, 1500 );
+			GlobCreate2DHists( h_xnxfE[i], "X_{1} + bX_{2}", "E" );
 			
 			// (3) *HIST* XNXF-E profile
-			p_xnxfE[i] = new TProfile( Form( "p_xnxfE_%i", i ), Form( "XNXF-E SPECTRUM %i", i ), 200, xnxfE_lims[i][0], xnxfE_lims[i][1], xnxfE_lims[i][2], xnxfE_lims[i][3] );
-			GlobCreateProfile( p_xnxfE[i], "XNXF", "E" );
+			p_xnxfE[i] = new TProfile( Form( "p_xnxfE_%i", i ), Form( "XNXF-E SPECTRUM %i", i ), 500, xnxfE_lims[i][0], xnxfE_lims[i][1], xnxfE_lims[i][2], xnxfE_lims[i][3] );
+			GlobCreateProfile( p_xnxfE[i], "X_{1} + bX_{2}", "E" );
 			
 			// (4) *HIST* XN-E hist monochrome
-			h_xnE[i] = new TH2F( Form( "h_xnE_%i", i ), Form( "XN-E SPECTRUM %i", i ), 200, 0, 2000, 200, 0, 2000 );
-			GlobCreate2DHists( h_xnE[i], "XN", "E" );
+			h_xnE[i] = new TH2F( Form( "h_xnE_%i", i ), Form( "XN-E SPECTRUM %i", i ), 500, 0, 1500, 500, 0, 1500 );
+			GlobCreate2DHists( h_xnE[i], "X_{2}", "E" );
 			
 			// (5) *HIST* XF-E hist monochrome
-			h_xfE[i] = new TH2F( Form( "h_xfE_%i", i ), Form( "XF-E SPECTRUM %i", i ), 200, 0, 2000, 200, 0, 2000 );
-			GlobCreate2DHists( h_xfE[i], "XF", "E" );
+			h_xfE[i] = new TH2F( Form( "h_xfE_%i", i ), Form( "XF-E SPECTRUM %i", i ), 500, 0, 1500, 500, 0, 1500 );
+			GlobCreate2DHists( h_xfE[i], "X_{1}", "E" );
 			
 			// (6) *HIST* XN-XF hist coloured
 			for ( Int_t j = 0; j < 5; j++ ){
-				h_xnxf_colour[i][j] = new TH2F( Form( "h_xnxf_%i_%i", i, j ), Form( "XN-XF COLOUR SPECTRUM | Det %i | Case %i", i, j ), 200, 0, 2000, 200, 0, 2000 );
-				GlobCreate2DHists( h_xnxf_colour[i][j], "XF", "XN" );
+				h_xnxf_colour[i][j] = new TH2F( Form( "h_xnxf_%i_%i", i, j ), Form( "XN-XF COLOUR SPECTRUM | Det %i | Case %i", i, j ), 500, 0, 1500, 500, 0, 1500 );
+				GlobCreate2DHists( h_xnxf_colour[i][j], "X_{1}", "X_{2}" );
 			}
 			h_xnxf_colour[i][0]->SetMarkerColor( kBlue );
 			h_xnxf_colour[i][1]->SetMarkerColor( kBlack );
@@ -238,8 +238,8 @@ void HCreateXNXF(){
 			
 			// (7) *HIST*  XN-E hist coloured
 			for ( Int_t j = 0; j < 5; j++ ){
-				h_xnE_colour[i][j] = new TH2F( Form( "h_xnE_%i_%i", i, j ), Form( "XN-E COLOUR SPECTRUM | Det %i | CASE %i", i, j ), 200, 0, 2000, 200, 0, 2000 );
-				GlobCreate2DHists( h_xnE_colour[i][j], "XN", "E" );
+				h_xnE_colour[i][j] = new TH2F( Form( "h_xnE_%i_%i", i, j ), Form( "XN-E COLOUR SPECTRUM | Det %i | CASE %i", i, j ), 500, 0, 1500, 500, 0, 1500 );
+				GlobCreate2DHists( h_xnE_colour[i][j], "X_{2}", "E" );
 			}
 			h_xnE_colour[i][0]->SetMarkerColor( kBlue );
 			h_xnE_colour[i][1]->SetMarkerColor( kBlack );
@@ -249,8 +249,8 @@ void HCreateXNXF(){
 			
 			// (8) *HIST* XF-E hist coloured
 			for ( Int_t j = 0; j < 5; j++ ){
-				h_xfE_colour[i][j] = new TH2F( Form( "h_xfE_%i_%i", i, j ), Form( "XF-E COLOUR SPECTRUM | Det %i | CASE %i", i, j ), 200, 0, 2000, 200, 0, 2000 );
-				GlobCreate2DHists( h_xfE_colour[i][j], "XF", "E" );
+				h_xfE_colour[i][j] = new TH2F( Form( "h_xfE_%i_%i", i, j ), Form( "XF-E COLOUR SPECTRUM | Det %i | CASE %i", i, j ), 400, 0, 1600, 400, 0, 1600 );
+				GlobCreate2DHists( h_xfE_colour[i][j], "X_{1}", "E" );
 			}
 			h_xfE_colour[i][0]->SetMarkerColor( kBlue );
 			h_xfE_colour[i][1]->SetMarkerColor( kBlack );
@@ -260,8 +260,8 @@ void HCreateXNXF(){
 			
 			// (9) XNXF-E hist coloured
 			for ( Int_t j = 0; j < 4; j++ ){
-				h_xnxfE_colour[i][j] = new TH2F( Form( "h_xnxfE_%i_%i", i, j ), Form( "XNXF-E COLOUR SPECTRUM | Det %i | CASE %i", i, j ), 200, 0, 2000, 200, 0, 2000 );
-				GlobCreate2DHists( h_xnxfE_colour[i][j], "XNXF", "E" );
+				h_xnxfE_colour[i][j] = new TH2F( Form( "h_xnxfE_%i_%i", i, j ), Form( "XNXF-E COLOUR SPECTRUM | Det %i | CASE %i", i, j ), 400, 0, 1600, 400, 0, 1600 );
+				GlobCreate2DHists( h_xnxfE_colour[i][j], "X_{1} + bX_{2}", "E" );
 			}
 			h_xnxfE_colour[i][0]->SetMarkerColor( kBlue );
 			h_xnxfE_colour[i][1]->SetMarkerColor( kGreen );
@@ -311,12 +311,14 @@ void HDrawXNXF(){
 	
 	TCanvas* c_xnxf_p[24];			// (1) XN-XF profile
 	TCanvas* c_xnxf_p_comb;
+	TH1F* frame_xnxf_p[24];
 	
 	TCanvas* c_xnxfE[24];			// (2) XNXF-E hist monochrome
 	TCanvas* c_xnxfE_comb;
 	
 	TCanvas* c_xnxfE_p[24];			// (3) XNXF-E profile
 	TCanvas* c_xnxfE_p_comb;
+	TH1F* frame_xnxfE_p[24];
 	
 	TCanvas* c_xnE[24];				// (4) XN-E hist monochrome
 	TCanvas* c_xnE_comb;
@@ -359,13 +361,13 @@ void HDrawXNXF(){
 	// Define fit lines for the different plots
 	TF1* fitline_xnxf = new TF1( "fitline_xnxf", "[0] + [1]*x", 200, 1800 );
 	fitline_xnxf->SetLineWidth(2);
-	fitline_xnxf->SetLineColorAlpha(kBlack,0.5);
+	fitline_xnxf->SetLineColor(kBlack);
 	fitline_xnxf->SetParameters( 0, 0 );
 	//fitline_xnxf->SetRange( 200, 1800 );
 	
 	TF1* fitline_xnxfE = new TF1( "fitline_xnxfE", "[0] + [1]*x", 200, 1800 );
 	fitline_xnxfE->SetLineWidth(2);
-	fitline_xnxfE->SetLineColorAlpha(kBlack,0.5);
+	fitline_xnxfE->SetLineColor(kBlack);
 	fitline_xnxfE->SetParameters( 0, 0 );
 	//fitline_xnxfE->SetRange( 200, 1800 );
 	
@@ -506,25 +508,27 @@ void HDrawXNXF(){
 			
 				// (0) *CANVAS* XN-XF hist monochrome
 				c_xnxf[i] = new TCanvas( Form( "c_xnxf_%i", i ), Form( "XN-XF | Det %i", i ), C_WIDTH, C_HEIGHT );
-				GlobSetCanvasMargins( c_xnxf[i] );
-				h_xnxf[i]->Draw();
-				for ( Int_t j = 0; j < 4; j++ ){
+				GlobSetCanvasMargins( c_xnxf[i], 0.12, 0.1, 0.02, 0.1 );
+				h_xnxf[i]->Draw("colz");
+				/*for ( Int_t j = 0; j < 4; j++ ){
 					bline_xnxf[i][j]->Draw();
-				}
-				if ( xnxf_cut != NULL ){ xnxf_cut->Draw("SAME"); }
+				}*/
+				//if ( xnxf_cut != NULL ){ xnxf_cut->Draw("SAME"); }
 				
 				
 				// (1) *CANVAS* XN-XF profile
 				c_xnxf_p[i] = new TCanvas( Form( "c_xnxf_p_%i", i ), Form( "XN-XF Profile | Det %i", i ), C_WIDTH, C_HEIGHT );
 				GlobSetCanvasMargins( c_xnxf_p[i] );
-				p_xnxf[i]->Draw("E1");
+				frame_xnxf_p[i] = c_xnxf_p[i]->DrawFrame(0,0,1500,1500);
+				CreateCanvasFrame( frame_xnxf_p[i], "X_{1}", "X_{2}" );
+				p_xnxf[i]->Draw("E1 SAME");
 				fitline_xnxf->Draw("SAME");
 				
 				
 				// (2) *CANVAS* XNXF-E hist monochrome
 				c_xnxfE[i] = new TCanvas( Form( "c_xnxfE_%i", i ), Form( "XNXF-E | Det %i", i ), C_WIDTH, C_HEIGHT );
-				GlobSetCanvasMargins( c_xnxfE[i] );
-				h_xnxfE[i]->Draw();
+				GlobSetCanvasMargins( c_xnxfE[i], 0.12, 0.1, 0.02, 0.1 );
+				h_xnxfE[i]->Draw("colz");
 				/*for ( Int_t j = 0; j < 4; j++ ){
 					bline_xnxfE[i][j]->Draw();
 				}*/
@@ -533,7 +537,9 @@ void HDrawXNXF(){
 				// (3) *CANVAS* XNXF-E profile
 				c_xnxfE_p[i] = new TCanvas( Form( "c_xnxf_pE_%i", i ), Form( "XNXF-E Profile | Det %i", i ), C_WIDTH, C_HEIGHT );
 				GlobSetCanvasMargins( c_xnxfE_p[i] );
-				p_xnxfE[i]->Draw("E1");
+				frame_xnxfE_p[i] = c_xnxfE_p[i]->DrawFrame(0,0,1600,1600);
+				CreateCanvasFrame( frame_xnxfE_p[i], "X_{1} + bX_{2}", "E" );
+				p_xnxfE[i]->Draw("E1 SAME");
 				fitline_xnxfE->Draw("SAME");
 				
 				
@@ -583,11 +589,11 @@ void HDrawXNXF(){
 				
 				// (9) XNXF-E hist coloured
 				c_xnxfE_colour[i] = new TCanvas( Form( "c_xnxfE_col_%i", i ), Form( "XNXF-E Colour Plot | Det %i", i ), C_WIDTH, C_HEIGHT );
-				GlobSetCanvasMargins( c_xnxfE_colour[i] );
-				h_xnxfE_colour[i][3]->Draw();
-				h_xnxfE_colour[i][0]->Draw("SAME");
-				h_xnxfE_colour[i][1]->Draw("SAME");
-				h_xnxfE_colour[i][2]->Draw("SAME");
+				GlobSetCanvasMargins( c_xnxfE_colour[i], 0.12, 0.1, 0.02, 0.1 );
+				//h_xnxfE_colour[i][3]->Draw();
+				//h_xnxfE_colour[i][0]->Draw("SAME");
+				//h_xnxfE_colour[i][1]->Draw("SAME");
+				h_xnxfE_colour[i][2]->Draw("colz");
 				
 				fitline_xnxfE->Draw("SAME");
 				

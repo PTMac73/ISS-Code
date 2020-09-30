@@ -12,6 +12,8 @@
 #include <TCanvas.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <THStack.h>
+#include <TPad.h>
 #include <TPaveText.h>
 #include <TProfile.h>
 #include <TString.h>
@@ -21,7 +23,7 @@
 // --------------------------------------------------------------------------------------------- //
 // GLOBAL FUNCTIONS
 // Set canvas margins
-void GlobSetCanvasMargins( TCanvas *c, Double_t l = 0.1, Double_t r = 0.02, Double_t t = 0.02, Double_t b = 0.1 ){
+void GlobSetCanvasMargins( TCanvas *c, Double_t l = 0.1, Double_t r = 0.03, Double_t t = 0.02, Double_t b = 0.1 ){
 	TPad* pad = (TPad*)c;
 	pad->SetLeftMargin( l );
 	pad->SetRightMargin( r );
@@ -49,8 +51,20 @@ void GlobSetHistFonts( TH2* h ){
 	h->GetXaxis()->CenterTitle();
 	h->GetYaxis()->SetTitleFont(62);
 	h->GetYaxis()->SetLabelFont(62);
+	h->GetZaxis()->SetTitleFont(62);
+	h->GetZaxis()->SetLabelFont(62);
 	h->GetYaxis()->CenterTitle();
 	h->SetTitleFont(62);
+	return;
+}
+
+void GlobSetHistFonts( THStack* hs ){
+	hs->GetXaxis()->SetTitleFont(62);
+	hs->GetXaxis()->SetLabelFont(62);
+	hs->GetXaxis()->CenterTitle();
+	hs->GetYaxis()->SetTitleFont(62);
+	hs->GetYaxis()->SetLabelFont(62);
+	hs->GetYaxis()->CenterTitle();
 	return;
 }
 
@@ -61,6 +75,12 @@ void GlobSetHistFonts( TGraph* g ){
 	g->GetYaxis()->SetTitleFont(62);
 	g->GetYaxis()->SetLabelFont(62);
 	g->GetYaxis()->CenterTitle();
+	return;
+}
+
+void SetPadTicks( TCanvas* c ){
+	TPad* pad = (TPad*)c->GetPad(0);
+	pad->SetTicks(1,1);
 	return;
 }
 
@@ -84,7 +104,7 @@ TString DoubleToString( Double_t a ){
 
 // Print functions
 void PrintPDF( TCanvas* c, TString spec_name ){
-	c->Print( ( spec_name + ".svg" ).Data() );
+	c->Print( ( spec_name + ".pdf" ).Data() );
 	return;
 }
 
@@ -93,10 +113,16 @@ void PrintPNG( TCanvas* c, TString spec_name ){
 	return;
 }
 
+void PrintTEX( TCanvas* c, TString spec_name ){
+	c->Print( ( spec_name + ".tex" ).Data() );
+	return;
+}
+
 
 void PrintAll( TCanvas* c, TString spec_name ){
 	if ( PRINT_PDF ){ PrintPDF( c, spec_name ); }
 	if ( PRINT_PNG ){ PrintPNG( c, spec_name ); }
+	if ( PRINT_TEX ){ PrintTEX( c, spec_name ); }
 	return;
 }
 
@@ -114,9 +140,9 @@ void SetCanvasTitleFont( TPad* pad ){
 
 // Create cherished spectra
 void CreateExSpectrum( TH1F*& h, TString name ){
-	h = new TH1F( name.Data(), name.Data(), 450, -1, 8 );
+	h = new TH1F( name.Data(), name.Data(), 400, -0.5, 8 );
 	h->SetTitle("");
-	h->GetXaxis()->SetTitle("Excitation Energy (MeV)");
+	h->GetXaxis()->SetTitle("E_{x} (MeV)");
 	h->GetYaxis()->SetTitle("Counts per 20 keV");	
 	h->SetLineColor(kRed);	
 	GlobSetHistFonts( h );
@@ -128,9 +154,17 @@ void CreateExSpectrum( TH1F*& h, TString name, Double_t lb, Double_t ub ){
 	Int_t nbins = (Int_t)( 50*( ub - lb ) );
 	h = new TH1F( name.Data(), name.Data(), nbins, lb, ub );
 	h->SetTitle("");
-	h->GetXaxis()->SetTitle("Excitation Energy (MeV)");
+	h->GetXaxis()->SetTitle("Silicon excitation energy (MeV)");
 	h->GetYaxis()->SetTitle("Counts per 20 keV");	
 	h->SetLineColor(kRed);	
+	GlobSetHistFonts( h );
+	return;
+}
+
+void CreateCanvasFrame( TH1F*& h, TString xlabel, TString ylabel ){
+	h->SetTitle("");
+	h->GetXaxis()->SetTitle( xlabel.Data() );
+	h->GetYaxis()->SetTitle( ylabel.Data() );		
 	GlobSetHistFonts( h );
 	return;
 }
@@ -151,7 +185,7 @@ void GlobCreate2DHists( TH2F* h, TString x_label, TString y_label ){
 
 void CreateEVZSpectrum( TH2F*& h, TString name ){
 	h = new TH2F( name.Data(), name.Data() , 400, -50, -10, 900, 0, 9 );
-	GlobCreate2DHists( h, "z (cm)", "Energy (MeV)" );
+	GlobCreate2DHists( h, "z (cm)", "T_{3} (MeV)" );
 	h->SetMarkerSize(0.2);
 	return;
 }

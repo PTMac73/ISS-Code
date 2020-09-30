@@ -140,7 +140,6 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 	// The Process() function is called for each entry in the tree (or possibly
 	// keyed object in the case of PROOF) to be processed. The entry argument
 	// specifies which entry in the currently loaded tree is to be processed.
-	// When processing keyed objects with PROOF, the object is already loaded
 	// and is available via the fObject pointer.
 	//
 	// This function should contain the \"body\" of the analysis. It can contain
@@ -200,7 +199,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 	}
 	// Create some doubles for use in the loop
 	Double_t XNCAL, XFCAL, XNcal, XFcal;
-	
+
 	// *LOOP* OVER DETECTORS IN THE ARRAY
 	for ( Int_t i = 0; i < 24; i++ ){
 
@@ -243,7 +242,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		is_in_theta_range = ( thetaCM[i] >= THETA_LB && thetaCM[i] < THETA_UB );
 		is_in_xcal = ( xcal[i] >= XCAL_cuts[i][0] && xcal[i] < XCAL_cuts[i][1] );
 		//is_in_xcal_mid = ( xcal[i] <= xcal_cuts[i][2] || xcal[i] >= xcal_cuts[i][3] );
-		
+
 		
 		
 		// XNXF cut boolean
@@ -302,7 +301,7 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			h_ecalibration[i][0]->Fill( e[i] );
 			if ( is_in_theta_min && is_in_xcal ){ h_ecalibration[i][1]->Fill( e[i] ); }
 		}
-
+		
 		// *HIST* SIGTIME
 		if ( i != 11 && SW_SIGTIME[0] == 1 ){
 			h_sigtime_e[i]->Fill( e_t[i], e[i] );
@@ -327,7 +326,6 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			}
 		}
 
-
 		// *HIST* xcal no cuts
 		if ( is_in_used_det && is_in_rdt_and_td_total && is_in_theta_min ){
 			if ( SW_XCAL[0] == 1 ){
@@ -341,6 +339,21 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 			if ( SW_XCAL[0] == 1 ){
 				h_xcal[i][1]->Fill( xcal[i] );
 				h_xcal_e[i][1]->Fill( xcal[i], ecrr[i] );
+			}
+		}
+		
+		// *HIST* xcal full comparison
+		if ( is_in_used_det && is_in_rdt_and_td_total && is_in_theta_custom ){
+			if ( SW_XCAL[0] == 1 ){
+				if ( !TMath::IsNaN(xn[i]) && !TMath::IsNaN(xf[i]) ){
+					h_xcal_full_comp[0]->Fill( xcal[i] );
+				}
+				else if ( !TMath::IsNaN(xn[i]) && TMath::IsNaN(xf[i]) ){
+					h_xcal_full_comp[1]->Fill( xcal[i] );
+				}
+				else if ( TMath::IsNaN(xn[i]) && !TMath::IsNaN(xf[i]) ){
+					h_xcal_full_comp[2]->Fill( xcal[i] );
+				}
 			}
 		}
 		
@@ -369,6 +382,16 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 				}
 			}
 			
+		}
+		
+		// EVZ highlight
+		if ( is_in_used_det && is_in_xcal && SW_EVZ[0] == 1 ){
+			if ( thetaCM[i] >= 11.0 && thetaCM[i] <= 14.5 ){
+				h_evz_highlight[1]->Fill( z[i], ecrr[i] );
+			}
+			else{
+				h_evz_highlight[0]->Fill( z[i], ecrr[i] );
+			}
 		}
 		
 		// EVOLUTION OF CUTS

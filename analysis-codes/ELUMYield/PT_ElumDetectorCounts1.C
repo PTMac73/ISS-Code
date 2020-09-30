@@ -42,26 +42,15 @@ void PT_ElumDetectorCounts( TFile *f ){
 
 	// Draw the full elum detector signal
 	TCanvas *c_elum = new TCanvas( "c_elum", "ELUM detector", 1200, 900 );
-	TPad* pad = (TPad*)c_elum;
-	pad->SetLeftMargin( 0.09 );
-	pad->SetRightMargin( 0.03 );
-	pad->SetTopMargin( 0.02 );
-	pad->SetBottomMargin( 0.08 );
 	t->Draw("elum>>h_elum(2450, -800, 9000)");
 	TH1F *h_elum = (TH1F*)gDirectory->Get("h_elum");
 
 	// Change viewing limits and style histogram
 	h_elum->GetXaxis()->SetRangeUser(-400,1600);
 	h_elum->GetYaxis()->SetRangeUser(-20,400);
-	h_elum->GetYaxis()->SetTitle("Counts");
-	h_elum->GetXaxis()->SetTitle("E (arbitrary units)");
-	h_elum->SetTitle("");
-	h_elum->GetXaxis()->SetLabelFont(62);
-	h_elum->GetYaxis()->SetLabelFont(62);
-	h_elum->GetXaxis()->SetTitleFont(62);
-	h_elum->GetYaxis()->SetTitleFont(62);
-	h_elum->GetXaxis()->CenterTitle();
-	h_elum->GetYaxis()->CenterTitle();
+	h_elum->GetYaxis()->SetTitle("#");
+	h_elum->GetXaxis()->SetTitle("Relative Energy");
+	h_elum->SetTitle( Form( "(d,d) Scattering in ELUM (Pos %i)", pos_num ) );
 
 	// Now define a fit - Gaussian with a quadratic background
 	Double_t d_lb = 300;
@@ -76,8 +65,8 @@ void PT_ElumDetectorCounts( TFile *f ){
 		}
 	}
 	
-	//h2->SetFillColor(kOrange);
-	//h2->Draw("same");
+	h2->SetFillColor(kOrange);
+	h2->Draw("same");
 
 	// Set the parameter limits
 	/*   A */ f_fitting->SetParLimits(0, 0, 1000);
@@ -85,11 +74,11 @@ void PT_ElumDetectorCounts( TFile *f ){
 	/* sig */ f_fitting->SetParLimits(2, 0, 500);
 
 	// Style the fit
-	f_fitting->SetLineWidth(3);
+	f_fitting->SetLineWidth(4);
 	f_fitting->SetLineColor(kRed);
 
 	// Fit the function
-	h_elum->Fit( "f_fitting", "R0" );
+	h_elum->Fit( "f_fitting", "R" );
 
 	// Draw the background and Gaussian separately
 	TF1 *f_bg = new TF1("f_bg", bg, d_lb, d_ub, 3);
@@ -97,7 +86,7 @@ void PT_ElumDetectorCounts( TFile *f ){
 	f_bg->SetLineColor(kBlue);
 	f_bg->SetLineWidth(2);
 	f_bg_2->SetLineColor(kBlue);
-	f_bg_2->SetLineWidth(2);
+	f_bg_2->SetLineWidth(1);
 	f_bg_2->SetLineStyle(3);
 
 	TF1 *f_gaussian = new TF1("f_gaussian", gaussian, d_lb, d_ub, 3);
@@ -114,16 +103,15 @@ void PT_ElumDetectorCounts( TFile *f ){
 	f_bg_2->SetParameters(&par[3]);
 	f_bg_2->Draw("same");
 	f_bg->Draw("same");
-	f_fitting->Draw("same");
 
 	// Add a legend
-	TLegend *leg = new TLegend(0.62,0.73,0.97,0.98);
-	leg->SetTextFont(62);
+	TLegend *leg = new TLegend(0.65,0.65,0.9,0.9);
+	leg->SetTextFont(42);
 	leg->SetTextSize(0.04);
-	leg->AddEntry(h_elum,"Raw Data","l");
+	leg->AddEntry(h_elum,"ELUM Signal","l");
 	leg->AddEntry(f_bg,"Background fit","l");
 	leg->AddEntry(f_gaussian,"Gaussian fit","l");
-	leg->AddEntry(f_fitting,"Total fit","l");
+	leg->AddEntry(f_fitting,"Total Fit","l");
 	leg->Draw();
 
 
@@ -145,7 +133,6 @@ void PT_ElumDetectorCounts( TFile *f ){
 
 	// Print the canvas
 	c_elum->Print( Form( "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/PLOTS/ELUM_DD/elum_plot%i.pdf", pos_num ) );
-	c_elum->Print( Form( "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/PLOTS/ELUM_DD/elum_plot%i.tex", pos_num ) );
 
 
 }

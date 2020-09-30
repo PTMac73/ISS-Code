@@ -39,8 +39,8 @@ void HCreateTD(){
 		if ( ( i == DET_NUMBER || ( DET_NUMBER == -1 ) ) && det_array[i % 6][(Int_t)TMath::Floor(i/6)] != 0 ){
 			h_td[i][0] = new TH1F( Form( "h_td_%i", i ), "", 60, -30, 30 );
 			h_td[i][0]->SetTitle("");
-			h_td[i][0]->GetXaxis()->SetTitle("Time Difference between recoils and array");
-			h_td[i][0]->GetYaxis()->SetTitle("Counts");	
+			h_td[i][0]->GetXaxis()->SetTitle("Time difference between recoils and array");
+			h_td[i][0]->GetYaxis()->SetTitle("Counts");
 			h_td[i][0]->SetFillColor(kRed);	
 			h_td[i][0]->SetLineWidth(1);
 			h_td[i][0]->SetLineColor(kBlack);
@@ -108,7 +108,11 @@ void HDrawTD(){
 			if ( CANVAS_COMBINE == 0 ){
 				// Plot spectrum
 				c_td[i] = new TCanvas( Form( "c_td_%i", i ), Form( "td | Det %i", i ), C_WIDTH, C_HEIGHT );
+				TPad *pad = new TPad("pad","",0,0,1,1);
 				GlobSetCanvasMargins( c_td[i] );
+				pad->Draw();
+				pad->SetTicks(1,1);
+				pad->cd();
 				h_td[i][0]->Draw();
 				h_td[i][1]->Draw("SAME");
 				cut_line[0]->Draw("SAME");

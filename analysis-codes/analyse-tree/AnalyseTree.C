@@ -430,7 +430,10 @@ Bool_t AnalyseTree::Process(Long64_t entry)
 		// Full cuts (Mg) with RBR theta_custom cuts
 		if ( is_in_used_det && is_in_rdt_and_td_total && is_in_theta_custom && is_in_xcal ){
 			if ( SW_EX[0] == 1 ){
-				if ( ALL_ROWS == 1 ){ h_ex_full->Fill( Ex[i] ); }
+				if ( ALL_ROWS == 1 ){ 
+					h_ex_full->Fill( Ex[i] );
+					h_ex_full_corr->Fill( Ex[i]*gain_match_pars[ARR_POSITION-1][0] + gain_match_pars[ARR_POSITION-1][1] );
+				}
 				if ( ROW_BY_ROW == 1 ){
 					h_ex_rbr[ i % 6 ][0]->Fill( Ex[i] );
 					//if ( i < 12 || i > 17 ){ h_ex_rbr[ i % 6 ][1]->Fill( Ex[i] ); }

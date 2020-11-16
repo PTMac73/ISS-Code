@@ -19,7 +19,7 @@
 
 // CONSTANTS
 // Location of ROOT files
-TString root_file_dir = "pos%i_ex.root";
+TString root_file_dir = "pos%i_ex_corr.root";
 TString print_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-codes/extract-yields";
 
 // Things that probably won't change
@@ -36,7 +36,41 @@ Double_t E_LIMITS[2] = {
 };
 
 // Peak energies
+/*const Double_t peak_energies[NUM_PEAKS] = {
+	0.00000,
+	1.09462,
+	1.43070,
+	2.26590,
+	2.49990,
+	2.87000,
+	3.18000,
+	
+	3.854334927,
+	3.989180979,
+	4.309017061,
+	
+	5.570797291,
+	5.759762758,
+	5.989528736 
+};*/
 const Double_t peak_energies[NUM_PEAKS] = {
+	0.00000,
+	1.09462,
+	1.43070,
+	2.26590,
+	2.49990,
+	2.87000,
+	3.18000,
+	
+	3.905593396,
+	4.044671377,
+	4.355921221,
+	
+	5.629749246,
+	5.825187047,
+	6.056059684 
+};
+/*const Double_t peak_energies[NUM_PEAKS] = {
 	0.00000,
 	1.09462,
 	1.43070,
@@ -47,10 +81,13 @@ const Double_t peak_energies[NUM_PEAKS] = {
 	3.874186853,
 	4.011653487,
 	4.313766313,
-	5.671,
-	5.913,
-	6.101
-};
+	5.6,
+	5.72,
+	6.0
+	//5.671,
+	//5.913,
+	//6.101
+};*/
 
 Int_t peak_colours[NUM_PEAKS] = {
 	kOrange,
@@ -71,37 +108,52 @@ Int_t peak_colours[NUM_PEAKS] = {
 };
 
 Double_t peak_label_pos_offset[NUM_PEAKS][2] = {
-	{ 0.03, 22.0 },
+	{ 0.03, 25.0 },
 	{ 0.00, 10.0 },
-	{ 0.09, 10.0 },
-	{ 0.00, 20.0 },
-	{ 0.00, 22.0 },
+	{ 0.2, 10.0 },
+	{ -0.05, 24.0 },
+	{ 0.00, 26.0 },
 	{ 0.00, 22.0 },
 	{ 0.00, 25.0 },
 	
-	{ 0.00, 24.5 },
+	{ 0.00, 18.0 },
 	{ 0.00, 20.0 },
 	{ 0.00, 20.0 },
 	
-	{ 0.00, 15.0 },
-	{ 0.00, 16.0 },
+	{ 0.00, 25.0 },
+	{ 0.00, 25.0 },
 	{ 0.00, 15.0 }
 };
 
-TString peak_label[NUM_PEAKS] = {
-	"1*",
-	"2",
-	"3",
-	"4",
-	"5",
-	"6",
-	"7",
-	"8",
-	"9",
-	"10",
-	"11",
-	"12",
-	"13"
+TString peak_label_gs_str[5] = {
+	"g.s.",
+	"l=2",
+	"+",
+	"55",
+	"l=0"
+};
+
+TString peak_label_ubd_str[4] = {
+	"3922",
+	"+",
+	"4053",
+	"l=1",
+};
+
+TString peak_label[NUM_PEAKS][2] = {
+	{"",""},					// 00***
+	{ "1092", "l=1",  },	// 01
+	{ "1432", "l=3",  },	// 02
+	{ "2270", "l=1",  },	// 03
+	{ "2501", "l=2",  },	// 04
+	{ "2900", "l=3",  },	// 05
+	{ "3220", "l=2",  },	// 06
+	{"",""},				// 07***
+	{"",""},				// 08***
+	{ "4360", "l=1",  },	// 09
+	{ "", "5627",  },	// 10
+	{ "", "5817",  },	// 11
+	{ "", "6049",  },	// 12
 };
 
 
@@ -113,8 +165,8 @@ Bool_t fix_widths[NUM_PEAKS] = {
 };
 Bool_t fix_positions[NUM_PEAKS] = {
 	0,0,0,0,0,0,0,
-	0,0,0,
-	0,0,0
+	1,1,1,
+	1,1,1
 };
 
 // UNBOUND DOUBLET PARAMETERS

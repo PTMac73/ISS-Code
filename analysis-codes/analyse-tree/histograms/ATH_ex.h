@@ -30,6 +30,7 @@
 // Switch for this is SW_EX
 // Number of histograms = 24 (DBD) + 6 (RBR) + 1 (Full)
 TH1F* h_ex_full = NULL;			// Full spectrum
+TH1F* h_ex_full_corr = NULL;
 TH1F* h_ex_full_best = NULL;	// Full spectrum (best)
 TH1F* h_ex_rbr[6][2];			// RBR spectrum: [0] is full, [1] is best resolution detectors
 TH1F* h_ex_dbd[24];				// DBD spectrum
@@ -38,13 +39,14 @@ TH1F* h_ex_before[4];
 TH1F* h_ex_after[4];
 
 
-Bool_t ex_print_opt[6] = {
+Bool_t ex_print_opt[7] = {
 	0,	// (0) full spectrum
 	0,	// (1) RBR spectrum (all good dets)
 	0,	// (2) RBR spectrum (best resolution dets)
 	0,	// (3) DBD spectrum
-	1,	// (4) spectrum evolution
-	0	// (5) full spectrum (best)
+	0,	// (4) spectrum evolution
+	0,	// (5) full spectrum (best)
+	1  // (6) full spectrum corrected with energy calibration
 };
 
 void HCreateEx(){
@@ -55,6 +57,7 @@ void HCreateEx(){
 		if ( i == 0 && ALL_ROWS == 1 ){
 			CreateExSpectrum( h_ex_full, "h_ex_full" );
 			CreateExSpectrum( h_ex_full_best, "h_ex_full_best" );
+			CreateExSpectrum( h_ex_full_corr, "h_ex_full_corr" );
 		}
 		
 		// Evolution
@@ -82,6 +85,7 @@ void HDrawEx(){
 	// Define some local variables
 	TCanvas* c_ex_full;
 	TCanvas* c_ex_full_best;
+	TCanvas* c_ex_full_corr;
 	TCanvas* c_ex_rbr[6][2];
 	TCanvas* c_ex_dbd[24];
 	TCanvas* c_ex_dbd_comb;
@@ -111,6 +115,10 @@ void HDrawEx(){
 			c_ex_full = new TCanvas( "c_ex_full", "Full excitation spectrum",  C_WIDTH, C_HEIGHT );
 			GlobSetCanvasMargins( c_ex_full );
 			h_ex_full->Draw();
+			
+			c_ex_full_corr = new TCanvas( "c_ex_full_corr", "Full excitation spectrum (corrected)",  C_WIDTH, C_HEIGHT );
+			GlobSetCanvasMargins( c_ex_full_corr );
+			h_ex_full_corr->Draw();
 			
 			c_ex_full_best = new TCanvas( "c_ex_full_best", "Full excitation spectrum (best res)",  C_WIDTH, C_HEIGHT );
 			GlobSetCanvasMargins( c_ex_full_best );
@@ -143,10 +151,12 @@ void HDrawEx(){
 			if ( SW_EX[1] == 1 ){
 				if( ex_print_opt[0] == 1 ){ PrintAll( c_ex_full, spec_name ); }
 				if( ex_print_opt[5] == 1 ){ PrintAll( c_ex_full_best, spec_name + "_best" ); }
+				if( ex_print_opt[6] == 1 ){ PrintAll( c_ex_full_corr, spec_name + "_corr" ); }
 				if ( PRINT_ROOT == 1 ){
 					f->cd();
 					if( ex_print_opt[0] == 1 ){ h_ex_full->Write(); }
 					if( ex_print_opt[5] == 1 ){ h_ex_full_best->Write(); }
+					if( ex_print_opt[6] == 1 ){ h_ex_full_corr->Write(); }
 				}
 				
 				for ( Int_t j = 0; j < 4; j++ ){

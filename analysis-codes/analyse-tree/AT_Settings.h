@@ -45,7 +45,7 @@ const Int_t DET_NUMBER = -1;
 const Int_t ROW_NUMBER = -1;
 
 // Array position - can only be one or two
-const Int_t ARR_POSITION = 1;
+const Int_t ARR_POSITION = 2;
 
 // Select angle cuts
 const Double_t THETA_MIN = 11.0;//19.21; //16.6278;
@@ -75,8 +75,8 @@ const Bool_t DRAW_NEW_CUTS = 0;
 const Bool_t  SW_EX_COMPARE[3] = { 0, 1, 0 };
 const Bool_t    SW_RDT_CUTS[3] = { 0, 1, 0 };
 const Bool_t      SW_EVZ_SI[3] = { 0, 0, 0 };
-const Bool_t          SW_EX[3] = { 0, 1, 0 };
-const Bool_t       SW_EX_SI[3] = { 1, 1, 0 };
+const Bool_t          SW_EX[3] = { 1, 1, 0 };
+const Bool_t       SW_EX_SI[3] = { 0, 1, 0 };
 const Bool_t SW_EVZ_COMPARE[3] = { 0, 1, 0 };
 const Bool_t         SW_EVZ[3] = { 0, 1, 0 };
 const Bool_t        SW_XNXF[3] = { 0, 1, 0 };
@@ -427,41 +427,10 @@ Float_t thetaCM_singles_cuts[6][2][2] = {
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Double_t gain_match_pars[2][2] = {
+	{ 1.00756, 0.0137467 },
+	{ 1.00611, 0.0150445 }
+};
 
 
 

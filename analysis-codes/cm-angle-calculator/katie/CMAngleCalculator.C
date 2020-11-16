@@ -27,10 +27,12 @@ Double_t CMAngleCalculator(Double_t ex, Double_t z, Bool_t print = 1 ){
 	// Define initial fixed quantities for the reaction
 	ReactionParameters rp;
 	FillRP(rp);
-
+	//PrintRP(rp);
+	
 	// Now calculate derived quantities from fixed quantities
 	KinematicsParameters kp;
 	CalculateKP( rp, kp, ex );
+	//PrintKP(kp);
 
 	// Function-specific calculations
 	Double_t p_para = rp.q*rp.B*z/( 2*TMath::Pi() );											// Parallel component of the momentum in MeV / c [LAB] -------> THIS IS A GUESS!!
@@ -189,22 +191,11 @@ Double_t CMAngleFindZ( Double_t ex, Double_t theta_cm ){
 
 /*************************************************************************************************/
 void CMAngleFindMinZ( Double_t theta ){
-	const Int_t NUM_STATES = 13;
+	const Int_t NUM_STATES = 3;
 	Double_t STATES[NUM_STATES] = {
 		0.0000,
-		0.0546,
-		1.0920,
-		1.4320,
-		2.2700,
-		2.5010,
-		2.9000,
-		3.2200,
-		3.9800,
-		4.3600,
-		//5.64321980164455,
-		5.627,
-		5.817,
-		6.049
+		1.0000,
+		2.0000
 	};
 
 	Int_t n;
@@ -307,6 +298,69 @@ void CMAngleGraph1D( ){
 	delete[] z;
 	delete[] theta;
 	return;
+
+}
+/*************************************************************************************************/
+void CMAngleMassDiff(){
+	const Int_t num_e = 34;
+	Double_t THETA[num_e + 1];
+	Double_t CHARGE[num_e + 1];
+	Double_t z = -44.7375;
+	Double_t ex = 0.0;
+	
+	for ( Int_t i = 0; i < num_e + 1; i++ ){
+		// Define charge
+		CHARGE[i] = -num_e + i;
+	
+		// Define initial fixed quantities for the reaction
+		ReactionParameters rp;
+		FillRP(rp);
+		
+		// Tweak the charge state of the incoming particle
+		rp.m1 = rp.m1 + 0.511*i;
+
+		// Now calculate derived quantities from fixed quantities
+		KinematicsParameters kp;
+		CalculateKP( rp, kp, ex );
+		//PrintKP(kp);
+
+		// Function-specific calculations
+		Double_t p_para = rp.q*rp.B*z/( 2*TMath::Pi() );											// Parallel component of the momentum in MeV / c [LAB] -------> THIS IS A GUESS!!
+		Double_t p_para_cm = p_para/kp.gamLAB_CM - kp.beta*kp.e3_cm;								// Parallel component of the momentum in MeV / c [CM]
+		Double_t p_perp_cm = TMath::Sqrt( kp.e3_cm*kp.e3_cm - p_para_cm*p_para_cm - rp.m3*rp.m3 );	// Perpendicular component of the momentum in MeV / c [CM]
+
+		// Calculate the function to be minimised and its first derivative
+		Double_t fp = ( 2*p_perp_cm/( rp.q*rp.B ) )*TMath::Sin( rp.q*rp.B*z/( 2*kp.gamLAB_CM*( p_para_cm + kp.beta*kp.e3_cm ) ) ) - kp.rho;
+		Double_t fd = ( ( -2*p_para_cm )/( rp.q*rp.B*p_perp_cm ) )*TMath::Sin( rp.q*rp.B*z/( 2*kp.gamLAB_CM*( p_para_cm + kp.beta*kp.e3_cm ) ) ) - ( ( p_perp_cm*z )/( kp.gamLAB_CM*TMath::Power( p_para_cm + kp.beta*kp.e3_cm , 2 ) ) )*TMath::Cos( rp.q*rp.B*z/( 2*kp.gamLAB_CM*( p_para_cm + kp.beta*kp.e3_cm ) ) );
+
+		// Now perform Newton-Raphson calculation to get the angle in the CM frame
+		Int_t n = 0;
+		while ( TMath::Abs(fp) > 1e-5 && n < 100000){
+			p_para_cm = p_para_cm - fp/fd;
+			p_perp_cm = TMath::Sqrt( kp.e3_cm*kp.e3_cm - p_para_cm*p_para_cm - rp.m3*rp.m3 );
+
+			fp = ( 2*p_perp_cm/( rp.q*rp.B ) )*TMath::Sin( rp.q*rp.B*z/( 2*kp.gamLAB_CM*( p_para_cm + kp.beta*kp.e3_cm ) ) ) - kp.rho;
+			fd = ( ( -2*p_para_cm )/( rp.q*rp.B*p_perp_cm ) )*TMath::Sin( rp.q*rp.B*z/( 2*kp.gamLAB_CM*( p_para_cm + kp.beta*kp.e3_cm ) ) ) - ( ( p_perp_cm*z )/( kp.gamLAB_CM*TMath::Power( p_para_cm + kp.beta*kp.e3_cm , 2 ) ) )*TMath::Cos( rp.q*rp.B*z/( 2*kp.gamLAB_CM*( p_para_cm + kp.beta*kp.e3_cm ) ) );
+			n++;
+		}
+
+		// Function minimised - now calculate the final quantities
+		Double_t theta_cm = 180 - ( TMath::ACos( p_para_cm/kp.p3_cm )*180/TMath::Pi() );
+		Double_t e3 = kp.gamLAB_CM*( kp.e3_cm + kp.beta*p_para_cm );
+		Double_t p3 = TMath::Sqrt( e3*e3 - rp.m3*rp.m3 );
+		Double_t p_perp = p_perp_cm;
+		p_para = TMath::Sqrt( p3*p3 - p_perp*p_perp );
+		Double_t theta = TMath::ACos( kp.gamLAB_CM*( p_para_cm + kp.beta*kp.e3_cm )/p3 )*180/TMath::Pi();
+		THETA[i] = theta_cm;
+	}
+	
+	TGraph* g = new TGraph( num_e + 1, CHARGE, THETA );
+	TCanvas* c = new TCanvas("c","",1200,900);
+	g->SetTitle("z=-44.7375 cm, ex = 0 MeV, m4 fully stripped");
+	g->GetXaxis()->SetTitle("m1 charge (e)");
+	g->GetYaxis()->SetTitle("#theta_{cm}");
+	g->SetMarkerStyle(21);
+	g->Draw("ACP");
 
 }
 

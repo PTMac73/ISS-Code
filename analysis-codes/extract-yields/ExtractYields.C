@@ -179,14 +179,43 @@ void ExtractYieldsHist( TH1D* h, Int_t pos ){
 	tNSE->SetTextFont(132);
 	tNSE->Draw("SAME");
 	
+	TText* peak_label_gs[5];
+	TText* peak_label_ubd[4];
+	
 	// Number the peaks
-	TText* peak_labels[NUM_PEAKS];
+	TText* peak_labels[NUM_PEAKS][2];
 	for ( Int_t i = 0; i < NUM_PEAKS; i++ ){
-		peak_labels[i] = new TText(peaks[i].mu + peak_label_pos_offset[i][0], peaks[i].amp + peak_label_pos_offset[i][1], peak_label[i] );
-		peak_labels[i]->SetTextAlign(22);
-		peak_labels[i]->SetTextFont(132);
-		peak_labels[i]->SetTextSize(0.03);
-		peak_labels[i]->Draw("SAME");
+		if ( i == 0 ){
+			for ( Int_t j = 0; j < 5; j++ ){
+				peak_label_gs[j] = new TText(peaks[i].mu + peak_label_pos_offset[i][0], peaks[i].amp + peak_label_pos_offset[i][1] + 10*(4-j), peak_label_gs_str[j] );
+				peak_label_gs[j]->SetTextAlign(22);
+				peak_label_gs[j]->SetTextFont(132);
+				peak_label_gs[j]->SetTextSize(0.03);
+				peak_label_gs[j]->Draw("SAME");
+			}
+		}
+		else if ( i == 7 ){
+			for ( Int_t j = 0; j < 4; j++ ){
+				peak_label_ubd[j] = new TText(peaks[i].mu + peak_label_pos_offset[i][0], peaks[i].amp + peak_label_pos_offset[i][1] + 10*(3-j), peak_label_ubd_str[j] );
+				peak_label_ubd[j]->SetTextAlign(22);
+				peak_label_ubd[j]->SetTextFont(132);
+				peak_label_ubd[j]->SetTextSize(0.03);
+				peak_label_ubd[j]->Draw("SAME");
+			}
+		}
+		else if ( i == 8 ){
+			// Do nothing
+		}
+		else{
+			for ( Int_t j = 0; j < 2; j++ ){
+				peak_labels[i][j] = new TText(peaks[i].mu + peak_label_pos_offset[i][0], peaks[i].amp + peak_label_pos_offset[i][1] + 10*(1-j), peak_label[i][j] );
+				peak_labels[i][j]->SetTextAlign(22);
+				peak_labels[i][j]->SetTextFont(132);
+				peak_labels[i][j]->SetTextSize(0.03);
+				peak_labels[i][j]->Draw("SAME");
+			}
+		}
+		
 		
 	}
 	
@@ -197,8 +226,8 @@ void ExtractYieldsHist( TH1D* h, Int_t pos ){
 	c_spec->Modified(); c_spec->Update();
 
 	// Print the spectrum
+	c_spec->Print( GenerateFileName( pdf, pos ) );
 	c_spec->Print( GenerateFileName( tex, pos ) );
-		
 	
 	// Append new line and close the file
 	out_file.close();

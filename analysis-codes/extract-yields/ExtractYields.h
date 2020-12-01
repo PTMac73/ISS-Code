@@ -134,9 +134,9 @@ TString peak_label_gs_str[5] = {
 };
 
 TString peak_label_ubd_str[4] = {
-	"3922",
+	"3929",
 	"+",
-	"4053",
+	"4068",
 	"l=1",
 };
 

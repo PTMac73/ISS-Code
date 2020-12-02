@@ -1,27 +1,43 @@
 # ISS-Code
 Code used to analyse data from the [ISOLDE Solenoidal Spectrometer](https://isolde-solenoidal-spectrometer.web.cern.ch/). A number of different codes used here:
 
-### AlphaCalibration
+
+##analysis-codes
+#### AlphaCalibration
 Performs an alpha calibration on the data that you feed in. Used a quadruple alpha source, so selects for those peaks (pre-defined positions as working with a small data set), and then fits a series of Gaussian peaks for extracting centroids and doing an energy calibration.
 
-### Doublet
+#### Doublet
+Numerically tries to fit a doublet with two distributions defined by two scaling factors.
 
-### ELUMSolidAngle
+#### ELUMSolidAngle
+Simulation to calculate the ELUM solid angle by modelling trajectories for a range of CM angles.
 
-### ELUMYield
+#### ELUMYield
+Extracts yields from the ELUM data by fitting a Gaussian peak on a quadratic background.
 
-### Plotter
+#### Plotter
+\[OLD\] Plots quantities using custom formulae applied to a TTree. Superceded by analyse-tree.
 
-### analyse-tree
+#### analyse-tree
+Runs a TSelector code through the TTree that encodes the ISS data, and selects and plots the elements that I want.
 
-### array-geometry
+#### array-geometry
+Simulates ejectile and residual nucleus trajectories within ISS.
 
-### cm-angle-calculator
+#### cm-angle-calculator
+Calculates the centre-of-mass angles within ISS for a given reaction.
 
-### energy-calibration
+#### energy-calibration
+Takes a number of data points and fits a straight line through them for the energy calibration.
 
-### fit-background-yields
+#### extract-yields
+Fits the excitation spectrum with a series of fitted Gaussians.
 
-### super-unbound-fit
+#### fit-background-yields
+\[OLD\] Fits the background using a TTree.
 
-### unbound-doublet-fit
+#### super-unbound-fit
+\[OLD\] Specifically fits 3 very unbound states. Superceded by extract-yields.
+
+#### unbound-doublet-fit
+\[OLD\] Specifically fits an unbound doublet. Superceded by extract-yields.

@@ -20,13 +20,12 @@
 // CONSTANTS
 // Location of ROOT files
 TString root_file_dir = "pos%i_ex_corr.root";
-TString print_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-codes/extract-yields";
+TString print_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-codes/extract-yields/print";
 
 // Things that probably won't change
 const Int_t BG_DIM = 0; 		// (0 = const, 1 = linear etc.)
 
 // REGION-SPECIFIC QUANTITIES
-
 const Int_t NUM_PEAKS = 13;
 
 // Min/max energy for the region
@@ -44,14 +43,14 @@ Double_t E_LIMITS[2] = {
 	2.49990,
 	2.87000,
 	3.18000,
-	
+
 	3.854334927,
 	3.989180979,
 	4.309017061,
-	
+
 	5.570797291,
 	5.759762758,
-	5.989528736 
+	5.989528736
 };*/
 const Double_t peak_energies[NUM_PEAKS] = {
 	0.00000,
@@ -61,14 +60,14 @@ const Double_t peak_energies[NUM_PEAKS] = {
 	2.49990,
 	2.87000,
 	3.18000,
-	
-	3.905593396,
-	4.044671377,
-	4.355921221,
-	
+
+	3.90,
+	4.04,
+	4.4,
+
 	5.629749246,
 	5.825187047,
-	6.056059684 
+	6.056059684
 };
 /*const Double_t peak_energies[NUM_PEAKS] = {
 	0.00000,
@@ -97,11 +96,11 @@ Int_t peak_colours[NUM_PEAKS] = {
 	kRed,
 	kRed,
 	kRed,
-	
+
 	kBlue,
 	kBlue,
 	kBlue,
-	
+
 	kCyan,
 	kCyan,
 	kCyan
@@ -115,11 +114,11 @@ Double_t peak_label_pos_offset[NUM_PEAKS][2] = {
 	{ 0.00, 26.0 },
 	{ 0.00, 22.0 },
 	{ 0.00, 25.0 },
-	
+
 	{ 0.00, 18.0 },
 	{ 0.00, 20.0 },
 	{ 0.00, 20.0 },
-	
+
 	{ 0.00, 25.0 },
 	{ 0.00, 25.0 },
 	{ 0.00, 15.0 }
@@ -158,24 +157,25 @@ TString peak_label[NUM_PEAKS][2] = {
 
 
 // REGION BOOLEANS
-Bool_t fix_widths[NUM_PEAKS] = { 
+Bool_t fix_widths[NUM_PEAKS] = {
 	0,1,1,1,1,1,1,
 	0,0,0,
-	1,1,1 
+	1,1,1
 };
 Bool_t fix_positions[NUM_PEAKS] = {
 	0,0,0,0,0,0,0,
-	1,1,1,
-	1,1,1
+	0,0,0,
+	0,0,0
 };
 
 // UNBOUND DOUBLET PARAMETERS
-const Int_t FIRST_PEAK_J = 1;	// 1 or 3 for unbound doublet
+const Int_t FIRST_PEAK_J = 3;	// 1 or 3 for unbound doublet
 const Double_t MAX_SF_WIDTH = 0.210;	// 210 keV max width due to sf
 const Double_t sf_estimates[3] = {		// Estimates for current strength already in other peaks
-	// 3/2- --> 0.364, 1/2- --> 0.809
-	( FIRST_PEAK_J == 1 ? 0.809 : 0.364 ),	// SF of the first peak
-	( FIRST_PEAK_J != 1 ? 0.809 : 0.364 ),	// SF of the second peak
+	// 3/2- --> 0.364, 1/2- --> 0.809 [OLD]
+	// 3/2- --> 0.650, 1/2- --> 0.827
+	( FIRST_PEAK_J == 1 ? 0.827 : 0.650 ),	// SF of the first peak
+	( FIRST_PEAK_J != 1 ? 0.827 : 0.650 ),	// SF of the second peak
 	1.00	// SF of the third peak
 };
 
@@ -244,12 +244,12 @@ TString GenerateFileName( FileType_t ft, Int_t pos, Int_t c_type = 0 ){
 	// Define prefix if necessary
 	TString prefix = "";
 	if ( c_type == 1 ){ prefix = "pre_"; }
-	
+
 	// Define string relative to root file directory
 	TString a = root_file_dir( 0, root_file_dir.First('.') );
-	return Form( "%s/%s_%s%s.%s", 
-		print_dir.Data(), 
-		Form( a, pos ), 
+	return Form( "%s/%s_%s%s.%s",
+		print_dir.Data(),
+		Form( a, pos ),
 		prefix.Data(),
 		GenerateJString().Data(),
 		GenerateSuffix(ft).Data()

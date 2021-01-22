@@ -13,6 +13,7 @@
 #include <TH1.h>
 #include <TH2.h>
 #include <THStack.h>
+#include <TMath.h>
 #include <TPad.h>
 #include <TPaveText.h>
 #include <TProfile.h>
@@ -140,11 +141,11 @@ void SetCanvasTitleFont( TPad* pad ){
 
 // Create cherished spectra
 void CreateExSpectrum( TH1F*& h, TString name ){
-	h = new TH1F( name.Data(), name.Data(), 400, -0.5, 8 );
+	h = new TH1F( name.Data(), name.Data(), 425, -0.5, 8 );
 	h->SetTitle("");
 	h->GetXaxis()->SetTitle("E_{x} (MeV)");
-	h->GetYaxis()->SetTitle("Counts per 20 keV");	
-	h->SetLineColor(kRed);	
+	h->GetYaxis()->SetTitle("Counts per 20 keV");
+	h->SetLineColor(kRed);
 	GlobSetHistFonts( h );
 	return;
 }
@@ -155,8 +156,8 @@ void CreateExSpectrum( TH1F*& h, TString name, Double_t lb, Double_t ub ){
 	h = new TH1F( name.Data(), name.Data(), nbins, lb, ub );
 	h->SetTitle("");
 	h->GetXaxis()->SetTitle("Silicon excitation energy (MeV)");
-	h->GetYaxis()->SetTitle("Counts per 20 keV");	
-	h->SetLineColor(kRed);	
+	h->GetYaxis()->SetTitle("Counts per 20 keV");
+	h->SetLineColor(kRed);
 	GlobSetHistFonts( h );
 	return;
 }
@@ -164,7 +165,7 @@ void CreateExSpectrum( TH1F*& h, TString name, Double_t lb, Double_t ub ){
 void CreateCanvasFrame( TH1F*& h, TString xlabel, TString ylabel ){
 	h->SetTitle("");
 	h->GetXaxis()->SetTitle( xlabel.Data() );
-	h->GetYaxis()->SetTitle( ylabel.Data() );		
+	h->GetYaxis()->SetTitle( ylabel.Data() );
 	GlobSetHistFonts( h );
 	return;
 }
@@ -178,7 +179,7 @@ void GlobCreate2DHists( TH2F* h, TString x_label, TString y_label ){
 	h->GetYaxis()->SetTitle( y_label.Data() );
 	h->SetMarkerStyle(20);
 	h->SetMarkerSize(0.5);
-	h->SetMarkerColor(kRed);	
+	h->SetMarkerColor(kRed);
 	GlobSetHistFonts( h );
 	return;
 }
@@ -207,43 +208,46 @@ void GlobCreateProfile( TProfile* p, TString x_label, TString y_label ){
 Double_t GetMeanBinPosition( TH1F* h, Double_t lb, Double_t ub, Double_t &err ){
 	Double_t sum1 = 0;	// Weighted mean numerator
 	Double_t sum2 = 0;	// Weighted mean denominator
-	
+
 	Double_t sumXXN = 0;	// X = bin position, N = number of counts
 	Double_t sumXN = 0;
 	Double_t sumN = 0;
-	
+
 	Int_t bub = h->FindBin(ub);
 	Int_t blb = h->FindBin(lb);
-	
+
 	Int_t num_bins = bub - blb;
 	Double_t w = h->GetBinWidth( blb );
-	
+
 	for ( Int_t i = 0; i < num_bins; i++ ){
 		sum1 += h->GetBinContent( i + blb )*h->GetBinCenter( i + blb );
 		sum2 += h->GetBinContent( i + blb );
-		
+
 		sumN += h->GetBinContent( i + blb );
 		sumXN += h->GetBinContent( i + blb )*h->GetBinCenter( i + blb );
 		sumXXN += h->GetBinContent( i + blb )*h->GetBinCenter( i + blb )*h->GetBinCenter( i + blb );
 	}
-	
+
 	err = sumXXN/( sumN*sumN ) - sumXN*sumXN/( sumN*sumN*sumN ) + w*w/4.0;
-	
+
 	std::cout << sum1 << "\t" << sum2 << "\t" << sumN << "\t" << sumXN << "\t" << sumXXN << "\t" << w << "\t" << num_bins << "\t" << err << "\n";
-	
+
 	return sum1/sum2;
 }
 
 
 
 TString SideString( Int_t det ){
-	if ( det >=  0 && det <=  5 ){ return "left"; }	
+	if ( det >=  0 && det <=  5 ){ return "left"; }
 	else if ( det >=  6 && det <= 11 ){ return "bottom"; }
 	else if ( det >= 12 && det <= 17 ){ return "right"; }
 	else if ( det >= 18 && det <= 23 ){ return "top"; }
 	else{ return ""; }
 }
 
+Double_t GetFWHM(Double_t sig){
+	return 2*TMath::Sqrt(2*TMath::Log(2))*sig;
+}
 
 
 

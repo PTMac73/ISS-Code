@@ -42,7 +42,7 @@ Double_t MaxRadius( Double_t v3, Double_t theta_cm, Double_t cyc_freq ){
 
 Double_t FWHMToSigma(){ return 1.0/( 2*TMath::Sqrt(2*TMath::Log(2.0) ) ); }
 
-Double_t GetTargetRDTDistance( ){
+Double_t GetTargetRDTDistance(){
 	//     ( Target-Recoil [Edith]         )     + ( New enc - old enc ) in cm
 	return ( 168.3 + 419.5 - 32.225 - 9.10 )*0.1 + ( 71201 - (-101708) )*0.0005;
 }
@@ -50,7 +50,7 @@ Double_t GetTargetRDTDistance( ){
 /*Double_t GetArrayRDTDistance( Int_t POS ){
 	//       ( Array-Target [Edith]          ) + ( Target-Recoil [Edith]         ) - Si  - centroid - ( offset )
 	//return ( ( 40.53 + 1713.4 - 717.5 + 0.75 ) + ( 168.3 + 419.5 - 32.225 - 9.10 ) - 25 - 66.76 - ( POS == 1 ? 94.98 : 65.0 ) )*0.1;
-	
+
 	//       ( Array-Target [Edith]          ) + ( Target-Recoil [Edith]         ) - Si  - centroid - ( offset )
 	return ( ( 40.53 + 1713.4 - 717.5 + 0.75 ) + ( 168.3 + 419.5 - 32.225 - 9.10 ) - 25 - 66.76 - ( POS == 1 ? 94.98 : 65.0 ) )*0.1;
 }*/

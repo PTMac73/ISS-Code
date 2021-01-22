@@ -63,7 +63,7 @@ TF1* EstimatePeakParameters( TH1D* h, FitPeakOptions_t &opt, Int_t**& var_type_a
 			var_type_arr[i][k] = -1;
 		}
 	}
-	
+
 	// Generate the fit
 	TString fit_str = GetFitString( opt.num_peaks, BG_DIM, var_type_arr, opt.fix_widths );
 	TF1* fit_func = new TF1( fit_name.Data(), fit_str, lb, ub );
@@ -72,10 +72,10 @@ TF1* EstimatePeakParameters( TH1D* h, FitPeakOptions_t &opt, Int_t**& var_type_a
 
 	// Loop over number of peaks + 1 (i)
 	for ( Int_t i = 0; i < opt.num_peaks + 1; i++ ){
-	
+
 		// Loop over number of parameters (j)
 		for ( Int_t j = 0; j < 3; j++ ){
-		
+
 			// Backgrounds
 			if ( i == 0 && var_type_arr[i][j] >= 0 ){
 				fit_func->SetParameter( var_type_arr[i][j], 0.01 );
@@ -83,14 +83,14 @@ TF1* EstimatePeakParameters( TH1D* h, FitPeakOptions_t &opt, Int_t**& var_type_a
 				//fit_func->FixParameter( var_type_arr[i][j], 4.80189 ); // unbound doublet
 				//fit_func->FixParameter( var_type_arr[i][j], 4.7508 ); // super unbound doublet
 			}
-			
+
 			// Amplitudes
 			else if ( i > 0 && j == 0 ){
 				amp_est = GetAmpEstimate( h, opt.pe[i - 1] - 0.5*PEAK_WIDTH_ESTIMATE, opt.pe[i - 1] + 0.5*PEAK_WIDTH_ESTIMATE );
 				fit_func->SetParameter( var_type_arr[i][j], amp_est );
 				fit_func->SetParLimits( var_type_arr[i][j], 0.0*amp_est, 1.2*amp_est );
 			}
-			
+
 			// Mus
 			else if ( i > 0 && j == 1 ){
 				if ( opt.fix_positions[i - 1] == 1 ){
@@ -101,27 +101,27 @@ TF1* EstimatePeakParameters( TH1D* h, FitPeakOptions_t &opt, Int_t**& var_type_a
 					fit_func->SetParLimits( var_type_arr[i][j], opt.pe[i - 1] - PEAK_WIDTH_ESTIMATE, opt.pe[i - 1] + PEAK_WIDTH_ESTIMATE );
 				}
 			}
-			
+
 			// Sigmas
 			else if ( i > 0 && j == 2 ){
-			
+
 				// Ensure the fixed width has not already been set
 				// Fixed-width peaks:
 				if ( var_type_arr[i][j] > var_type_arr[i][j-1] && opt.fix_widths[i - 1] == 1 ){
 					fit_func->SetParameter( var_type_arr[i][j], opt.sig_est );
 					fit_func->SetParLimits( var_type_arr[i][j], opt.sig_est, opt.sig_est + 5*opt.sig_range );
 				}
-				
+
 				// Variable-width peaks
 				else if ( var_type_arr[i][j] > var_type_arr[i][j-1] && opt.fix_widths[i - 1] == 0 ){
 					fit_func->SetParameter( var_type_arr[i][j], opt.sig_est );
 					fit_func->SetParLimits( var_type_arr[i][j], opt.sig_est, CalculatePeakUpperWidth( i - 1, opt.sig_est ) );
 				}
-					
+
 			}
-			
+
 		}
-		
+
 	}
 	return fit_func;
 }
@@ -134,7 +134,7 @@ void PrintFF( TF1* fit_func, Int_t** vta, Int_t num_peaks, std::ostream& f = std
 	TString bl = "-";
 	Double_t lb = 0;
 	Double_t ub = 0;
-	
+
 	// Print header
 	f << "\n>>> Fitting function parameters <<<\n";
 	std::cout << "FORMULA: " << fit_func->GetExpFormula() << "\n";
@@ -142,35 +142,35 @@ void PrintFF( TF1* fit_func, Int_t** vta, Int_t num_peaks, std::ostream& f = std
 		<< std::setw(w) << "AMP" << sp << std::setw(w) << "[lb]" << sp << std::setw(w) << "[ub]" << sp
 		<< std::setw(w) << "MU"  << sp << std::setw(w) << "[lb]" << sp << std::setw(w) << "[ub]" << sp
 		<< std::setw(w) << "SIG"  << sp << std::setw(w) << "[lb]" << sp << std::setw(w) << "[ub]" << sp << "\n";
-	
+
 	for ( Int_t i = 0; i < num_peaks + 1; i++ ){
 		// Print first column
 		f << std::setw(w) << std::right << ( i == 0 ? "BG :" : Form( "P%i :", i-1 ) ) << std::left << sp;
-	
+
 		// Print other columns
 		for ( Int_t j = 0; j < 3; j++ ){
 			// Get parameter limits
 			fit_func->GetParLimits( vta[i][j], lb, ub );
-			
+
 			// Print the section
 			if ( vta[i][j] != -1 ){
 				f << std::setprecision(prec) << std::setw(w) << fit_func->GetParameter( vta[i][j] ) << sp
 					<< std::setprecision(prec) << std::setw(w) << lb << sp
 					<< std::setprecision(prec) << std::setw(w) << ub << sp;
 			}
-			else{ 
+			else{
 				f << std::setprecision(prec) << std::setw(w) << bl << sp
 					<< std::setprecision(prec) << std::setw(w) << bl << sp
 					<< std::setprecision(prec) << std::setw(w) << bl << sp;
 			}
 		}
-		
+
 		// Finish the line
 		f << "\n";
-		
+
 	}
 	f << "\n";
-	
+
 	return;
 }
 

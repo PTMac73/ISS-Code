@@ -29,7 +29,8 @@ const Int_t C_WIDTH = 1200;
 const Int_t C_HEIGHT = 900;
 
 // Directories
-TString print_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/Mg-Analysis/SPE-Files";
+//TString print_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/Mg-Analysis/SPE-Files";
+TString print_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-codes/extract-yields/print";
 //TString cut_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/working/ALL-MgCuts3.root";
 TString cut_dir = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-codes/analyse-tree/mg_cuts.root";
 TString cut_dir_new = "/home/ptmac/Documents/07-CERN-ISS-Mg/analysis/analysis-codes/analyse-tree/cuttlefish.root";
@@ -45,7 +46,7 @@ const Int_t DET_NUMBER = -1;
 const Int_t ROW_NUMBER = -1;
 
 // Array position - can only be one or two
-const Int_t ARR_POSITION = 2;
+const Int_t ARR_POSITION = 1;
 
 // Select angle cuts
 const Double_t THETA_MIN = 11.0;//19.21; //16.6278;
@@ -54,10 +55,10 @@ const Double_t THETA_UB = 20.0;
 
 // PRINT OPTIONS
 const Bool_t DISPLAY_CANVAS = 0;
-const Bool_t PRINT_PDF = 1;
+const Bool_t PRINT_PDF = 0;
 const Bool_t PRINT_PNG = 0;
-const Bool_t PRINT_TEX = 1;
-const Bool_t PRINT_ROOT = 1;
+const Bool_t PRINT_TEX = 0;
+const Bool_t PRINT_ROOT = 0;
 const Bool_t CANVAS_COMBINE = 0;
 
 // Cut creator
@@ -75,7 +76,7 @@ const Bool_t DRAW_NEW_CUTS = 0;
 const Bool_t  SW_EX_COMPARE[3] = { 0, 1, 0 };
 const Bool_t    SW_RDT_CUTS[3] = { 0, 1, 0 };
 const Bool_t      SW_EVZ_SI[3] = { 0, 0, 0 };
-const Bool_t          SW_EX[3] = { 1, 1, 0 };
+const Bool_t          SW_EX[3] = { 1, 1, 1 };
 const Bool_t       SW_EX_SI[3] = { 0, 1, 0 };
 const Bool_t SW_EVZ_COMPARE[3] = { 0, 1, 0 };
 const Bool_t         SW_EVZ[3] = { 0, 1, 0 };
@@ -333,7 +334,7 @@ Double_t rawE_pos[24][4] = {
 	{ 0775.0,  1275.0, 1360.0, 1440.0 }, // 21
 	{ 0925.0,  1500.0, 1600.0, 1700.0 }, // 22
 	{ 0760.0,  1240.0, 1310.0, 1390.0 }  // 23
-	
+
 };
 Float_t XCAL_cuts[24][2] = {
 	{ 0.01, 0.96 }, // 00
@@ -418,10 +419,10 @@ Int_t TD_rdt_e_cuts[24][2] = {
 
 
 Float_t thetaCM_singles_cuts[6][2][2] = {
-	{ { 11.0, 14.5 }, { 11.0, 90.0 } }, 
-	{ { 11.0, 17.0 }, { 11.0, 90.0 } }, 
-	{ { 12.0, 19.0 }, { 14.0, 90.0 } }, 
-	{ { 12.5, 20.0 }, { 16.5, 24.0 } }, 
+	{ { 11.0, 14.5 }, { 11.0, 90.0 } },
+	{ { 11.0, 17.0 }, { 11.0, 90.0 } },
+	{ { 12.0, 19.0 }, { 14.0, 90.0 } },
+	{ { 12.5, 20.0 }, { 16.5, 24.0 } },
 	{ { 18.5, 23.0 }, { 19.0, 25.0 } },
 	{ { 20.5, 24.5 }, { 21.0, 26.0 } }
 };

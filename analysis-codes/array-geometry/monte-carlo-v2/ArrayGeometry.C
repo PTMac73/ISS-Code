@@ -36,8 +36,8 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	const Int_t MOD_SIDE_TRAJECTORIES = (Int_t)( NUM_SIDE_ANGLE_INCREMENT/theta_spacing );
 	const Int_t NUM_THETA_GRAPHS = (Int_t)TMath::Ceil( NUM_THETA/MOD_SIDE_TRAJECTORIES );
 	Int_t side_traj_ctr = 0;
-	
-	
+
+
 	if ( THETA_HEAD < theta_lb || THETA_HEAD > theta_ub ){
 		std::cout << "Trajectories will not plot as " << THETA_HEAD << " is not within sampled angles!" << "\n";
 	}
@@ -59,7 +59,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	Double_t* y4 = new Double_t[NUM_ZR];
 	Double_t* z4 = new Double_t[NUM_ZR];
 	Double_t* r4 = new Double_t[NUM_ZR];
-	
+
 	// Interpolating gradients and intercepts
 	Double_t mx = 0.0;
 	Double_t my = 0.0;
@@ -71,7 +71,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 
 	// Store the fraction of theta where there is a proton-recoil coincidence [theta]
 	Double_t* theta_frac_proton_recoil = new Double_t[NUM_THETA];
-	
+
 	// Store solid angles [theta value][type: 1 = hit, 2 = hit array, miss detector, 3 = clip edge of array]
 	Double_t** d_phi = new Double_t*[NUM_THETA];
 	for ( Int_t i = 0; i < NUM_THETA; i++ ){
@@ -81,14 +81,36 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	// Solid angle pointer
 	Double_t solid_angle[NUM_THETA];
 
+	// Status indicators: 0 = fail, 1 = success, 2 = questionable
+	Int_t status_ejectile = 0;
+	Int_t status_recoil = 0;
+	Int_t success_green = (Int_t)kGreen;
+	Int_t fail_red = (Int_t)kRed;
+
 	// Open log file
 	std::ofstream log_file;
 	log_file.open( Form( "output-data/EX_%s-POS_%i.dat", DecimalDotToUnderscore( ex ).Data(), POSITION ), std::ofstream::out );
-	
+
 	// Check file is open
 	if ( !log_file.is_open() ){
 		std::cout << "LOG FILE FAILED TO OPEN!\n";
 		std::exit(1);
+	}
+
+	// Open file to record successful angles
+	std::ofstream angle_status_file;
+	angle_status_file.open( Form( "output-data/EX_%s-POS_%i_angle_status.dat", DecimalDotToUnderscore( ex ).Data(), POSITION ), std::ofstream::out );
+
+	// Check file is open
+	if ( !angle_status_file.is_open() ){
+		std::cout << "ANGLE STATUS FILE FAILED TO OPEN!\n";
+		std::exit(1);
+	}
+	else{
+		angle_status_file <<
+			"    \u03b8CM (\u00b0)" <<
+			"     EJECT." <<
+			"     RECOIL" << "\n";
 	}
 
 	// Percentage progress holder
@@ -106,7 +128,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	Double_t T_cm_3 = mass[3]*T_cm_f/( mass[2] + mass[3] );		// Final energy of ejectile in CM [MeV]
 	Double_t v3 = TMath::Sqrt( 2*T_cm_3/mass[2] );				// Final velocity of ejectile in CM [c]
 	Double_t v4 = -mass[2]*v3/mass[3];							// Final velocity of recoil in CM [c]
-	
+
 	// Declare doubles for angle-specific kinematic terms
 	Double_t T_lab_3, u3_para, u3_perp, theta_var, phi, beam_offset_r, beam_offset_theta;
 	Double_t v4_para, v4_perp;
@@ -117,7 +139,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 
 	// Calculate contributions to solid angle (roughly)
 	Double_t phi_cont = TMath::TwoPi()*1.0/NUM_EVENTS_PER_THETA;
-	
+
 
 
 
@@ -127,7 +149,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	for ( Int_t i = 0; i < NUM_THETA_GRAPHS; i++ ){ g_traj_ejectile_side[i] = NULL; }
 	TGraph *g_traj_ejectile_head[NUM_TRAJECTORIES];
 	for ( Int_t i = 0; i < NUM_TRAJECTORIES; i++ ){ g_traj_ejectile_head[i] = NULL; }
-	
+
 	Bool_t* b_ejectile_success = new Bool_t[NUM_TRAJECTORIES];
 	for ( Int_t i = 0; i < NUM_TRAJECTORIES; i++ ){
 		b_ejectile_success[i] = 0;
@@ -157,7 +179,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 		theta_var = 180 - theta_cm[i];									// The "proper" CM angle
 		T_lab_3 = T_cm_3 + 0.5*mass[2]*V_cm*V_cm + mass[2]*v3*V_cm*TMath::Cos( theta_var*TMath::DegToRad() );		// [MeV]
 		u3_para = v3*TMath::Cos( theta_var*TMath::DegToRad() ) + V_cm;												// LAB [c]
-		u3_perp = v3*TMath::Sin( theta_var*TMath::DegToRad() );		
+		u3_perp = v3*TMath::Sin( theta_var*TMath::DegToRad() );
 		if ( u3_para <= 0 ){											// LAB [c]
 			theta_lab[i] = TMath::ASin( u3_perp/TMath::Sqrt( u3_para*u3_para + u3_perp*u3_perp ) )*TMath::RadToDeg();	// [DEG]
 		}
@@ -185,7 +207,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 		// Initialise counters for how many successful hits there are
 		num_proton_hits[i] = 0;
 		theta_frac_proton_recoil[i] = 0.0;
-		
+
 
 		// LOOP OVER NUMBER OF EVENTS FOR A GIVEN THETA (j) ------------------------------------- //
 		for ( Int_t j = 0; j < NUM_EVENTS_PER_THETA + 1; j++ ){
@@ -202,10 +224,10 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 				beam_offset_r = rand_beam_offset_r.Gaus(0, BEAM_FWHM*FWHMToSigma() );
 				beam_offset_theta = rand_beam_offset_theta.Uniform(0,180);
 			}			// This is initial phi angle
-			
+
 			phi_stop = 0;
-			
-			
+
+
 			// LOOP OVER Z (PROTONS) (k) ------------------------------------------------------- //
 			for ( Int_t k = 0; k < NUM_ZP; k++ ){
 				// Calculate x,y,z
@@ -218,7 +240,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 					}
 					x3[k] = u3_perp*UC_CToMS()*UC_MToCM()*( TMath::Cos( phi*TMath::DegToRad() ) - TMath::Cos( phi*TMath::DegToRad() + cyclotron_freq*z3[k]/( u3_para*UC_CToMS()*UC_MToCM() ) ) )/cyclotron_freq + beam_offset_r*TMath::Cos( beam_offset_theta*TMath::DegToRad() ) + BEAM_SPOT_OFF_X;
 					y3[k] = u3_perp*UC_CToMS()*UC_MToCM()*( -TMath::Sin( phi*TMath::DegToRad() ) + TMath::Sin( phi*TMath::DegToRad() + cyclotron_freq*z3[k]/( u3_para*UC_CToMS()*UC_MToCM() ) ) )/cyclotron_freq + beam_offset_r*TMath::Sin( beam_offset_theta*TMath::DegToRad() ) + BEAM_SPOT_OFF_Y;
-					
+
 					// Check if trajectory passed through the array
 					if ( k == 0 ){
 						if ( TMath::Abs( x3[k] ) > ARR_IN_DIAM/2 || TMath::Abs( y3[k] ) > ARR_IN_DIAM/2 ){
@@ -232,7 +254,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 							STARTS_IN_VALID_SPOT = 0;
 						}
 						else{
-							if ( j > 0 ){ 
+							if ( j > 0 ){
 								h_phi_dist->Fill(phi);
 								h_beam_width->Fill( x3[k],y3[k] );
 							}
@@ -250,25 +272,25 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 					// Define bools to say it's hit the array, and define success and failure -- interpolate lines
 					x_success = 0;	y_success = 0;
 					x_failure = 0;	y_failure = 0;
-					
+
 					// Find when it is in the array
 					if ( TMath::Abs( x3[k] ) <= ARR_DIAM/2 && TMath::Abs( y3[k] ) <= ARR_DIAM/2 && ( TMath::Abs( x3[k-1] ) > ARR_DIAM/2 || TMath::Abs( y3[k-1] ) > ARR_DIAM/2 ) ){
 						// Now find interpolation parameters for x and y lines
 						GetInterpolation( x3[k-1], y3[k-1], x3[k], y3[k], mx, cx );
 						GetInterpolation( y3[k-1], x3[k-1], y3[k], x3[k], my, cy );
-						
+
 						// Define temporary x's and y's along boundaries
 						Double_t tempy = mx*TMath::Sign( ARR_DIAM/2, x3[k-1] ) + cx;
 						Double_t tempx = my*TMath::Sign( ARR_DIAM/2, y3[k-1] ) + cy;
-						
+
 						// Test whether points lie on a straight line in order
 						Bool_t x_straight = ( ( tempx - x3[k-1] > 0 && x3[k] - tempx > 0 ) || ( tempx - x3[k-1] < 0 && x3[k] - tempx < 0 ) );
 						Bool_t y_straight = ( ( tempy - y3[k-1] > 0 && y3[k] - tempy > 0 ) || ( tempy - y3[k-1] < 0 && y3[k] - tempy < 0 ) );
-						
+
 						// Test whether the point lies on an edge
 						Bool_t x_on_edge = ( TMath::Abs( tempx ) <= ARR_DIAM/2 );
 						Bool_t y_on_edge = ( TMath::Abs( tempy ) <= ARR_DIAM/2 );
-						
+
 						if ( x_straight && x_on_edge ){
 							if ( TMath::Abs( tempx ) < SI_HEIGHT/2 ){
 								x_success = 1;
@@ -296,13 +318,13 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 						else{
 							std::cout << std::setprecision(6) << x3[k-1] << "    " << tempx << "    " << x3[k] << "    " << y3[k-1] << "    " << tempy << "    " << y3[k] << "\n";
 						}
-						
+
 					}
-					
+
 					// Define z failure - z fails if on 4 jaws
 					z_failure = ( z3[k] >= z_fj - 0.5*z_spacing - SLIT_LENGTH && TMath::Abs( x3[k] ) <= ARR_DIAM/2 && TMath::Abs( y3[k] ) <= ARR_DIAM/2 );
-					
-					
+
+
 					/*
 					if ( k > 0 && TMath::Abs( x3[k-1] ) > ARR_DIAM/2 && TMath::Abs( x3[k] ) <= ARR_DIAM/2 && TMath::Abs( y3[k-1] ) <= ARR_DIAM/2 ){
 						// X is within array -- calculate gradient and intercept
@@ -321,22 +343,22 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 						y_failure = ( TMath::Abs( x3[k] ) >= SI_HEIGHT/2 );
 					}
 					*/
-					
-					
-					
-					
-	
-				    
+
+
+
+
+
+
 					/*x_success2 = ( TMath::Abs( x3[k] ) <= ARR_DIAM/2 && TMath::Abs( y3[k] ) < SI_HEIGHT/2 );
 					y_success2 = ( TMath::Abs( y3[k] ) <= ARR_DIAM/2 && TMath::Abs( x3[k] ) < SI_HEIGHT/2 );
 					x_failure2 = ( TMath::Abs( x3[k] ) <= ARR_DIAM/2 && TMath::Abs( y3[k] ) > SI_HEIGHT/2 && TMath::Abs( y3[k] ) <= ARR_DIAM/2 );
 					y_failure2 = ( TMath::Abs( y3[k] ) <= ARR_DIAM/2 && TMath::Abs( x3[k] ) > SI_HEIGHT/2 && TMath::Abs( x3[k] ) <= ARR_DIAM/2 );*/
-					
-					
+
+
 					// It hits the array
 					if ( x_success || y_success ){
 						phi_stop = 1;
-						
+
 						// See if z fails
 						if ( z_failure ){
 							traj_colour[j] = (Int_t)kBlue;
@@ -348,7 +370,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 								z_strip[a] = ( z3[k] >= -Si_centroids[POSITION][a] - SI_WIDTH/2 && z3[k] <= -Si_centroids[POSITION][a] + SI_WIDTH/2 );
 								on_z_strip = on_z_strip || z_strip[a];
 							}
-							
+
 							// Test to see if it lands on a strip
 							if ( on_z_strip ){
 								traj_colour[j] = (Int_t)kGreen;
@@ -362,33 +384,33 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 								traj_colour[j] = (Int_t)kRed;
 							}
 						}
-						
+
 					}
 					// It hits the array, but not on a strip
 					else if ( x_failure || y_failure ){
 						phi_stop = 1;
 						traj_colour[j] = (Int_t)kRed;
-						if ( j > 0 ){ 
+						if ( j > 0 ){
 							d_phi[i][1] += phi_cont;
 						}
 					}
 					else if ( z_failure ){
 						phi_stop = 1;
 						traj_colour[j] = (Int_t)kBlue;
-						if ( j > 0 ){ 
+						if ( j > 0 ){
 							d_phi[i][2] += phi_cont;
 						}
-						
+
 					}
 
 				}
-				
+
 				//std::cout << "\n" << NUM_ZP << "--" << i << "--" << j << "--" << k << "\n";
 				//log_file << i << "--" << j << "--" << k << "\n";
-				
+
 
 			}	// Loop over z (protons) (k)
-			
+
 			//std::cout << "\n" << i << "--" << j << "\n";
 			//log_file << i << "--" << j << "\n";
 
@@ -407,7 +429,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 				y4[l] = (-1.0)*( v4_perp*UC_CToMS()*UC_MToCM()*( -TMath::Sin( phi*TMath::DegToRad() ) + TMath::Sin( phi*TMath::DegToRad() + cyclotron_freq_recoil*z4[l]/( v4_para*UC_CToMS()*UC_MToCM() ) ) )/cyclotron_freq_recoil + beam_offset_r*TMath::Sin( beam_offset_theta*TMath::DegToRad() ) + BEAM_SPOT_OFF_Y );
 				r4[l] = TMath::Sqrt( x4[l]*x4[l] + y4[l]*y4[l] );
 			}	// Loop over z (recoils) (l)
-		
+
 
 			// CHECK TRAJECTORIES FOR VALIDITY AND PLOT GRAPHS --------------------------------- //
 			if ( STARTS_IN_VALID_SPOT == 1 ){
@@ -417,7 +439,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 					g_traj_ejectile_head[j - 1] = new TGraph( NUM_ZP, x3, y3 );
 					g_traj_ejectile_head[j - 1]->SetLineColorAlpha( traj_colour[j], 0.3 );
 					if ( traj_colour[j] == kGreen ){ b_ejectile_success[j-1] = 1; }
-					
+
 
 					//beam_start[j] = new TEllipse( x3[0], y3[0], 0.01);
 					//beam_start[j]->SetFillColor( traj_colour[j] );
@@ -427,7 +449,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 					g_traj_recoil_head[j - 1]->SetLineColor( kBlack );
 
 				}
-				
+
 				// Test how many recoils worked
 				Double_t rtemp = TMath::Sqrt( y4[NUM_ZR-1]*y4[NUM_ZR-1] + x4[NUM_ZR-1]*x4[NUM_ZR-1] );
 				if ( rtemp >= RDT_RADIUS_TO_CLEAR  && rtemp <= RDT_SI_OUTER_RAD + 0.5*TMath::Sqrt(2)*RDT_DETECTOR_GAP ){
@@ -436,14 +458,13 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 
 				// Draw trajectories in theta for a random phi
 				//if ( j == EVENT_NUMBER && i % TMath::Max( (Int_t)TMath::Floor( (Double_t)NUM_THETA/50.0 ), 1 ) == 0 ){
-				
+
 				if ( j == EVENT_NUMBER && i % MOD_SIDE_TRAJECTORIES == 0 ){
 					// Ejectiles
 					theta_graph[side_traj_ctr] = theta_cm[i];
 					g_traj_ejectile_side[ side_traj_ctr ] = new TGraph( NUM_ZP, z3, y3 );
 					g_traj_ejectile_side[ side_traj_ctr ]->SetLineColorAlpha( traj_colour[j], 0.3 );
 					g_traj_ejectile_side[ side_traj_ctr ]->SetLineWidth(1);
-
 
 					// recoils
 					g_traj_recoil_side[side_traj_ctr] = new TGraph( NUM_ZR, z4, r4 );
@@ -456,46 +477,69 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 					else{
 						g_traj_recoil_side[side_traj_ctr]->SetLineColor(kRed);
 					}
-					
-					
+
 					side_traj_ctr++;
+				}
+				// Status file CALCULATIONS
+				if ( j == EVENT_NUMBER ){
+					if( traj_colour[j] == success_green ){ status_ejectile = 1; }
+					else if( traj_colour[j] == fail_red ){ status_ejectile = 0; }
+					else{ status_ejectile = 2; }
+
+					if ( rtemp >= RDT_SI_INNER_RAD + 0.5*TMath::Sqrt(2)*RDT_DETECTOR_GAP && rtemp <= RDT_SI_OUTER_RAD + 0.5*TMath::Sqrt(2)*RDT_DETECTOR_GAP ){
+						status_recoil = 1;
+					}
+					else if ( rtemp >= RDT_PCB_INNER_RAD + 0.5*TMath::Sqrt(2)*RDT_DETECTOR_GAP && rtemp < RDT_SI_INNER_RAD + 0.5*TMath::Sqrt(2)*RDT_DETECTOR_GAP ){
+						status_recoil = 2;
+					}
+					else{
+						status_recoil = 0;
+					}
 				}
 			}
 			else{
 				j--;
 				continue;
 			}
-			
+
+
+
 		}	// Loop over events per theta (j)
-		
+
 
 		// Point to solid angle (for graphing purposes)
 		solid_angle[i] = d_phi[i][0];
 		// Print to file
 		if ( i == 0 && log_file.is_open() ){
 			log_file << theta_lb << "\u00b0 <= \u03b8 <= " << theta_ub << "\u00b0; \u03b8-SPACING = " << theta_spacing << "\u00b0; NUM EVENTS PER THETA = " << NUM_EVENTS_PER_THETA << "; z-SPACING = " << z_spacing << " cm\n";
-			log_file << 
-				"     THETA_CM(\u00b0)" << 
-				"    THETA_LAB(\u00b0)" << 
-				"     X_FINAL(cm)" << 
-				"     Y_FINAL(cm)" << 
-				"     Z_FINAL(cm)" << 
-				"        SA_1(sr)" << 
-				"        SA_2(sr)" << 
-				"        SA_3(sr)" << 
+			log_file <<
+				"     THETA_CM(\u00b0)" <<
+				"    THETA_LAB(\u00b0)" <<
+				"     X_FINAL(cm)" <<
+				"     Y_FINAL(cm)" <<
+				"     Z_FINAL(cm)" <<
+				"        SA_1(sr)" <<
+				"        SA_2(sr)" <<
+				"        SA_3(sr)" <<
 				"    THETA_RDT(%)\n";
 		}
-		
+
 		// Standard line to file
-		log_file << std::fixed << std::setw(log_width) << std::setprecision( TMath::Abs( TMath::Floor( TMath::Log10( theta_lb ) ) ) + TMath::Abs( TMath::Floor( TMath::Log10( theta_spacing ) ) ) + 1 ) << theta_cm[i] << 
-								  std::setw(log_width) << std::setprecision(log_prec) << theta_lab[i] << 
-								  std::setw(log_width) << std::setprecision(log_prec) << x3[NUM_ZP-1] << 
-								  std::setw(log_width) << std::setprecision(log_prec) << y3[NUM_ZP-1] << 
-								  std::setw(log_width) << std::setprecision(log_prec) << z3[NUM_ZP-1] << 
-								  std::setw(log_width) << std::setprecision(log_prec) << d_phi[i][0] << 
-								  std::setw(log_width) << std::setprecision(log_prec) << d_phi[i][1] << 
-								  std::setw(log_width) << std::setprecision(log_prec) << d_phi[i][2] << 
+		log_file << std::fixed << std::setw(log_width) << std::setprecision( TMath::Abs( TMath::Floor( TMath::Log10( theta_lb ) ) ) + TMath::Abs( TMath::Floor( TMath::Log10( theta_spacing ) ) ) + 1 ) << theta_cm[i] <<
+								  std::setw(log_width) << std::setprecision(log_prec) << theta_lab[i] <<
+								  std::setw(log_width) << std::setprecision(log_prec) << x3[NUM_ZP-1] <<
+								  std::setw(log_width) << std::setprecision(log_prec) << y3[NUM_ZP-1] <<
+								  std::setw(log_width) << std::setprecision(log_prec) << z3[NUM_ZP-1] <<
+								  std::setw(log_width) << std::setprecision(log_prec) << d_phi[i][0] <<
+								  std::setw(log_width) << std::setprecision(log_prec) << d_phi[i][1] <<
+								  std::setw(log_width) << std::setprecision(log_prec) << d_phi[i][2] <<
 								  std::setw(log_width) << std::setprecision(log_prec) << theta_frac_proton_recoil[i] << "\n";
+
+		// Write to status files
+		angle_status_file << std::fixed << std::setw(11) << std::setprecision(8) << theta_cm[i] <<
+										   std::setw(11) << std::setprecision(8) << status_ejectile <<
+										   std::setw(11) << std::setprecision(8) << status_recoil << "\n";
+
 
 		// Output percentage in terminal
 		prog = 100.0*(Double_t)i/(Double_t)NUM_THETA;
@@ -507,13 +551,13 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 		//std::cout << theta_cm[i] << "\t" << RDT_RADIUS_TO_CLEAR - TMath::Abs( v4_perp*UC_CToMS()*UC_MToCM()*TMath::Sqrt( 2.0*( 1.0 - TMath::Cos( cyclotron_freq_recoil*TARGET_RDT_DISTANCE/( v4_para*UC_CToMS()*UC_MToCM() ) ) ) )/cyclotron_freq_recoil ) << " cm\n";
 
 	}	// Loop over theta (i)
-	
-	
+
+
 
 	// CALCULATE THE AVERAGE SOLID ANGLE ------------------------------------------------------- //
 	Double_t solid_angle_mav[NUM_THETA];
 	Int_t half_window_size = 4; // Multiple by 2*i + 1 to get window width
-	
+
 	for ( Int_t i = 0; i < NUM_THETA; i++ ){
 		if ( i == half_window_size ){
 			Double_t sum = 0;
@@ -544,7 +588,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	CreateStyle( ptm_style );
 	ptm_style->cd();
 	TCanvas* c_traj_ejectile_side = new TCanvas( Form( "c_traj_ejectile_side_%s", DecimalDotToUnderscore( ex ).Data() ), "EJECTILE SIDE", CANVAS_WIDTH, CANVAS_HEIGHT );
-	
+
 	// Draw frame
 	TH1F* frame = c_traj_ejectile_side->DrawFrame( ej_side_X1, ej_side_Y1, ej_side_X2, ej_side_Y2 );
 	FormatFrame( frame, "z (cm)", "r (cm)" );
@@ -553,7 +597,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	TBox* b_target = new TBox( 0, -2, 0.5, 2 );
 	b_target->SetFillColor(kBlack);
 	b_target->Draw("SAME");
-	
+
 	// Draw Al bracket for array
 	TBox* b_al_bracket = new TBox( - Si_centroids[POSITION][5] + LAST_CENTROID_TO_PCB - PCB_LENGTH - 1, -ARR_DIAM/2, - Si_centroids[POSITION][5] + LAST_CENTROID_TO_PCB, ARR_DIAM/2 );
 	b_al_bracket->SetFillColor(kGray);
@@ -584,7 +628,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 			g_traj_ejectile_side[i]->Draw("SAME");
 		}
 	}
-	
+
 	if ( bFileOpen ){
 		outfile->cd(); c_traj_ejectile_side->Write();
 	}
@@ -626,11 +670,11 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	if ( bFileOpen ){
 		outfile->cd(); c_traj_ejectile_head->Write();
 	}
-	
+
 	std::cout << "Plotted ejectile_head" << "\n";
 	// DRAW THE PHI FRACTION ------------------------------------------------------------------- //
 	TCanvas* c_phi_frac = new TCanvas( Form( "c_phi_frac_%s", DecimalDotToUnderscore( ex ).Data() ), "PHI FRACTION", CANVAS_WIDTH, CANVAS_HEIGHT );
-	c_phi_frac->cd();	
+	c_phi_frac->cd();
 	ptm_style->cd();
 
 	TH1F* frame2 = c_phi_frac->DrawFrame( TMath::Max( 0.0, theta_lb - theta_spacing ), 0, theta_ub + theta_spacing, 6.4 );
@@ -638,7 +682,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 
 	TGraph* g_phi_frac = new TGraph( NUM_THETA, theta_cm, solid_angle );
 	TGraph* g_phi_frac_mav = new TGraph( NUM_THETA, theta_cm, solid_angle_mav );
-	
+
 	g_phi_frac->SetMarkerStyle(20);
 	g_phi_frac->SetMarkerSize(0.5);
 	g_phi_frac->Draw("LP");
@@ -654,7 +698,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	l_solid_angle->SetLineColor(kRed);
 	l_solid_angle->SetLineWidth(2);
 	l_solid_angle->Draw("SAME");
-	
+
 	if ( bFileOpen ){
 		outfile->cd(); c_phi_frac->Write();
 	}
@@ -684,7 +728,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	pad->SetRightMargin(0.13);
 	pad->SetBottomMargin(0.09);
 	pad->SetTopMargin(0.02);
-	
+
 	FormatFrame( h_beam_width, "x (cm)", "y (cm)" );
 	h_beam_width->Draw("colz");
 	h_beam_width->GetYaxis()->SetTitleOffset(1.3);
@@ -704,7 +748,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	if ( bFileOpen ){
 		outfile->cd(); c_rand_numbers->Write();
 	}
-	
+
 	std::cout << "Plotted rand_numbers" << "\n";
 
 	// RECOILS SIDE ON ------------------------------------------------------------------------- //
@@ -712,7 +756,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	CreateStyle( ptm_style );
 	ptm_style->cd();
 	TCanvas* c_traj_recoil_side = new TCanvas( Form( "c_traj_recoil_side_%s", DecimalDotToUnderscore( ex ).Data() ), "RECOIL SIDE", CANVAS_WIDTH, CANVAS_HEIGHT );
-	
+
 	// Draw frame
 	TH1F* frame_rec_side = c_traj_recoil_side->DrawFrame( rec_side_X1, rec_side_Y1, rec_side_X2, rec_side_Y2 );
 	FormatFrame( frame_rec_side, "z (cm)", "r (cm)" );
@@ -749,7 +793,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	if ( bFileOpen ){
 		outfile->cd(); c_traj_recoil_side->Write();
 	}
-	
+
 	std::cout << "Plotted recoil_side" << "\n";
 
 	// RECOILS HEAD ON ------------------------------------------------------------------------- //
@@ -768,7 +812,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 
 	for ( Int_t i = 0; i < 4; i++ ){
 		// Draw large PCBs
-		rdt_pcb[i] = new TEllipse( 
+		rdt_pcb[i] = new TEllipse(
 			0.5*RDT_DETECTOR_GAP*TMath::Cos( RDT_ROTATION*TMath::DegToRad() + 0.25*TMath::Pi()*( 1 + 2*i ) ), 	// X1
 			0.5*RDT_DETECTOR_GAP*TMath::Sin( RDT_ROTATION*TMath::DegToRad() + 0.25*TMath::Pi()*( 1 + 2*i ) ), 	// Y1
 			RDT_PCB_OUTER_RAD, 														// R1
@@ -779,8 +823,8 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 		rdt_pcb[i]->SetFillColor( pcb_green_i );
 		rdt_pcb[i]->SetLineWidth(0);
 		rdt_pcb[i]->Draw("SAME");
-		
-		
+
+
 
 		// Draw Si detectors
 		rdt_Si[i] = new TEllipse( 0.5*TMath::Sqrt(2)*RDT_DETECTOR_GAP*TMath::Cos( RDT_ROTATION*TMath::DegToRad() + 0.25*TMath::Pi()*( 1 + 2*i ) ), 0.5*TMath::Sqrt(2)*RDT_DETECTOR_GAP*TMath::Sin( RDT_ROTATION*TMath::DegToRad() + 0.25*TMath::Pi()*( 1 + 2*i ) ), RDT_SI_OUTER_RAD, RDT_SI_OUTER_RAD, i*90 + 0.8*( 90 - RDT_ANGULAR_COVERAGE ) + RDT_ROTATION, (i+1)*90 - 0.2*( 90 - RDT_ANGULAR_COVERAGE ) + RDT_ROTATION );
@@ -798,7 +842,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	rdt_hole->SetFillColor(kWhite);
 	rdt_hole->SetLineWidth(0);
 	rdt_hole->Draw("SAME");
-	
+
 	// Draw trajectories
 	for ( Int_t j = 0; j < NUM_TRAJECTORIES; j++ ){
 		if ( b_ejectile_success[j] == 1 ){
@@ -824,20 +868,20 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 				g_traj_recoil_head[j]->SetLineColorAlpha(kBlack,0.5);
 				std::cout << xtemp << "\t" << ytemp << "\t" << rtemp << "\t" << "\n";
 			}
-			
+
 			g_traj_recoil_head[j]->Draw("C SAME");
 		}
 	}
-	
+
 	if ( bFileOpen ){
 		outfile->cd(); c_traj_recoil_head->Write();
 	}
-	
+
 	std::cout << "Plotted recoil_head" << "\n";
 
 	// FRACTION OF THETA ACCEPTED ON RECOIL DETECTORS ------------------------------------------ //
 	TCanvas* c_recoil_theta_frac = new TCanvas( Form( "c_recoil_theta_frac_%s", DecimalDotToUnderscore( ex ).Data() ), "THETA FRACTION ON RDT", CANVAS_WIDTH, CANVAS_HEIGHT );
-	c_recoil_theta_frac->cd();	
+	c_recoil_theta_frac->cd();
 	ptm_style->cd();
 
 	TH1F* fr_recoil_theta_frac = c_recoil_theta_frac->DrawFrame( TMath::Max( 0.0, theta_lb - theta_spacing ), 0, theta_ub + theta_spacing, 105.0 );
@@ -850,11 +894,11 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	g_recoil_theta_frac->GetYaxis()->CenterTitle();
 	g_recoil_theta_frac->SetMarkerColor( kRed );
 	g_recoil_theta_frac->Draw("P");
-	
+
 	if ( bFileOpen ){
 		outfile->cd(); c_recoil_theta_frac->Write();
 	}
-	
+
 
 	// PRINT THE CANVASES AND FREE MEMORY------------------------------------------------------- //
 	PrintCanvas( c_traj_ejectile_side, Form( "output-data/EX_%s-POS_%i-traj_ejectile_side", DecimalDotToUnderscore( ex ).Data(), POSITION ) );
@@ -864,9 +908,10 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	PrintCanvas( c_traj_recoil_side,   Form( "output-data/EX_%s-POS_%i-traj_recoil_side",   DecimalDotToUnderscore( ex ).Data(), POSITION ) );
 	PrintCanvas( c_traj_recoil_head,   Form( "output-data/EX_%s-POS_%i-traj_recoil_head",   DecimalDotToUnderscore( ex ).Data(), POSITION ) );
 	PrintCanvas( c_recoil_theta_frac,  Form( "output-data/EX_%s-POS_%i-recoil_theta_frac",  DecimalDotToUnderscore( ex ).Data(), POSITION ) );
-	
+
 	// Close the files
 	log_file.close();
+	angle_status_file.close();
 
 
 	if ( !BATCH_MODE ){ gPad->WaitPrimitive("TPave"); }
@@ -887,7 +932,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	delete[] num_proton_hits;
 	delete[] theta_frac_proton_recoil;
 	delete[] d_phi;
-	
+
 	std::cout << "Deleted arrays ... \n";
 
 	// TCanvases
@@ -898,7 +943,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	if ( c_traj_recoil_side->IsOnHeap() ){ delete c_traj_recoil_side; }
 	if ( c_traj_recoil_head->IsOnHeap() ){ delete c_traj_recoil_head; }
 	if ( c_recoil_theta_frac->IsOnHeap() ){ delete c_recoil_theta_frac; }
-	
+
 	std::cout << "Deleted canvases ... \n";
 
 	// TBoxes
@@ -914,7 +959,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 		if ( b_si_headon[i]->IsOnHeap() ){ b_si_headon[i]->Delete(); }
 	}
 	if ( b_rec_target->IsOnHeap() ){ b_rec_target->Delete(); }
-	
+
 	std::cout << "Deleted boxes ... \n";
 
 	// TGraphs
@@ -928,11 +973,11 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	}
 	if ( g_phi_frac->IsOnHeap() ){ g_phi_frac->Delete(); }
 	if ( g_recoil_theta_frac->IsOnHeap() ){ g_recoil_theta_frac->Delete(); }
-	
+
 	std::cout << "Deleted graphs ... \n";
 
 	// TH's
-	
+
 	if ( h_beam_width->IsOnHeap() ){ h_beam_width->Delete(); }
 	if ( h_phi_dist->IsOnHeap() ){ h_phi_dist->Delete(); }
 	//if ( frame->IsOnHeap() ){ frame->Delete(); }
@@ -949,7 +994,7 @@ void ArrayGeometryEX( Double_t ex = EX, Double_t theta_lb = THETA_LB, Double_t t
 	for ( Int_t i = 0; i < 4; i++ ){
 		if ( border[i]->IsOnHeap() ){ border[i]->Delete(); }
 	}
-	
+
 	std::cout << "Deleted lines ... \n";
 
 	// TEllipses
@@ -982,10 +1027,10 @@ void ArrayGeometry(){
 		//4.28395
 		4.30000
 	};*/
-	
+
 	Double_t theta_lb_arr[NUM_STATES] = { 16.3, 17.0, 17.6, 18.0, 19.8 };
 	Double_t theta_ub_arr[NUM_STATES] = { 17.3, 18.0, 18.7, 19.0, 22.2 };
-	
+
 	Double_t STATES[NUM_STATES] = {
 		0.06,
 		1.45,
@@ -1008,7 +1053,7 @@ void ArrayGeometry(){
 	else{
 		ArrayGeometryEX( 0.000 );
 	}
-	
+
 	// Close the file
 	if ( outfile->IsOpen() ){ outfile->Close(); }
 
@@ -1022,22 +1067,3 @@ void ArrayGeometry(){
  * Save in ROOT files (in tree?) for ease of manipulation
  * Recoil solid angle stuff
 */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
